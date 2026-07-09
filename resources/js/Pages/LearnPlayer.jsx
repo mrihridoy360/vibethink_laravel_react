@@ -3,12 +3,17 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import VideoPlayer from '../Components/VideoPlayer';
+import Loader from '../Components/Loader';
+import Lottie from 'lottie-react';
+import comingSoonAnimation from '../Assets/Animations/coming-soon.json';
 import { 
     Play, ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle,
     LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, ShoppingBag, Award, CreditCard,
     Users, Wallet, MessageSquare, Ticket, Settings, LogOut, Search, Home as HomeIcon,
     BarChart2, Moon, ChevronDown, GraduationCap, Award as AwardIcon, CheckCircle
 } from 'lucide-react';
+
+const LottiePlayer = Lottie.default || Lottie;
 
 export default function LearnPlayer() {
     const { slug } = useParams();
@@ -114,26 +119,8 @@ export default function LearnPlayer() {
         }));
     };
 
-    if (loading) {
-        return (
-            <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[60vh] text-gray-800">
-                <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-gray-500 mt-4 text-sm font-medium">Loading classroom player...</span>
-            </div>
-        );
-    }
-
-    if (!course) {
-        return (
-            <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-800">Course Not Found</h2>
-                <Link to="/" className="text-blue-600 hover:text-blue-500 mt-4 inline-block font-medium">Back to Courses</Link>
-            </div>
-        );
-    }
-
     // Flat list of lessons to easily find previous/next
-    const flatLessons = course.chapters?.flatMap(chap => chap.lessons || []) || [];
+    const flatLessons = course?.chapters?.flatMap(chap => chap.lessons || []) || [];
     const currentIdx = flatLessons.findIndex(les => les.id === currentLesson?.id);
     const prevLesson = currentIdx > 0 ? flatLessons[currentIdx - 1] : null;
     const nextLesson = currentIdx !== -1 && currentIdx < flatLessons.length - 1 ? flatLessons[currentIdx + 1] : null;
@@ -326,7 +313,15 @@ export default function LearnPlayer() {
 
                 {/* Content Panel */}
                 <main className="flex-grow pt-4 pb-12 px-4 lg:px-6">
-                    <div className="w-full mx-auto flex flex-col lg:flex-row gap-6">
+                    {loading ? (
+                        <Loader text="ক্লাসরুম লোড হচ্ছে..." />
+                    ) : !course ? (
+                        <div className="text-center py-20 bg-white rounded-xl shadow-md border border-gray-200 p-8 max-w-xl mx-auto">
+                            <h2 className="text-2xl font-bold text-gray-800">Course Not Found</h2>
+                            <Link to="/" className="text-blue-600 hover:text-blue-500 mt-4 inline-block font-medium">Back to Courses</Link>
+                        </div>
+                    ) : (
+                        <div className="w-full mx-auto flex flex-col lg:flex-row gap-6">
                         
                         {/* Course Content Accordion Sidebar (Left) */}
                         <div className="w-full lg:w-80 xl:w-96 shrink-0 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden sticky top-16 h-[calc(100vh-5rem)] flex flex-col">
@@ -463,10 +458,12 @@ export default function LearnPlayer() {
                                             ) : (
                                                 <div className="bg-slate-50 w-full overflow-hidden aspect-video flex items-center justify-center relative min-h-[300px] rounded-t-xl">
                                                     <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
-                                                    <div className="text-center p-8 z-10 flex flex-col items-center">
-                                                        <FileText className="h-16 w-16 text-indigo-500/50 mb-4" />
-                                                        <h3 className="text-lg font-bold mb-2 text-slate-800">Coming Soon</h3>
-                                                        <p className="text-sm text-slate-500 px-4">The learning materials for this lesson are being prepared.</p>
+                                                    <div className="text-center p-4 sm:p-8 z-10 flex flex-col items-center">
+                                                        <div className="w-24 h-24 sm:w-32 sm:h-32 mb-4">
+                                                            <LottiePlayer animationData={comingSoonAnimation} loop={true} autoplay={true} />
+                                                        </div>
+                                                        <h3 className="text-lg sm:text-xl font-bold mb-2 text-slate-800">শীঘ্রই আসছে</h3>
+                                                        <p className="text-sm sm:text-base text-slate-500 px-4">এই লেসনের ভিডিওটি বর্তমানে প্রস্তুত করা হচ্ছে।</p>
                                                     </div>
                                                 </div>
                                             )}
@@ -640,8 +637,8 @@ export default function LearnPlayer() {
                                 </div>
                             )}
                         </div>
-
                     </div>
+                )}
                 </main>
             </div>
 
