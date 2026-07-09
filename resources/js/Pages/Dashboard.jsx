@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import {
-    LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, Cpu, ShoppingBag,
+    LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, ShoppingBag,
     Award, CreditCard, Users, Wallet, MessageSquare, Ticket, Settings,
     ShieldAlert, LogOut, Search, Home as HomeIcon, BarChart2, Moon,
     BookOpenCheck, CheckCircle2, Clock, PlayCircle, GraduationCap
@@ -30,7 +30,6 @@ const MENU_ITEMS = [
     { key: 'giftbox',         label: 'গিফট বক্স',            icon: Gift },
     { key: 'review',          label: 'রিভিউ এবং আর্ন করুন', icon: Star },
     { key: 'tools',           label: 'প্রয়োজনীয় টুলস',      icon: Wrench },
-    { key: 'ai_tools',        label: 'এআই টুলস',             icon: Cpu },
     { key: 'products',        label: 'পণ্য',                  icon: ShoppingBag },
     { key: 'certificates',    label: 'সার্টিফিকেট',           icon: Award },
     { key: 'billing',         label: 'বিলিং',                 icon: CreditCard },
@@ -52,7 +51,6 @@ const PAGE_TITLES = {
     giftbox:         'গিফট বক্স',
     review:          'রিভিউ এবং আর্ন করুন',
     tools:           'প্রয়োজনীয় টুলস',
-    ai_tools:        'এআই টুলস',
     products:        'পণ্য',
     certificates:    'সার্টিফিকেট',
     billing:         'বিলিং',
@@ -75,6 +73,13 @@ export default function Dashboard() {
             navigate('/login');
             return;
         }
+
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get('tab');
+        if (tabParam && PAGE_TITLES[tabParam]) {
+            setActiveTab(tabParam);
+        }
+
         const fetchDashboardData = async () => {
             try {
                 const response = await axios.get('/api/dashboard-data');
@@ -415,7 +420,7 @@ export default function Dashboard() {
                         {activeTab === 'settings'        && <SettingsPage />}
 
                         {/* ── Coming Soon Pages ─────────────────── */}
-                        {['review', 'ai_tools', 'products'].includes(activeTab) && (
+                        {['review', 'products'].includes(activeTab) && (
                             <ComingSoon tab={activeTab} />
                         )}
 
@@ -438,7 +443,6 @@ const COMING_SOON_CONFIG = {
     giftbox:   { icon: Gift,        title: 'গিফট বক্স',              desc: 'বিশেষ অফার ও উপহার এখানে থাকবে।' },
     review:    { icon: Star,        title: 'রিভিউ এবং আর্ন করুন',   desc: 'কোর্স রিভিউ করুন এবং পুরস্কার অর্জন করুন।' },
     tools:     { icon: Wrench,      title: 'প্রয়োজনীয় টুলস',       desc: 'আপনার কাজে লাগবে এমন সব টুলস এখানে পাবেন।' },
-    ai_tools:  { icon: Cpu,         title: 'এআই টুলস',               desc: 'আর্টিফিশিয়াল ইন্টেলিজেন্স টুলস শীঘ্রই আসছে।' },
     products:  { icon: ShoppingBag, title: 'পণ্য',                   desc: 'ডিজিটাল ও ফিজিক্যাল পণ্য কিনুন।' },
 };
 
