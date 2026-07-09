@@ -39,55 +39,53 @@ export default function AdminPayments() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-base font-bold text-gray-900">পেমেন্ট</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">সব পেমেন্ট লেনদেন</p>
+                    <h2 className="text-lg font-bold text-gray-900">পেমেন্ট</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">সব পেমেন্ট লেনদেন</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-                        className="bg-gray-50 border border-gray-200 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700">
+                        className="bg-gray-50 border border-gray-200 text-sm px-3 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700">
                         <option value="">সব স্ট্যাটাস</option>
                         {Object.entries(statusCfg).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
                     <div className="relative">
                         <input type="text" placeholder="ব্যবহারকারী খুঁজুন..." value={search}
                             onChange={e => { setSearch(e.target.value); setPage(1); }}
-                            className="bg-gray-50 border border-gray-200 text-xs px-3.5 pl-8 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700 w-48" />
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                            className="bg-gray-50 border border-gray-200 text-sm px-3.5 pl-8 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700 w-48" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     </div>
                 </div>
             </div>
 
-            {/* Summary */}
             <div className="grid grid-cols-3 gap-4">
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <DollarSign className="h-5 w-5 text-green-500 mx-auto mb-1.5" />
                     <p className="text-lg font-extrabold text-gray-900">৳{parseFloat(summary.completed || 0).toLocaleString()}</p>
-                    <p className="text-[10px] text-gray-400">মোট আয়</p>
+                    <p className="text-xs text-gray-400">মোট আয়</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <DollarSign className="h-5 w-5 text-blue-500 mx-auto mb-1.5" />
                     <p className="text-lg font-extrabold text-gray-900">৳{parseFloat(summary.total || 0).toLocaleString()}</p>
-                    <p className="text-[10px] text-gray-400">মোট লেনদেন</p>
+                    <p className="text-xs text-gray-400">মোট লেনদেন</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <Clock className="h-5 w-5 text-yellow-500 mx-auto mb-1.5" />
                     <p className="text-lg font-extrabold text-gray-900">{summary.pending || 0}</p>
-                    <p className="text-[10px] text-gray-400">অপেক্ষমাণ</p>
+                    <p className="text-xs text-gray-400">অপেক্ষমাণ</p>
                 </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 bg-gray-50">
-                                <th className="text-left px-5 py-3 font-bold text-gray-500 uppercase tracking-wider">ব্যবহারকারী</th>
-                                <th className="text-left px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">কোর্স</th>
-                                <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">পদ্ধতি</th>
-                                <th className="text-right px-4 py-3 font-bold text-gray-500 uppercase tracking-wider">পরিমাণ</th>
-                                <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider">স্ট্যাটাস</th>
-                                <th className="text-right px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">তারিখ</th>
+                                <th className="text-left px-5 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">ব্যবহারকারী</th>
+                                <th className="text-left px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell text-xs">কোর্স</th>
+                                <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell text-xs">পদ্ধতি</th>
+                                <th className="text-right px-4 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">পরিমাণ</th>
+                                <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">স্ট্যাটাস</th>
+                                <th className="text-right px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell text-xs">তারিখ</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -102,14 +100,14 @@ export default function AdminPayments() {
                                     <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-5 py-3">
                                             <p className="font-semibold text-gray-900 truncate">{p.user?.name || '—'}</p>
-                                            <p className="text-[10px] text-gray-400 truncate">{p.user?.email}</p>
+                                            <p className="text-xs text-gray-400 truncate">{p.user?.email}</p>
                                         </td>
                                         <td className="px-4 py-3 hidden md:table-cell text-gray-600 truncate max-w-[160px]">{p.course?.title || '—'}</td>
                                         <td className="px-4 py-3 text-center hidden sm:table-cell text-gray-500 uppercase">{p.payment_method}</td>
                                         <td className="px-4 py-3 text-right font-bold text-gray-900">৳{parseFloat(p.amount).toFixed(0)}</td>
                                         <td className="px-4 py-3 text-center">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${cfg.color}`}>
-                                                <Icon className="h-2.5 w-2.5" /> {cfg.label}
+                                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${cfg.color}`}>
+                                                <Icon className="h-3 w-3" /> {cfg.label}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-right hidden sm:table-cell text-gray-400">
@@ -123,7 +121,7 @@ export default function AdminPayments() {
                 </div>
                 {meta && meta.last_page > 1 && (
                     <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-between">
-                        <p className="text-[10px] text-gray-400">মোট {meta.total}টি • পৃষ্ঠা {meta.current_page}/{meta.last_page}</p>
+                        <p className="text-xs text-gray-400">মোট {meta.total}টি • পৃষ্ঠা {meta.current_page}/{meta.last_page}</p>
                         <div className="flex gap-2">
                             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={meta.current_page === 1} className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40"><ChevronLeft className="h-3.5 w-3.5" /></button>
                             <button onClick={() => setPage(p => Math.min(meta.last_page, p + 1))} disabled={meta.current_page === meta.last_page} className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40"><ChevronRight className="h-3.5 w-3.5" /></button>

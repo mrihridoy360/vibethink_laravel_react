@@ -6,7 +6,7 @@ import { GraduationCap, Mail, Lock, AlertCircle } from 'lucide-react';
 export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
-    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');

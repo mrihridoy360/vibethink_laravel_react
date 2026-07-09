@@ -11,6 +11,8 @@ import Login from './Pages/Login';
 import Register from './Pages/Register';
 import Dashboard from './Pages/Dashboard';
 import AdminDashboard from './Pages/AdminDashboard';
+import AdminCourseCreate from './Pages/Admin/AdminCourseCreate';
+import AdminCourseEdit from './Pages/Admin/AdminCourseEdit';
 
 function AppLayout() {
     const location = useLocation();
@@ -32,7 +34,10 @@ function AppLayout() {
                     <Route path="/register"                element={<Register />} />
                     <Route path="/dashboard"               element={<Dashboard />} />
                     <Route path="/dashboard/:tab"          element={<Dashboard />} />
-                    <Route path="/admin"                   element={<AdminDashboard />} />
+                    <Route path="/admin"                        element={<AdminDashboard />} />
+                    <Route path="/admin/courses/create"        element={<AdminCourseCreate />} />
+                    <Route path="/admin/courses/:id/edit"      element={<AdminCourseEdit />} />
+                    <Route path="/admin/:tab"                  element={<AdminDashboard />} />
                 </Routes>
             </main>
             {!hideLayout && <Footer />}

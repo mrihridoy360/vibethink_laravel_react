@@ -94,21 +94,21 @@ export default function AdminTickets() {
         return (
             <div className="space-y-5">
                 <button onClick={() => setSelectedTicket(null)}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 font-semibold">
+                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-semibold">
                     <ArrowLeft className="h-4 w-4" /> টিকেট তালিকায় ফিরুন
                 </button>
-
+ 
                 {/* Ticket Header */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-5">
                     <div className="flex items-start justify-between gap-3 mb-3">
                         <div>
-                            <h3 className="text-sm font-bold text-gray-900">{selectedTicket.subject}</h3>
+                            <h3 className="text-base font-bold text-gray-900">{selectedTicket.subject}</h3>
                             <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                <span className="text-[10px] font-mono text-gray-400">{selectedTicket.ticket_number}</span>
+                                <span className="text-xs font-mono text-gray-400">{selectedTicket.ticket_number}</span>
                                 <span className="text-gray-200">•</span>
-                                <span className="text-[10px] text-gray-500">{selectedTicket.user?.name} ({selectedTicket.user?.email})</span>
+                                <span className="text-xs text-gray-500">{selectedTicket.user?.name} ({selectedTicket.user?.email})</span>
                                 <span className="text-gray-200">•</span>
-                                <span className={`text-[10px] font-bold ${priorityCfg[selectedTicket.priority]?.color}`}>
+                                <span className={`text-xs font-bold ${priorityCfg[selectedTicket.priority]?.color}`}>
                                     {priorityCfg[selectedTicket.priority]?.label}
                                 </span>
                             </div>
@@ -119,14 +119,14 @@ export default function AdminTickets() {
                                 value={selectedTicket.status}
                                 onChange={e => handleStatusChange(e.target.value)}
                                 disabled={updatingStatus}
-                                className={`text-[10px] font-bold px-2.5 py-1.5 rounded-xl border focus:outline-none ${cfg.color}`}
+                                className={`text-xs font-bold px-3 py-1.5 rounded-xl border focus:outline-none ${cfg.color}`}
                             >
                                 {Object.entries(statusCfg).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                             </select>
                         </div>
                     </div>
-                    <div className="bg-gray-50 rounded-xl p-4 text-xs text-gray-700 leading-relaxed">{selectedTicket.message}</div>
-                    <p className="text-[10px] text-gray-300 mt-2">{new Date(selectedTicket.created_at).toLocaleString('bn-BD')}</p>
+                    <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed">{selectedTicket.message}</div>
+                    <p className="text-xs text-gray-300 mt-2">{new Date(selectedTicket.created_at).toLocaleString('bn-BD')}</p>
                 </div>
 
                 {/* Replies */}
@@ -135,14 +135,14 @@ export default function AdminTickets() {
                         {replies.map(reply => (
                             <div key={reply.id} className={`rounded-2xl p-4 ${reply.is_admin_reply ? 'bg-blue-50 border border-blue-100 mr-8' : 'bg-white border border-gray-100 ml-8'}`}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${reply.is_admin_reply ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                    <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${reply.is_admin_reply ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
                                         {reply.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
-                                    <span className="text-[10px] font-bold text-gray-700">{reply.user?.name}</span>
-                                    {reply.is_admin_reply && <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold">Admin</span>}
-                                    <span className="text-[10px] text-gray-300 ml-auto">{new Date(reply.created_at).toLocaleString('bn-BD')}</span>
+                                    <span className="text-xs font-bold text-gray-700">{reply.user?.name}</span>
+                                    {reply.is_admin_reply && <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold">Admin</span>}
+                                    <span className="text-xs text-gray-300 ml-auto">{new Date(reply.created_at).toLocaleString('bn-BD')}</span>
                                 </div>
-                                <p className="text-xs text-gray-700">{reply.message}</p>
+                                <p className="text-sm text-gray-700">{reply.message}</p>
                             </div>
                         ))}
                     </div>
@@ -150,15 +150,15 @@ export default function AdminTickets() {
 
                 {/* Admin Reply Box */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                    <h4 className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1.5">
+                    <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5">
                         <Send className="h-3.5 w-3.5 text-blue-500" /> অ্যাডমিন রিপ্লাই
                     </h4>
                     <textarea value={replyMsg} onChange={e => setReplyMsg(e.target.value)} rows={4}
                         placeholder="রিপ্লাই লিখুন..."
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs text-gray-700 focus:outline-none focus:border-blue-500 resize-none" />
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-blue-500 resize-none" />
                     <div className="flex justify-end mt-3">
                         <button onClick={handleReply} disabled={replying || !replyMsg.trim()}
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
                             {replying ? <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                             পাঠান
                         </button>
@@ -173,20 +173,20 @@ export default function AdminTickets() {
         <div className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 className="text-base font-bold text-gray-900">সাপোর্ট টিকেট</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">সব সাপোর্ট টিকেট পরিচালনা করুন</p>
+                    <h2 className="text-lg font-bold text-gray-900">সাপোর্ট টিকেট</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">সব সাপোর্ট টিকেট পরিচালনা করুন</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-                        className="bg-gray-50 border border-gray-200 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700">
+                        className="bg-gray-50 border border-gray-200 text-sm px-3 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700">
                         <option value="">সব স্ট্যাটাস</option>
                         {Object.entries(statusCfg).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
                     <div className="relative">
                         <input type="text" placeholder="বিষয় বা নম্বর..." value={search}
                             onChange={e => { setSearch(e.target.value); setPage(1); }}
-                            className="bg-gray-50 border border-gray-200 text-xs px-3.5 pl-8 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700 w-44" />
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                            className="bg-gray-50 border border-gray-200 text-sm px-3.5 pl-8 py-2 rounded-xl focus:outline-none focus:border-blue-500 text-gray-700 w-44" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     </div>
                 </div>
             </div>
@@ -199,8 +199,8 @@ export default function AdminTickets() {
                         <button key={k} onClick={() => { setStatusFilter(k); setPage(1); }}
                             className={`bg-white rounded-xl border p-3 text-center hover:shadow-sm transition-all ${statusFilter === k ? 'border-blue-500' : 'border-gray-100'}`}>
                             <div className={`inline-flex p-1.5 rounded-lg mb-1 ${cfg.color}`}><Icon className="h-3.5 w-3.5" /></div>
-                            <p className="text-base font-extrabold text-gray-900">{stats[k] ?? 0}</p>
-                            <p className="text-[10px] text-gray-400">{cfg.label}</p>
+                            <p className="text-lg font-extrabold text-gray-900">{stats[k] ?? 0}</p>
+                            <p className="text-xs text-gray-400">{cfg.label}</p>
                         </button>
                     );
                 })}
@@ -221,16 +221,16 @@ export default function AdminTickets() {
                                 <div className={`p-2 rounded-xl shrink-0 ${cfg.color}`}><Icon className="h-4 w-4" /></div>
                                 <div className="flex-grow min-w-0">
                                     <div className="flex items-start justify-between gap-2">
-                                        <p className="text-xs font-bold text-gray-900 truncate">{ticket.subject}</p>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${cfg.color}`}>{cfg.label}</span>
+                                        <p className="text-sm font-bold text-gray-900 truncate">{ticket.subject}</p>
+                                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full shrink-0 ${cfg.color}`}>{cfg.label}</span>
                                     </div>
                                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                        <span className="text-[10px] font-mono text-gray-300">{ticket.ticket_number}</span>
+                                        <span className="text-xs font-mono text-gray-300">{ticket.ticket_number}</span>
                                         <span className="text-gray-200">•</span>
-                                        <span className="text-[10px] text-gray-400">{ticket.user?.name}</span>
+                                        <span className="text-xs text-gray-400">{ticket.user?.name}</span>
                                         <span className="text-gray-200">•</span>
-                                        <span className={`text-[10px] font-semibold ${pCfg.color}`}>{pCfg.label}</span>
-                                        {ticket.replies_count > 0 && <><span className="text-gray-200">•</span><span className="text-[10px] text-gray-400">{ticket.replies_count} রিপ্লাই</span></>}
+                                        <span className={`text-xs font-semibold ${pCfg.color}`}>{pCfg.label}</span>
+                                        {ticket.replies_count > 0 && <><span className="text-gray-200">•</span><span className="text-xs text-gray-400">{ticket.replies_count} রিপ্লাই</span></>}
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-gray-300 shrink-0" />
@@ -242,7 +242,7 @@ export default function AdminTickets() {
 
             {meta && meta.last_page > 1 && (
                 <div className="flex items-center justify-between">
-                    <p className="text-[10px] text-gray-400">মোট {meta.total}টি • পৃষ্ঠা {meta.current_page}/{meta.last_page}</p>
+                    <p className="text-xs text-gray-400">মোট {meta.total}টি • পৃষ্ঠা {meta.current_page}/{meta.last_page}</p>
                     <div className="flex gap-2">
                         <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={meta.current_page === 1} className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40"><ChevronLeft className="h-3.5 w-3.5" /></button>
                         <button onClick={() => setPage(p => Math.min(meta.last_page, p + 1))} disabled={meta.current_page === meta.last_page} className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40"><CR className="h-3.5 w-3.5" /></button>

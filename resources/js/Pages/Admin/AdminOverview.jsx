@@ -102,12 +102,12 @@ function StatCard({ label, value, sub, growth, icon: Icon, iconBg, iconColor, on
             className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center justify-between hover:shadow-lg hover:border-blue-500/20 transition-all group text-left w-full"
         >
             <div>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">{label}</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">{label}</span>
                 <span className="text-2xl font-extrabold text-gray-900 mt-1 block">{value}</span>
-                {sub && <span className="text-[10px] text-gray-400 mt-0.5 block">{sub}</span>}
+                {sub && <span className="text-xs text-gray-400 mt-0.5 block">{sub}</span>}
                 {growth !== undefined && (
-                    <span className={`flex items-center gap-0.5 text-[10px] font-bold mt-1 ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
-                        {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    <span className={`flex items-center gap-0.5 text-xs font-bold mt-1 ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
+                        {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                         {isPositive ? '+' : ''}{growth}%
                     </span>
                 )}
@@ -167,17 +167,17 @@ export default function AdminOverview({ onTabChange }) {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-50/50 rounded-full -translate-y-16 translate-x-16 -z-0" />
                 <div className="relative">
-                    <p className="text-xs text-blue-500 font-semibold flex items-center gap-1.5 mb-1">
+                    <p className="text-sm text-blue-500 font-semibold flex items-center gap-1.5 mb-1">
                         🚀 স্বাগতম, অ্যাডমিন!
                     </p>
                     <h2 className="text-xl font-extrabold text-gray-900">আপনার লার্নিং প্ল্যাটফর্ম ওভারভিউ</h2>
-                    <p className="text-xs text-gray-400 mt-1 max-w-lg">
+                    <p className="text-sm text-gray-400 mt-1 max-w-lg">
                         আপনার প্ল্যাটফর্মের কার্যকারিতা ট্র্যাক করুন, এনরোলমেন্ট মনিটর করুন এবং আপনার কোর্সগুলি পরিচালনা করুন।
                     </p>
                 </div>
                 <button
                     onClick={() => onTabChange('courses')}
-                    className="shrink-0 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
+                    className="shrink-0 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                     <Plus className="h-3.5 w-3.5" /> নতুন কোর্স
                 </button>
@@ -228,12 +228,12 @@ export default function AdminOverview({ onTabChange }) {
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                        <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="h-4 w-4 text-blue-500" /> রাজস্ব ওভারভিউ
                         </h3>
-                        <p className="text-[10px] text-gray-400 mt-0.5">মাসিক রাজস্ব ট্রেন্ড</p>
+                        <p className="text-xs text-gray-400 mt-0.5">মাসিক রাজস্ব ট্রেন্ড</p>
                     </div>
-                    <span className="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-full font-semibold">
+                    <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-full font-semibold">
                         গত ১২ মাস
                     </span>
                 </div>
@@ -245,13 +245,13 @@ export default function AdminOverview({ onTabChange }) {
                 {/* Recent Payments */}
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">সাম্প্রতিক পেমেন্ট</h3>
-                        <button onClick={() => onTabChange('payments')} className="text-[10px] font-bold text-blue-500 hover:text-blue-600">
+                        <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">সাম্প্রতিক পেমেন্ট</h3>
+                        <button onClick={() => onTabChange('payments')} className="text-xs font-bold text-blue-500 hover:text-blue-600">
                             সবগুলো &gt;
                         </button>
                     </div>
                     {recentPayments.length === 0 ? (
-                        <div className="py-10 text-center text-xs text-gray-400">কোনো পেমেন্ট নেই</div>
+                        <div className="py-10 text-center text-sm text-gray-400">কোনো পেমেন্ট নেই</div>
                     ) : (
                         <div className="divide-y divide-gray-50">
                             {recentPayments.map(p => {
@@ -262,12 +262,12 @@ export default function AdminOverview({ onTabChange }) {
                                             {p.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
                                         <div className="flex-grow min-w-0">
-                                            <p className="text-xs font-semibold text-gray-900 truncate">{p.user?.name}</p>
-                                            <p className="text-[10px] text-gray-400 truncate">{p.course?.title}</p>
+                                            <p className="text-sm font-semibold text-gray-900 truncate">{p.user?.name}</p>
+                                            <p className="text-xs text-gray-400 truncate">{p.course?.title}</p>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <p className="text-xs font-extrabold text-gray-900">৳{parseFloat(p.amount).toFixed(0)}</p>
-                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${cfg.color}`}>{cfg.label}</span>
+                                            <p className="text-sm font-extrabold text-gray-900">৳{parseFloat(p.amount).toFixed(0)}</p>
+                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.color}`}>{cfg.label}</span>
                                         </div>
                                     </div>
                                 );
@@ -279,13 +279,13 @@ export default function AdminOverview({ onTabChange }) {
                 {/* Recent Users */}
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">নতুন ব্যবহারকারী</h3>
-                        <button onClick={() => onTabChange('users')} className="text-[10px] font-bold text-blue-500 hover:text-blue-600">
+                        <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">নতুন ব্যবহারকারী</h3>
+                        <button onClick={() => onTabChange('users')} className="text-xs font-bold text-blue-500 hover:text-blue-600">
                             সবগুলো &gt;
                         </button>
                     </div>
                     {recentUsers.length === 0 ? (
-                        <div className="py-10 text-center text-xs text-gray-400">কোনো ব্যবহারকারী নেই</div>
+                        <div className="py-10 text-center text-sm text-gray-400">কোনো ব্যবহারকারী নেই</div>
                     ) : (
                         <div className="divide-y divide-gray-50">
                             {recentUsers.map(u => (
@@ -294,10 +294,10 @@ export default function AdminOverview({ onTabChange }) {
                                         {u.name?.charAt(0)?.toUpperCase()}
                                     </div>
                                     <div className="flex-grow min-w-0">
-                                        <p className="text-xs font-semibold text-gray-900 truncate">{u.name}</p>
-                                        <p className="text-[10px] text-gray-400 truncate">{u.email}</p>
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{u.name}</p>
+                                        <p className="text-xs text-gray-400 truncate">{u.email}</p>
                                     </div>
-                                    <p className="text-[10px] text-gray-300 shrink-0">
+                                    <p className="text-xs text-gray-300 shrink-0">
                                         {new Date(u.created_at).toLocaleDateString('bn-BD')}
                                     </p>
                                 </div>
@@ -317,8 +317,8 @@ export default function AdminOverview({ onTabChange }) {
                         <AlertCircle className="h-5 w-5 text-orange-600" />
                     </div>
                     <div className="flex-grow">
-                        <p className="text-xs font-bold text-orange-800">{stats.open_tickets}টি খোলা সাপোর্ট টিকেট অপেক্ষা করছে</p>
-                        <p className="text-[10px] text-orange-600 mt-0.5">দ্রুত সাড়া দিতে ক্লিক করুন</p>
+                        <p className="text-sm font-bold text-orange-800">{stats.open_tickets}টি খোলা সাপোর্ট টিকেট অপেক্ষা করছে</p>
+                        <p className="text-xs text-orange-600 mt-0.5">দ্রুত সাড়া দিতে ক্লিক করুন</p>
                     </div>
                     <ArrowUpRight className="h-4 w-4 text-orange-500 shrink-0" />
                 </div>

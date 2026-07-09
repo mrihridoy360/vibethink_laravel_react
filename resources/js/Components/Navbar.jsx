@@ -49,7 +49,7 @@ export default function Navbar() {
                                 )}
                                 <span className="text-sm text-gray-200 font-medium hidden md:inline">{user.name}</span>
                             </div>
-                            
+
                             <button
                                 onClick={handleLogout}
                                 className="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-white/5 transition-all"

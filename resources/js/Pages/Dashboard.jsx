@@ -9,58 +9,56 @@ import {
     BookOpenCheck, CheckCircle2, Clock, PlayCircle, GraduationCap
 } from 'lucide-react';
 
-import Sidebar from '../Components/Sidebar';
-
 // Tab page components
 import EnrolledCourses from './Dashboard/EnrolledCourses';
-import Notice          from './Dashboard/Notice';
-import GiftBox         from './Dashboard/GiftBox';
-import Tools           from './Dashboard/Tools';
-import Certificates    from './Dashboard/Certificates';
-import Billing         from './Dashboard/Billing';
-import Referral        from './Dashboard/Referral';
-import WalletPage      from './Dashboard/Wallet';
-import SupportGroup    from './Dashboard/SupportGroup';
-import SupportTickets  from './Dashboard/SupportTickets';
-import SettingsPage    from './Dashboard/Settings';
+import Notice from './Dashboard/Notice';
+import GiftBox from './Dashboard/GiftBox';
+import Tools from './Dashboard/Tools';
+import Certificates from './Dashboard/Certificates';
+import Billing from './Dashboard/Billing';
+import Referral from './Dashboard/Referral';
+import WalletPage from './Dashboard/Wallet';
+import SupportGroup from './Dashboard/SupportGroup';
+import SupportTickets from './Dashboard/SupportTickets';
+import SettingsPage from './Dashboard/Settings';
 
 // ── Sidebar nav config ───────────────────────────────────────
 const MENU_ITEMS = [
-    { key: 'dashboard',       label: 'ড্যাশবোর্ড',           icon: LayoutDashboard },
-    { key: 'enrolled',        label: 'ইনরোলড কোর্স',         icon: BookOpen },
-    { key: 'notice',          label: 'নোটিশ',                icon: Bell },
-    { key: 'giftbox',         label: 'গিফট বক্স',            icon: Gift },
-    { key: 'review',          label: 'রিভিউ এবং আর্ন করুন', icon: Star },
-    { key: 'tools',           label: 'প্রয়োজনীয় টুলস',      icon: Wrench },
-    { key: 'products',        label: 'পণ্য',                  icon: ShoppingBag },
-    { key: 'certificates',    label: 'সার্টিফিকেট',           icon: Award },
-    { key: 'billing',         label: 'বিলিং',                 icon: CreditCard },
-    { key: 'referral',        label: 'রেফারেল',               icon: Users },
-    { key: 'wallet',          label: 'ওয়ালেট',               icon: Wallet },
+    { key: 'dashboard', label: 'ড্যাশবোর্ড', icon: LayoutDashboard },
+    { key: 'enrolled', label: 'ইনরোলড কোর্স', icon: BookOpen },
+    { key: 'notice', label: 'নোটিশ', icon: Bell },
+    { key: 'giftbox', label: 'গিফট বক্স', icon: Gift },
+    { key: 'review', label: 'রিভিউ এবং আর্ন করুন', icon: Star },
+    { key: 'tools', label: 'প্রয়োজনীয় টুলস', icon: Wrench },
+    { key: 'products', label: 'পণ্য', icon: ShoppingBag },
+    { key: 'certificates', label: 'সার্টিফিকেট', icon: Award },
+    { key: 'billing', label: 'বিলিং', icon: CreditCard },
+    { key: 'referral', label: 'রেফারেল', icon: Users },
+    { key: 'wallet', label: 'ওয়ালেট', icon: Wallet },
 ];
 
 const SERVICE_ITEMS = [
-    { key: 'support_group',   label: 'সাপোর্ট গ্রুপ',         icon: MessageSquare },
-    { key: 'support_tickets', label: 'সাপোর্ট টিকেট',         icon: Ticket },
-    { key: 'settings',        label: 'সেটিংস',                icon: Settings },
+    { key: 'support_group', label: 'সাপোর্ট গ্রুপ', icon: MessageSquare },
+    { key: 'support_tickets', label: 'সাপোর্ট টিকেট', icon: Ticket },
+    { key: 'settings', label: 'সেটিংস', icon: Settings },
 ];
 
 // ── Tab page titles ─────────────────────────────────────────
 const PAGE_TITLES = {
-    dashboard:       'ওভারভিউ',
-    enrolled:        'ইনরোলড কোর্স',
-    notice:          'নোটিশ',
-    giftbox:         'গিফট বক্স',
-    review:          'রিভিউ এবং আর্ন করুন',
-    tools:           'প্রয়োজনীয় টুলস',
-    products:        'পণ্য',
-    certificates:    'সার্টিফিকেট',
-    billing:         'বিলিং',
-    referral:        'রেফারেল',
-    wallet:          'ওয়ালেট',
-    support_group:   'সাপোর্ট গ্রুপ',
+    dashboard: 'ওভারভিউ',
+    enrolled: 'ইনরোলড কোর্স',
+    notice: 'নোটিশ',
+    giftbox: 'গিফট বক্স',
+    review: 'রিভিউ এবং আর্ন করুন',
+    tools: 'প্রয়োজনীয় টুলস',
+    products: 'পণ্য',
+    certificates: 'সার্টিফিকেট',
+    billing: 'বিলিং',
+    referral: 'রেফারেল',
+    wallet: 'ওয়ালেট',
+    support_group: 'সাপোর্ট গ্রুপ',
     support_tickets: 'সাপোর্ট টিকেট',
-    settings:        'সেটিংস',
+    settings: 'সেটিংস',
 };
 
 export default function Dashboard() {
@@ -68,7 +66,6 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const { tab } = useParams();
     const activeTab = (tab && PAGE_TITLES[tab]) ? tab : 'dashboard';
 
@@ -116,11 +113,10 @@ export default function Dashboard() {
         return (
             <Link
                 to={item.key === 'dashboard' ? '/dashboard' : `/dashboard/${item.key}`}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                    isActive
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${isActive
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                    }`}
             >
                 <Icon className="h-5 w-5 shrink-0" />
                 <span>{item.label}</span>
@@ -129,13 +125,83 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f4f6fc] text-gray-800 font-sans antialiased">
+        <div className="flex h-screen overflow-hidden bg-[#f4f6fc] text-gray-800 font-sans">
 
-            {/* ── Reusable Collapsible Sidebar ───────────── */}
-            <Sidebar activeTab={activeTab} sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
+            {/* ── Sidebar ─────────────────────────────────── */}
+            <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
+                {/* Brand */}
+                <div className="h-16 px-6 flex items-center shrink-0">
+                    <Link to="/" className="flex items-center gap-2">
+                        <span className="text-2xl font-extrabold tracking-tight text-blue-600">
+                            Vibe<span className="text-gray-900">Think</span>
+                        </span>
+                    </Link>
+                </div>
+
+                {/* Nav */}
+                <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-4 space-y-6">
+                    {/* Menu */}
+                    <div>
+                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                            মেনু
+                        </span>
+                        <div className="space-y-1">
+                            {MENU_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
+                        </div>
+                    </div>
+
+                    {/* Service */}
+                    <div>
+                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                            সার্ভিস
+                        </span>
+                        <div className="space-y-1">
+                            {SERVICE_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
+                        </div>
+                    </div>
+
+                    {/* Admin (conditional) */}
+                    {user?.role === 'admin' && (
+                        <div>
+                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                                ADMIN
+                            </span>
+                            <div className="space-y-1">
+                                <Link
+                                    to="/admin"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all"
+                                >
+                                    <ShieldAlert className="h-5 w-5 shrink-0" />
+                                    <span>এডমিন প্যানেল</span>
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* User footer */}
+                <div className="p-4 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                            {user.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0"
+                        title="Logout"
+                    >
+                        <LogOut className="h-4 w-4" />
+                    </button>
+                </div>
+            </aside>
 
             {/* ── Main Area ───────────────────────────────── */}
-            <div className={`flex-grow flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+            <div className="flex-grow flex flex-col min-w-0">
 
                 {/* Topbar */}
                 <header className="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
@@ -335,17 +401,17 @@ export default function Dashboard() {
                         )}
 
                         {/* ── Other Tab Pages ─────────────────────── */}
-                        {activeTab === 'enrolled'        && <EnrolledCourses />}
-                        {activeTab === 'notice'          && <Notice />}
-                        {activeTab === 'giftbox'         && <GiftBox />}
-                        {activeTab === 'tools'           && <Tools />}
-                        {activeTab === 'certificates'    && <Certificates />}
-                        {activeTab === 'billing'         && <Billing />}
-                        {activeTab === 'referral'        && <Referral />}
-                        {activeTab === 'wallet'          && <WalletPage />}
-                        {activeTab === 'support_group'   && <SupportGroup />}
+                        {activeTab === 'enrolled' && <EnrolledCourses />}
+                        {activeTab === 'notice' && <Notice />}
+                        {activeTab === 'giftbox' && <GiftBox />}
+                        {activeTab === 'tools' && <Tools />}
+                        {activeTab === 'certificates' && <Certificates />}
+                        {activeTab === 'billing' && <Billing />}
+                        {activeTab === 'referral' && <Referral />}
+                        {activeTab === 'wallet' && <WalletPage />}
+                        {activeTab === 'support_group' && <SupportGroup />}
                         {activeTab === 'support_tickets' && <SupportTickets />}
-                        {activeTab === 'settings'        && <SettingsPage />}
+                        {activeTab === 'settings' && <SettingsPage />}
 
                         {/* ── Coming Soon Pages ─────────────────── */}
                         {['review', 'products'].includes(activeTab) && (
@@ -367,11 +433,11 @@ export default function Dashboard() {
 
 // ── Coming Soon placeholder ──────────────────────────────────
 const COMING_SOON_CONFIG = {
-    notice:    { icon: Bell,        title: 'নোটিশ',                  desc: 'গুরুত্বপূর্ণ নোটিশ ও আপডেট এখানে দেখতে পাবেন।' },
-    giftbox:   { icon: Gift,        title: 'গিফট বক্স',              desc: 'বিশেষ অফার ও উপহার এখানে থাকবে।' },
-    review:    { icon: Star,        title: 'রিভিউ এবং আর্ন করুন',   desc: 'কোর্স রিভিউ করুন এবং পুরস্কার অর্জন করুন।' },
-    tools:     { icon: Wrench,      title: 'প্রয়োজনীয় টুলস',       desc: 'আপনার কাজে লাগবে এমন সব টুলস এখানে পাবেন।' },
-    products:  { icon: ShoppingBag, title: 'পণ্য',                   desc: 'ডিজিটাল ও ফিজিক্যাল পণ্য কিনুন।' },
+    notice: { icon: Bell, title: 'নোটিশ', desc: 'গুরুত্বপূর্ণ নোটিশ ও আপডেট এখানে দেখতে পাবেন।' },
+    giftbox: { icon: Gift, title: 'গিফট বক্স', desc: 'বিশেষ অফার ও উপহার এখানে থাকবে।' },
+    review: { icon: Star, title: 'রিভিউ এবং আর্ন করুন', desc: 'কোর্স রিভিউ করুন এবং পুরস্কার অর্জন করুন।' },
+    tools: { icon: Wrench, title: 'প্রয়োজনীয় টুলস', desc: 'আপনার কাজে লাগবে এমন সব টুলস এখানে পাবেন।' },
+    products: { icon: ShoppingBag, title: 'পণ্য', desc: 'ডিজিটাল ও ফিজিক্যাল পণ্য কিনুন।' },
 };
 
 function ComingSoon({ tab }) {

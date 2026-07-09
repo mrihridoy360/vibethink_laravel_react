@@ -60,13 +60,39 @@ Route::prefix('api')->group(function () {
         Route::prefix('admin')->group(function () {
             Route::get('/stats',                           [AdminController::class, 'stats']);
             Route::get('/courses',                         [AdminController::class, 'courses']);
+            Route::get('/courses/{id}',                    [AdminController::class, 'showCourse']);
+            Route::post('/courses',                        [AdminController::class, 'storeCourse']);
+            Route::match(['post', 'put'], '/courses/{id}/update', [AdminController::class, 'updateCourse']);
+            Route::delete('/courses/{id}',                 [AdminController::class, 'destroyCourse']);
             Route::post('/courses/{id}/toggle-publish',    [AdminController::class, 'toggleCoursePublish']);
+            Route::get('/categories',                      [AdminController::class, 'categories']);
+            Route::get('/categories/list',                 [AdminController::class, 'adminCategoriesList']);
+            Route::post('/categories',                     [AdminController::class, 'storeCategory']);
+            Route::put('/categories/{id}',                 [AdminController::class, 'updateCategory']);
+            Route::delete('/categories/{id}',              [AdminController::class, 'destroyCategory']);
             Route::get('/users',                           [AdminController::class, 'users']);
+            Route::put('/users/{id}',                      [AdminController::class, 'updateUser']);
+            Route::delete('/users/{id}',                   [AdminController::class, 'deleteUser']);
             Route::get('/enrollments',                     [AdminController::class, 'enrollments']);
+            Route::get('/enrollments/resources',           [AdminController::class, 'enrollmentResources']);
+            Route::post('/enrollments',                    [AdminController::class, 'storeEnrollment']);
             Route::get('/payments',                        [AdminController::class, 'payments']);
             Route::get('/tickets',                         [AdminController::class, 'tickets']);
             Route::put('/tickets/{id}/status',             [AdminController::class, 'updateTicketStatus']);
             Route::post('/tickets/{id}/reply',             [AdminController::class, 'replyTicket']);
+
+            // ── Curriculum: Chapters ──────────────────────────────
+            Route::get('/courses/{courseId}/chapters',     [AdminController::class, 'getChapters']);
+            Route::post('/courses/{courseId}/chapters',    [AdminController::class, 'storeChapter']);
+            Route::put('/chapters/{id}',                   [AdminController::class, 'updateChapter']);
+            Route::delete('/chapters/{id}',                [AdminController::class, 'deleteChapter']);
+            Route::post('/courses/{courseId}/chapters/reorder', [AdminController::class, 'reorderChapters']);
+
+            // ── Curriculum: Lessons ───────────────────────────────
+            Route::post('/chapters/{chapterId}/lessons',   [AdminController::class, 'storeLessonInChapter']);
+            Route::put('/lessons/{id}',                    [AdminController::class, 'updateLesson']);
+            Route::delete('/lessons/{id}',                 [AdminController::class, 'deleteLesson']);
+            Route::post('/chapters/{chapterId}/lessons/reorder', [AdminController::class, 'reorderLessons']);
         });
     });
 });

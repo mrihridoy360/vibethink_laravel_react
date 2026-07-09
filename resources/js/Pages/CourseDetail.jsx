@@ -112,7 +112,7 @@ export default function CourseDetail() {
                 <div className="glass-panel p-6 rounded-2xl flex flex-col items-center text-center max-w-sm mx-auto w-full relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl -z-10" />
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -z-10" />
-                    
+
                     <div className="relative aspect-video w-full bg-slate-800 rounded-xl overflow-hidden mb-6">
                         {course.thumbnail ? (
                             <img
@@ -189,7 +189,7 @@ export default function CourseDetail() {
                     <div>
                         <h2 className="text-xl font-bold text-white mb-2">Course Curriculum</h2>
                         <p className="text-sm text-gray-400 mb-6">Browse chapters and check lessons preview</p>
-                        
+
                         <div className="space-y-4">
                             {course.chapters && course.chapters.length > 0 ? (
                                 course.chapters.map((chapter) => (
