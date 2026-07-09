@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Hind Siliguri', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --color-brand-primary: #8b5cf6;
+    --color-brand-secondary: #ec4899;
+    --color-brand-dark: #0b0f19;
+}
+
+/* Glassmorphism utility classes for Tailwind v4 custom theme */
+.glass-panel {
+    background: rgba(17, 25, 40, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-hover:hover {
+    background: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.1);
+}
+
+.glass-input {
+    background: rgba(17, 25, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f3f4f6;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    border-color: #8b5cf6;
+    outline: none;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+.glass-btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    border: none;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.glass-btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Custom scrollbar for modern feel */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0b0f19;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #374151;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}

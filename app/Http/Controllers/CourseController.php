@@ -1,0 +1,246 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Course;
+use App\Models\Enrollment;
+use App\Models\Lesson;
+use App\Models\LessonProgress;
+use Illuminate\Support\Facades\Auth;
+
+class CourseController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Course::with('user:id,name,avatar')
+            ->where('is_published', true);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        $courses = $query->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'courses' => $courses
+        ]);
+    }
+
+    public function show($slug)
+    {
+        $course = Course::with(['user:id,name,avatar', 'chapters' => function($q) {
+            $q->where('is_published', true)->with(['lessons' => function($l) {
+                $l->where('is_published', true)->orderBy('sort_order');
+            }])->orderBy('sort_order');
+        }])->where('slug', $slug)->firstOrFail();
+
+        $enrollment = null;
+        $completedLessons = [];
+
+        if (Auth::check()) {
+            $enrollment = Enrollment::where('user_id', Auth::id())
+                ->where('course_id', $course->id)
+                ->first();
+
+            if ($enrollment) {
+                // Get completed lesson IDs for this user in this course
+                $lessonIds = [];
+                foreach ($course->chapters as $chapter) {
+                    foreach ($chapter->lessons as $lesson) {
+                        $lessonIds[] = $lesson->id;
+                    }
+                }
+
+                $completedLessons = LessonProgress::where('user_id', Auth::id())
+                    ->whereIn('lesson_id', $lessonIds)
+                    ->where('is_completed', true)
+                    ->pluck('lesson_id')
+                    ->toArray();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'course' => $course,
+            'is_enrolled' => !is_null($enrollment),
+            'enrollment' => $enrollment,
+            'completed_lessons' => $completedLessons
+        ]);
+    }
+
+    public function enroll(Request $request, $id)
+    {
+        $course = Course::findOrFail($id);
+        
+        $existing = Enrollment::where('user_id', Auth::id())
+            ->where('course_id', $course->id)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are already enrolled in this course.'
+            ], 400);
+        }
+
+        $enrollment = Enrollment::create([
+            'user_id' => Auth::id(),
+            'course_id' => $course->id,
+            'status' => 'active',
+            'progress' => 0,
+            'completed_lessons_count' => 0
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Successfully enrolled in this course.',
+            'enrollment' => $enrollment
+        ]);
+    }
+
+    public function toggleLessonProgress(Request $request, $lessonId)
+    {
+        $lesson = Lesson::findOrFail($lessonId);
+        $chapter = $lesson->chapter;
+        $course = $chapter->course;
+
+        // Check enrollment
+        $enrollment = Enrollment::where('user_id', Auth::id())
+            ->where('course_id', $course->id)
+            ->first();
+
+        if (!$enrollment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not enrolled in this course.'
+            ], 403);
+        }
+
+        // Toggle progress
+        $progress = LessonProgress::where('user_id', Auth::id())
+            ->where('lesson_id', $lesson->id)
+            ->first();
+
+        if ($progress) {
+            $progress->is_completed = !$progress->is_completed;
+            $progress->completed_at = $progress->is_completed ? now() : null;
+            $progress->save();
+        } else {
+            $progress = LessonProgress::create([
+                'user_id' => Auth::id(),
+                'lesson_id' => $lesson->id,
+                'is_completed' => true,
+                'completed_at' => now()
+            ]);
+        }
+
+        // Recalculate course progress
+        $lessonIds = Lesson::whereIn('chapter_id', $course->chapters->pluck('id'))->pluck('id')->toArray();
+        $totalLessons = count($lessonIds);
+        
+        $completedLessonsCount = LessonProgress::where('user_id', Auth::id())
+            ->whereIn('lesson_id', $lessonIds)
+            ->where('is_completed', true)
+            ->count();
+
+        $progressPercent = $totalLessons > 0 ? round(($completedLessonsCount / $totalLessons) * 100) : 0;
+
+        $enrollment->update([
+            'progress' => $progressPercent,
+            'completed_lessons_count' => $completedLessonsCount
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'is_completed' => $progress->is_completed,
+            'progress' => $progressPercent,
+            'completed_lessons_count' => $completedLessonsCount
+        ]);
+    }
+
+    public function dashboard()
+    {
+        $user = Auth::user();
+        
+        $enrollments = Enrollment::where('user_id', $user->id)
+            ->with(['course' => function($q) {
+                $q->with(['user:id,name', 'chapters' => function($c) {
+                    $c->where('is_published', true)->with('lessons');
+                }]);
+            }])
+            ->get();
+
+        $formattedEnrollments = [];
+        $activeCount = 0;
+        $completedCount = 0;
+        $pendingCount = 0;
+
+        foreach ($enrollments as $enrollment) {
+            $course = $enrollment->course;
+            if (!$course) continue;
+
+            $lessonIds = [];
+            foreach ($course->chapters as $chapter) {
+                foreach ($chapter->lessons as $lesson) {
+                    if ($lesson->is_published) {
+                        $lessonIds[] = $lesson->id;
+                    }
+                }
+            }
+            $totalLessons = count($lessonIds);
+
+            $completedLessonsCount = LessonProgress::where('user_id', $user->id)
+                ->whereIn('lesson_id', $lessonIds)
+                ->where('is_completed', true)
+                ->count();
+
+            $progressPercent = $totalLessons > 0 ? round(($completedLessonsCount / $totalLessons) * 100) : 0;
+
+            if ($enrollment->progress != $progressPercent || $enrollment->completed_lessons_count != $completedLessonsCount) {
+                $enrollment->update([
+                    'progress' => $progressPercent,
+                    'completed_lessons_count' => $completedLessonsCount
+                ]);
+            }
+
+            if ($progressPercent == 100) {
+                $completedCount++;
+            } elseif ($progressPercent > 0) {
+                $activeCount++;
+            } else {
+                $pendingCount++;
+            }
+
+            $formattedEnrollments[] = [
+                'id' => $enrollment->id,
+                'course_id' => $course->id,
+                'title' => $course->title,
+                'slug' => $course->slug,
+                'thumbnail' => $course->thumbnail,
+                'price' => $course->price,
+                'discount_price' => $course->discount_price,
+                'instructor_name' => $course->user ? $course->user->name : 'Expert',
+                'progress' => $progressPercent,
+                'completed_lessons_count' => $completedLessonsCount,
+                'total_lessons_count' => $totalLessons
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'stats' => [
+                'enrolled_count' => count($formattedEnrollments),
+                'active_count' => $activeCount,
+                'completed_count' => $completedCount,
+                'pending_count' => $pendingCount,
+            ],
+            'enrollments' => $formattedEnrollments
+        ]);
+    }
+}

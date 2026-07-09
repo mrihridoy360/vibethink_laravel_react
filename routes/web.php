@@ -1,0 +1,77 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\AdminController;
+
+// API Routes
+Route::prefix('api')->group(function () {
+    // Auth Routes
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth');
+    Route::get('/auth/me', [AuthController::class, 'me']);
+
+    // Course Routes
+    Route::get('/courses', [CourseController::class, 'index']);
+    Route::get('/courses/{slug}', [CourseController::class, 'show']);
+
+    // Authenticated API Routes
+    Route::middleware('auth')->group(function () {
+        Route::post('/courses/{id}/enroll', [CourseController::class, 'enroll']);
+        Route::post('/lessons/{lessonId}/toggle-progress', [CourseController::class, 'toggleLessonProgress']);
+        Route::get('/dashboard-data', [CourseController::class, 'dashboard']);
+
+        // User Profile & Settings
+        Route::get('/profile', [UserController::class, 'profile']);
+        Route::put('/profile', [UserController::class, 'updateProfile']);
+        Route::put('/profile/password', [UserController::class, 'updatePassword']);
+
+        // Certificates
+        Route::get('/certificates', [UserController::class, 'certificates']);
+
+        // Billing / Payments
+        Route::get('/billing', [UserController::class, 'billing']);
+
+        // Wallet
+        Route::get('/wallet', [UserController::class, 'wallet']);
+
+        // Referral
+        Route::get('/referral', [UserController::class, 'referral']);
+
+        // Support Groups
+        Route::get('/support-groups', [UserController::class, 'supportGroups']);
+
+        // Announcements, Gifts, Tools
+        Route::get('/announcements', [UserController::class, 'announcements']);
+        Route::get('/gifts', [UserController::class, 'gifts']);
+        Route::get('/tools', [UserController::class, 'tools']);
+
+        // Support Tickets
+        Route::get('/support-tickets', [SupportTicketController::class, 'index']);
+        Route::post('/support-tickets', [SupportTicketController::class, 'store']);
+        Route::get('/support-tickets/{id}', [SupportTicketController::class, 'show']);
+        Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'reply']);
+
+        // ── Admin Routes ──────────────────────────────────────
+        Route::prefix('admin')->group(function () {
+            Route::get('/stats',                           [AdminController::class, 'stats']);
+            Route::get('/courses',                         [AdminController::class, 'courses']);
+            Route::post('/courses/{id}/toggle-publish',    [AdminController::class, 'toggleCoursePublish']);
+            Route::get('/users',                           [AdminController::class, 'users']);
+            Route::get('/enrollments',                     [AdminController::class, 'enrollments']);
+            Route::get('/payments',                        [AdminController::class, 'payments']);
+            Route::get('/tickets',                         [AdminController::class, 'tickets']);
+            Route::put('/tickets/{id}/status',             [AdminController::class, 'updateTicketStatus']);
+            Route::post('/tickets/{id}/reply',             [AdminController::class, 'replyTicket']);
+        });
+    });
+});
+
+// Fallback Route for React SPA
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '^(?!api).*$');
