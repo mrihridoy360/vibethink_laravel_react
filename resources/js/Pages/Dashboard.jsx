@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import {
@@ -8,6 +8,8 @@ import {
     ShieldAlert, LogOut, Search, Home as HomeIcon, BarChart2, Moon,
     BookOpenCheck, CheckCircle2, Clock, PlayCircle, GraduationCap
 } from 'lucide-react';
+
+import Sidebar from '../Components/Sidebar';
 
 // Tab page components
 import EnrolledCourses from './Dashboard/EnrolledCourses';
@@ -66,18 +68,14 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const { tab } = useParams();
+    const activeTab = (tab && PAGE_TITLES[tab]) ? tab : 'dashboard';
 
     useEffect(() => {
         if (!user) {
             navigate('/login');
             return;
-        }
-
-        const params = new URLSearchParams(window.location.search);
-        const tabParam = params.get('tab');
-        if (tabParam && PAGE_TITLES[tabParam]) {
-            setActiveTab(tabParam);
         }
 
         const fetchDashboardData = async () => {
@@ -116,8 +114,8 @@ export default function Dashboard() {
         const Icon = item.icon;
         const isActive = activeTab === item.key;
         return (
-            <button
-                onClick={() => setActiveTab(item.key)}
+            <Link
+                to={item.key === 'dashboard' ? '/dashboard' : `/dashboard/${item.key}`}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     isActive
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
@@ -126,88 +124,18 @@ export default function Dashboard() {
             >
                 <Icon className="h-5 w-5 shrink-0" />
                 <span>{item.label}</span>
-            </button>
+            </Link>
         );
     };
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[#f4f6fc] text-gray-800 font-sans">
+        <div className="min-h-screen flex bg-[#f4f6fc] text-gray-800 font-sans antialiased">
 
-            {/* ── Sidebar ─────────────────────────────────── */}
-            <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
-                {/* Brand */}
-                <div className="h-16 px-6 flex items-center shrink-0">
-                    <Link to="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-extrabold tracking-tight text-blue-600">
-                            Vibe<span className="text-gray-900">Think</span>
-                        </span>
-                    </Link>
-                </div>
-
-                {/* Nav */}
-                <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-4 space-y-6">
-                    {/* Menu */}
-                    <div>
-                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                            মেনু
-                        </span>
-                        <div className="space-y-1">
-                            {MENU_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
-                        </div>
-                    </div>
-
-                    {/* Service */}
-                    <div>
-                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                            সার্ভিস
-                        </span>
-                        <div className="space-y-1">
-                            {SERVICE_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
-                        </div>
-                    </div>
-
-                    {/* Admin (conditional) */}
-                    {user?.role === 'admin' && (
-                        <div>
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                                ADMIN
-                            </span>
-                            <div className="space-y-1">
-                                <Link
-                                    to="/admin"
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all"
-                                >
-                                    <ShieldAlert className="h-5 w-5 shrink-0" />
-                                    <span>এডমিন প্যানেল</span>
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* User footer */}
-                <div className="p-4 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
-                            {user.name.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0"
-                        title="Logout"
-                    >
-                        <LogOut className="h-4 w-4" />
-                    </button>
-                </div>
-            </aside>
+            {/* ── Reusable Collapsible Sidebar ───────────── */}
+            <Sidebar activeTab={activeTab} sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
 
             {/* ── Main Area ───────────────────────────────── */}
-            <div className="flex-grow flex flex-col min-w-0">
+            <div className={`flex-grow flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
 
                 {/* Topbar */}
                 <header className="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between shrink-0">

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import VideoPlayer from '../Components/VideoPlayer';
 import Loader from '../Components/Loader';
+import Sidebar from '../Components/Sidebar';
 import Lottie from 'lottie-react';
 import comingSoonAnimation from '../Assets/Animations/coming-soon.json';
 import { 
@@ -104,7 +105,7 @@ export default function LearnPlayer() {
     };
 
     const handleSidebarItemClick = (key) => {
-        navigate(`/dashboard?tab=${key}`);
+        navigate(key === 'dashboard' ? '/dashboard' : `/dashboard/${key}`);
     };
 
     const handleLogout = async () => {
@@ -126,133 +127,13 @@ export default function LearnPlayer() {
     const nextLesson = currentIdx !== -1 && currentIdx < flatLessons.length - 1 ? flatLessons[currentIdx + 1] : null;
     const totalLessonsCount = flatLessons.length;
 
-    const MENU_ITEMS = [
-        { key: 'dashboard',       label: 'ড্যাশবোর্ড',           icon: LayoutDashboard },
-        { key: 'enrolled',        label: 'ইনরোলড কোর্স',         icon: BookOpen },
-        { key: 'notice',          label: 'নোটিশ',                icon: Bell },
-        { key: 'giftbox',         label: 'গিফট বক্স',            icon: Gift },
-        { key: 'review',          label: 'রিভিউ এবং আর্ন করুন', icon: Star },
-        { key: 'tools',           label: 'প্রয়োজনীয় টুলস',      icon: Wrench },
-        { key: 'products',        label: 'পণ্য',                  icon: ShoppingBag },
-        { key: 'certificates',    label: 'সার্টিফিকেট',           icon: Award },
-        { key: 'billing',         label: 'বিলিং',                 icon: CreditCard },
-        { key: 'referral',        label: 'রেফারেল',               icon: Users },
-        { key: 'wallet',          label: 'ওয়ালেট',               icon: Wallet },
-    ];
 
-    const SERVICE_ITEMS = [
-        { key: 'support_group',   label: 'সাপোর্ট গ্রুপ',         icon: MessageSquare },
-        { key: 'support_tickets', label: 'সাপোর্ট টিকেট',         icon: Ticket },
-        { key: 'settings',        label: 'সেটিংস',                icon: Settings },
-    ];
 
     return (
         <div className="min-h-screen flex bg-[#f4f7fe] text-gray-800 font-sans antialiased">
             
-            {/* ── Sidebar ─────────────────────────────────── */}
-            <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 flex flex-col shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
-                {/* Brand Logo & Toggle */}
-                <div className="h-20 px-4 flex items-center justify-between shrink-0 border-b border-gray-100">
-                    <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
-                        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
-                            <span className="text-white font-bold text-lg">V</span>
-                        </div>
-                        {!sidebarCollapsed && (
-                            <span className="text-xl font-bold text-gray-800">
-                                Vibe<span className="text-blue-600">Think</span>
-                            </span>
-                        )}
-                    </Link>
-                    {!sidebarCollapsed && (
-                        <button 
-                            onClick={() => setSidebarCollapsed(true)}
-                            className="p-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
-                            title="Collapse Sidebar"
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </button>
-                    )}
-                </div>
-
-                {/* Sidebar Nav */}
-                <nav className="flex-1 px-3 py-4 overflow-y-auto no-scrollbar space-y-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {/* Menu */}
-                    <div>
-                        {!sidebarCollapsed && (
-                            <div className="px-3 mb-2">
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">মেনু</span>
-                            </div>
-                        )}
-                        <div className="space-y-0.5">
-                            {MENU_ITEMS.map(item => {
-                                const Icon = item.icon;
-                                const isActive = item.key === 'enrolled';
-                                return (
-                                    <button
-                                        key={item.key}
-                                        onClick={() => handleSidebarItemClick(item.key)}
-                                        className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
-                                            isActive
-                                                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/10'
-                                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                        }`}
-                                        title={item.label}
-                                    >
-                                        <Icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`} />
-                                        {!sidebarCollapsed && <span>{item.label}</span>}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Service */}
-                    <div>
-                        {!sidebarCollapsed && (
-                            <div className="px-3 mb-2">
-                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">সার্ভিস</span>
-                            </div>
-                        )}
-                        <div className="space-y-0.5">
-                            {SERVICE_ITEMS.map(item => {
-                                const Icon = item.icon;
-                                return (
-                                    <button
-                                        key={item.key}
-                                        onClick={() => handleSidebarItemClick(item.key)}
-                                        className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900`}
-                                        title={item.label}
-                                    >
-                                        <Icon className="h-5 w-5 shrink-0 text-gray-500" />
-                                        {!sidebarCollapsed && <span>{item.label}</span>}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </nav>
-
-                {/* Sidebar Footer User */}
-                <div className="p-3 border-t border-gray-100 flex flex-col gap-2 shrink-0">
-                    {sidebarCollapsed && (
-                        <button
-                            onClick={() => setSidebarCollapsed(false)}
-                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors mx-auto cursor-pointer"
-                            title="Expand Sidebar"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </button>
-                    )}
-                    <button
-                        onClick={handleLogout}
-                        className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-lg text-sm font-medium text-red-650 hover:bg-red-50 hover:text-red-750 transition-all cursor-pointer`}
-                        title="Logout"
-                    >
-                        <LogOut className="h-5 w-5 shrink-0 text-red-500" />
-                        {!sidebarCollapsed && <span>লগআউট</span>}
-                    </button>
-                </div>
-            </aside>
+            {/* ── Reusable Collapsible Sidebar ───────────── */}
+            <Sidebar activeTab="enrolled" sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
 
             {/* ── Main Area ───────────────────────────────── */}
             <div className={`flex-grow flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
