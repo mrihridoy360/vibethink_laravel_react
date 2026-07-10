@@ -35,9 +35,9 @@ const MAIN_MENU = [
 
 const BOTTOM_MENU = [
     { key: 'pages', label: 'পেজ', icon: Globe, active: false, path: '#' },
-    { key: 'modules', label: 'মডিউল', icon: Puzzle, active: false, path: '#' },
+    { key: 'modules', label: 'মডিউল', icon: Puzzle, active: true, path: '/admin/modules' },
     { key: 'help', label: 'সাহায্য', icon: HelpCircle, active: false, path: '#' },
-    { key: 'settings', label: 'সেটিংস', icon: Settings, active: false, path: '#' },
+    { key: 'settings', label: 'সেটিংস', icon: Settings, active: true, path: '/admin/settings' },
     { key: 'support', label: 'সাপোর্ট', icon: HeadphonesIcon, active: false, path: '#' },
     { key: 'faq', label: 'প্রশ্নাবলী', icon: MessageCircleQuestion, active: false, path: '#' },
 ];
@@ -57,6 +57,8 @@ const PAGE_TITLES = {
     referral: 'রেফারেল ও এফিলিয়েট',
     blog: 'ব্লগ ও কন্টেন্ট ম্যানেজমেন্ট',
     reviews: 'কোর্স রিভিউ ম্যানেজমেন্ট',
+    settings: 'সাইট সেটিংস',
+    modules: 'মডিউল ম্যানেজমেন্ট',
 };
 
 export default function AdminLayout({ children, activeTab, headerContent }) {

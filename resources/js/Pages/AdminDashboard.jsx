@@ -23,6 +23,8 @@ import AdminProducts from './Admin/AdminProducts';
 import AdminReferral from './Admin/AdminReferral';
 import AdminBlog from './Admin/AdminBlog';
 import AdminReviews from './Admin/AdminReviews';
+import AdminSettings from './Admin/AdminSettings';
+import AdminModules from './Admin/AdminModules';
 import AdminLayout from '../Components/AdminLayout';
 
 // ── Coming Soon Placeholder ───────────────────────────────────
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
         navigate(key === 'dashboard' ? '/admin' : `/admin/${key}`);
     };
 
-    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews'];
+    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules'];
 
     if (loading) {
         return (
@@ -92,6 +94,8 @@ export default function AdminDashboard() {
             {activeTab === 'referral' && <AdminReferral />}
             {activeTab === 'blog' && <AdminBlog />}
             {activeTab === 'reviews' && <AdminReviews />}
+            {activeTab === 'settings' && <AdminSettings />}
+            {activeTab === 'modules' && <AdminModules />}
 
             {/* Coming Soon tabs */}
             {!activeTabs.includes(activeTab) && (

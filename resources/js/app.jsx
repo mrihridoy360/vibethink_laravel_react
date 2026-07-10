@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './Contexts/AuthContext';
+import { SiteSettingsProvider } from './Contexts/SiteSettingsContext';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import Home from './Pages/Home';
@@ -52,7 +53,9 @@ if (container) {
         <React.StrictMode>
             <BrowserRouter>
                 <AuthProvider>
-                    <AppLayout />
+                    <SiteSettingsProvider>
+                        <AppLayout />
+                    </SiteSettingsProvider>
                 </AuthProvider>
             </BrowserRouter>
         </React.StrictMode>

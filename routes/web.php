@@ -19,6 +19,10 @@ Route::prefix('api')->group(function () {
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
 
+    // Public Settings (no auth required)
+    Route::get('/settings', [AdminController::class, 'publicSettings']);
+
+
     // Authenticated API Routes
     Route::middleware('auth')->group(function () {
         Route::post('/courses/{id}/enroll', [CourseController::class, 'enroll']);
@@ -177,10 +181,16 @@ Route::prefix('api')->group(function () {
             Route::match(['post', 'put'], '/blog/tags/{id}/update', [AdminController::class, 'updateBlogTag']);
             Route::delete('/blog/tags/{id}',                        [AdminController::class, 'destroyBlogTag']);
 
-            // ── Reviews Management ────────────────────────────────
+            // ── Reviews Management ────────────────────────────────────
             Route::get('/reviews',                                  [AdminController::class, 'adminReviews']);
             Route::post('/reviews/{id}/toggle',                     [AdminController::class, 'toggleReviewStatus']);
             Route::delete('/reviews/{id}',                          [AdminController::class, 'destroyReview']);
+
+            // ── Site Settings ──────────────────────────────────────────
+            Route::get('/settings',                                 [AdminController::class, 'getSettings']);
+            Route::post('/settings',                                [AdminController::class, 'updateSettings']);
+            Route::post('/settings/upload-image',                   [AdminController::class, 'uploadSettingsImage']);
+
 
             // ── Curriculum: Chapters ──────────────────────────────
             Route::get('/courses/{courseId}/chapters',     [AdminController::class, 'getChapters']);

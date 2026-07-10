@@ -38,6 +38,7 @@ use App\Models\BlogPost;
 use App\Models\BlogCategory;
 use App\Models\BlogTag;
 use App\Models\Review;
+use App\Models\Setting;
 use App\Services\CloudinaryService;
 
 class AdminController extends Controller
@@ -2862,5 +2863,59 @@ class AdminController extends Controller
             'success' => true,
             'message' => 'রিভিউটি সফলভাবে মুছে ফেলা হয়েছে।',
         ]);
+    }
+    // ─────────────────────────────────────────
+    // Site Settings
+    // ─────────────────────────────────────────
+
+    public function getSettings()
+    {
+        $this->ensureAdmin();
+        $rows = Setting::all();
+        $grouped = [];
+        foreach ($rows as $row) {
+            $grouped[$row->group][$row->key] = $row->value;
+        }
+        return response()->json(['success' => true, 'settings' => $grouped]);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $this->ensureAdmin();
+        $group    = $request->input('group', 'general');
+        $settings = $request->input('settings', []);
+        if (!is_array($settings) || empty($settings)) {
+            return response()->json(['success' => false, 'message' => 'কোনো সেটিংস পাওয়া যায়নি।'], 422);
+        }
+        foreach ($settings as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
+        }
+        return response()->json(['success' => true, 'message' => 'সেটিংস সফলভাবে আপডেট করা হয়েছে।']);
+    }
+
+    public function uploadSettingsImage(Request $request)
+    {
+        $this->ensureAdmin();
+        $request->validate(['file' => 'required|file|image|max:2048', 'type' => 'required|in:logo,favicon,footer_logo']);
+        $cloudinary = new CloudinaryService();
+        $result = $cloudinary->uploadImage($request->file('file'), 'logos');
+        if (!$result || empty($result['url'])) {
+            return response()->json(['success' => false, 'message' => 'ইমেজ আপলোড ব্যর্থ হয়েছে।'], 500);
+        }
+        $url = $result['url'];
+        $typeMap = ['logo' => 'site_logo', 'favicon' => 'site_favicon', 'footer_logo' => 'footer_logo'];
+        $key = $typeMap[$request->type];
+        Setting::updateOrCreate(['key' => $key], ['value' => $url, 'group' => 'appearance']);
+        return response()->json(['success' => true, 'message' => 'ইমেজ সফলভাবে আপলোড হয়েছে।', 'url' => $url, 'key' => $key]);
+    }
+
+    public function publicSettings()
+    {
+        $rows = Setting::whereIn('group', ['general', 'appearance', 'footer'])->get();
+        $grouped = [];
+        foreach ($rows as $row) {
+            $grouped[$row->group][$row->key] = $row->value;
+        }
+        return response()->json(['success' => true, 'settings' => $grouped]);
     }
 }
