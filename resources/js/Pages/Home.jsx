@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
 
 export default function Home() {
     const [courses, setCourses] = useState([]);
-    const [search, setSearch] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get('search') || '';
     const [loading, setLoading] = useState(true);
 
     const fetchCourses = async (query = '') => {
@@ -44,7 +45,7 @@ export default function Home() {
                         type="text"
                         placeholder="Search courses..."
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => setSearchParams(e.target.value ? { search: e.target.value } : {})}
                         className="w-full pl-12 pr-4 py-3 rounded-2xl text-sm bg-white border border-slate-200 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/10 text-slate-800 shadow-sm transition-all"
                     />
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400" />
