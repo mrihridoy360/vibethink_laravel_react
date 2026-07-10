@@ -11,6 +11,18 @@ import AdminEnrollments from './Admin/AdminEnrollments';
 import AdminPayments from './Admin/AdminPayments';
 import AdminTickets from './Admin/AdminTickets';
 import AdminCategories from './Admin/AdminCategories';
+import AdminAssignments from './Admin/AdminAssignments';
+import AdminGateways from './Admin/AdminGateways';
+import AdminCoupons from './Admin/AdminCoupons';
+import AdminErrorLogs from './Admin/AdminErrorLogs';
+import AdminAnnouncements from './Admin/AdminAnnouncements';
+import AdminGifts from './Admin/AdminGifts';
+import AdminSocialReviews from './Admin/AdminSocialReviews';
+import AdminTools from './Admin/AdminTools';
+import AdminProducts from './Admin/AdminProducts';
+import AdminReferral from './Admin/AdminReferral';
+import AdminBlog from './Admin/AdminBlog';
+import AdminReviews from './Admin/AdminReviews';
 import AdminLayout from '../Components/AdminLayout';
 
 // ── Coming Soon Placeholder ───────────────────────────────────
@@ -44,7 +56,7 @@ export default function AdminDashboard() {
         navigate(key === 'dashboard' ? '/admin' : `/admin/${key}`);
     };
 
-    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories'];
+    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews'];
 
     if (loading) {
         return (
@@ -68,6 +80,18 @@ export default function AdminDashboard() {
             {activeTab === 'payments' && <AdminPayments />}
             {activeTab === 'tickets' && <AdminTickets />}
             {activeTab === 'categories' && <AdminCategories />}
+            {activeTab === 'assignments' && <AdminAssignments />}
+            {activeTab === 'gateway' && <AdminGateways />}
+            {activeTab === 'coupons' && <AdminCoupons />}
+            {activeTab === 'error_logs' && <AdminErrorLogs />}
+            {activeTab === 'announcements' && <AdminAnnouncements />}
+            {activeTab === 'giftmgmt' && <AdminGifts />}
+            {activeTab === 'social_review' && <AdminSocialReviews />}
+            {activeTab === 'tools' && <AdminTools />}
+            {activeTab === 'products' && <AdminProducts />}
+            {activeTab === 'referral' && <AdminReferral />}
+            {activeTab === 'blog' && <AdminBlog />}
+            {activeTab === 'reviews' && <AdminReviews />}
 
             {/* Coming Soon tabs */}
             {!activeTabs.includes(activeTab) && (

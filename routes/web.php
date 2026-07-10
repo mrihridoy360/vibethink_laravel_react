@@ -73,13 +73,114 @@ Route::prefix('api')->group(function () {
             Route::get('/users',                           [AdminController::class, 'users']);
             Route::put('/users/{id}',                      [AdminController::class, 'updateUser']);
             Route::delete('/users/{id}',                   [AdminController::class, 'deleteUser']);
+
+            // ── Assignments ───────────────────────────────────────
+            Route::get('/assignments',                     [AdminController::class, 'assignments']);
+            Route::get('/courses/{courseId}/lessons-no-assignment', [AdminController::class, 'getLessonsForAssignment']);
+            Route::post('/assignments',                    [AdminController::class, 'storeAssignment']);
+            Route::put('/assignments/{id}',                [AdminController::class, 'updateAssignment']);
+            Route::delete('/assignments/{id}',             [AdminController::class, 'destroyAssignment']);
+            Route::get('/submissions',                     [AdminController::class, 'getSubmissions']);
+            Route::post('/submissions/{id}/grade',         [AdminController::class, 'gradeSubmission']);
+
             Route::get('/enrollments',                     [AdminController::class, 'enrollments']);
             Route::get('/enrollments/resources',           [AdminController::class, 'enrollmentResources']);
             Route::post('/enrollments',                    [AdminController::class, 'storeEnrollment']);
             Route::get('/payments',                        [AdminController::class, 'payments']);
+
+            // ── Payment Gateways ──────────────────────────────────
+            Route::get('/payment-gateways',                [AdminController::class, 'paymentGateways']);
+            Route::post('/payment-gateways',               [AdminController::class, 'storePaymentGateway']);
+            Route::put('/payment-gateways/{id}',           [AdminController::class, 'updatePaymentGateway']);
+            Route::delete('/payment-gateways/{id}',        [AdminController::class, 'destroyPaymentGateway']);
+
+            // ── Coupons ──────────────────────────────────────────
+            Route::get('/coupons',                         [AdminController::class, 'coupons']);
+            Route::post('/coupons',                        [AdminController::class, 'storeCoupon']);
+            Route::put('/coupons/{id}',                    [AdminController::class, 'updateCoupon']);
+            Route::delete('/coupons/{id}',                 [AdminController::class, 'destroyCoupon']);
+
+            // ── Error Logs ────────────────────────────────────────
+            Route::get('/error-logs',                      [AdminController::class, 'errorLogs']);
+            Route::put('/error-logs/{id}',                 [AdminController::class, 'updateErrorLog']);
+            Route::delete('/error-logs/{id}',              [AdminController::class, 'destroyErrorLog']);
+            Route::post('/error-logs/clear',               [AdminController::class, 'clearErrorLogs']);
+            Route::post('/error-logs/bulk-delete',         [AdminController::class, 'bulkDestroyErrorLogs']);
+
+            // ── Announcements ────────────────────────────────────
+            Route::get('/announcements',                   [AdminController::class, 'announcements']);
+            Route::get('/announcements/resources',         [AdminController::class, 'announcementResources']);
+            Route::post('/announcements',                  [AdminController::class, 'storeAnnouncement']);
+            Route::put('/announcements/{id}',              [AdminController::class, 'updateAnnouncement']);
+            Route::delete('/announcements/{id}',           [AdminController::class, 'destroyAnnouncement']);
+
+            // ── Gifts ────────────────────────────────────────────
+            Route::get('/gifts',                           [AdminController::class, 'gifts']);
+            Route::post('/gifts',                          [AdminController::class, 'storeGift']);
+            Route::match(['post', 'put'], '/gifts/{id}/update', [AdminController::class, 'updateGift']);
+            Route::delete('/gifts/{id}',                   [AdminController::class, 'destroyGift']);
+
+            // ── Social Reviews ───────────────────────────────────
+            Route::get('/social-reviews',                  [AdminController::class, 'socialReviews']);
+            Route::put('/social-reviews/{id}',             [AdminController::class, 'updateSocialReview']);
+            Route::delete('/social-reviews/{id}',          [AdminController::class, 'destroySocialReview']);
+
             Route::get('/tickets',                         [AdminController::class, 'tickets']);
             Route::put('/tickets/{id}/status',             [AdminController::class, 'updateTicketStatus']);
             Route::post('/tickets/{id}/reply',             [AdminController::class, 'replyTicket']);
+
+            // ── Tools & Tool Categories ──────────────────────────
+            Route::get('/tool-categories',                      [AdminController::class, 'toolCategories']);
+            Route::post('/tool-categories',                     [AdminController::class, 'storeToolCategory']);
+            Route::match(['post', 'put'], '/tool-categories/{id}/update', [AdminController::class, 'updateToolCategory']);
+            Route::delete('/tool-categories/{id}',              [AdminController::class, 'destroyToolCategory']);
+
+            Route::get('/tools',                                [AdminController::class, 'adminTools']);
+            Route::post('/tools',                               [AdminController::class, 'storeTool']);
+            Route::match(['post', 'put'], '/tools/{id}/update', [AdminController::class, 'updateTool']);
+            Route::delete('/tools/{id}',                        [AdminController::class, 'destroyTool']);
+
+            // ── Products & Product Orders ────────────────────────
+            Route::get('/products',                                [AdminController::class, 'adminProducts']);
+            Route::post('/products',                               [AdminController::class, 'storeProduct']);
+            Route::match(['post', 'put'], '/products/{id}/update', [AdminController::class, 'updateProduct']);
+            Route::delete('/products/{id}',                        [AdminController::class, 'destroyProduct']);
+
+            Route::get('/product-orders',                          [AdminController::class, 'adminProductOrders']);
+            Route::patch('/product-orders/{id}/status',            [AdminController::class, 'updateProductOrderStatus']);
+
+            // ── Referral Management ──────────────────────────────
+            Route::get('/referrals',                                [AdminController::class, 'referralIndex']);
+            Route::get('/referrals/settings',                       [AdminController::class, 'referralSettings']);
+            Route::post('/referrals/settings',                      [AdminController::class, 'updateReferralSettings']);
+            Route::get('/referrals/users/{id}',                     [AdminController::class, 'showReferralUser']);
+            Route::post('/referrals/users/{id}/approve',            [AdminController::class, 'approveReferralUser']);
+            Route::post('/referrals/users/{id}/reject',             [AdminController::class, 'rejectReferralUser']);
+            Route::post('/referrals/users/{id}/suspend',            [AdminController::class, 'suspendReferralUser']);
+            Route::delete('/referrals/users/{id}/reset',            [AdminController::class, 'resetReferralUser']);
+            Route::get('/referrals/commissions',                    [AdminController::class, 'referralCommissions']);
+            Route::post('/referrals/commissions/{id}/credit',       [AdminController::class, 'creditReferralCommission']);
+
+            // ── Blog Management ──────────────────────────────────
+            Route::get('/blog/posts',                               [AdminController::class, 'adminBlogPosts']);
+            Route::post('/blog/posts',                              [AdminController::class, 'storeBlogPost']);
+            Route::match(['post', 'put'], '/blog/posts/{id}/update', [AdminController::class, 'updateBlogPost']);
+            Route::delete('/blog/posts/{id}',                       [AdminController::class, 'destroyBlogPost']);
+
+            Route::get('/blog/categories',                          [AdminController::class, 'adminBlogCategories']);
+            Route::post('/blog/categories',                         [AdminController::class, 'storeBlogCategory']);
+            Route::match(['post', 'put'], '/blog/categories/{id}/update', [AdminController::class, 'updateBlogCategory']);
+            Route::delete('/blog/categories/{id}',                  [AdminController::class, 'destroyBlogCategory']);
+
+            Route::get('/blog/tags',                                [AdminController::class, 'adminBlogTags']);
+            Route::post('/blog/tags',                               [AdminController::class, 'storeBlogTag']);
+            Route::match(['post', 'put'], '/blog/tags/{id}/update', [AdminController::class, 'updateBlogTag']);
+            Route::delete('/blog/tags/{id}',                        [AdminController::class, 'destroyBlogTag']);
+
+            // ── Reviews Management ────────────────────────────────
+            Route::get('/reviews',                                  [AdminController::class, 'adminReviews']);
+            Route::post('/reviews/{id}/toggle',                     [AdminController::class, 'toggleReviewStatus']);
+            Route::delete('/reviews/{id}',                          [AdminController::class, 'destroyReview']);
 
             // ── Curriculum: Chapters ──────────────────────────────
             Route::get('/courses/{courseId}/chapters',     [AdminController::class, 'getChapters']);

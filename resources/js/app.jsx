@@ -23,7 +23,7 @@ function AppLayout() {
         || location.pathname.startsWith('/admin');
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className={`flex flex-col min-h-screen ${!hideLayout ? 'bg-[#f8fafc] text-slate-800 font-sans' : ''}`}>
             {!hideLayout && <Navbar />}
             <main className="flex-grow">
                 <Routes>

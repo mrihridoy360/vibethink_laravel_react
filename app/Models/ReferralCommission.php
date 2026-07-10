@@ -33,4 +33,34 @@ class ReferralCommission extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class);
+    }
+
+    /**
+     * Credit this commission to referrer's wallet
+     */
+    public function creditToWallet(): bool
+    {
+        if ($this->status !== 'pending') {
+            return false;
+        }
+
+        $wallet = UserWallet::getOrCreateForUser($this->referrer_id);
+        
+        $wallet->credit(
+            $this->commission_amount,
+            "Referral commission from {$this->referred->name} for {$this->course->title}",
+            'referral_commission',
+            $this->id
+        );
+
+        $this->status = 'credited';
+        $this->credited_at = now();
+        $this->save();
+
+        return true;
+    }
 }

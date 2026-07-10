@@ -37,4 +37,9 @@ class Lesson extends Model
     {
         return $this->belongsTo(Chapter::class);
     }
+
+    public function assignment()
+    {
+        return $this->hasOne(Assignment::class);
+    }
 }

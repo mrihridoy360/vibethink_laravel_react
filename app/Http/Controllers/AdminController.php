@@ -8,14 +8,36 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Course;
 use App\Models\Category;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Models\Chapter;
 use App\Models\Lesson;
 use App\Models\User;
 use App\Models\Enrollment;
 use App\Models\Payment;
+use App\Models\PaymentGateway;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
+use App\Models\ErrorLog;
+use App\Models\Announcement;
+use App\Models\Gift;
+use App\Models\SocialReview;
 use App\Models\SupportTicket;
 use App\Models\TicketCategory;
 use App\Models\TicketReply;
+use App\Models\Tool;
+use App\Models\ToolCategory;
+use App\Models\Product;
+use App\Models\ProductOrder;
+use App\Models\ReferralSetting;
+use App\Models\ReferralUser;
+use App\Models\ReferralCommission;
+use App\Models\UserWallet;
+use App\Models\WalletTransaction;
+use App\Models\BlogPost;
+use App\Models\BlogCategory;
+use App\Models\BlogTag;
+use App\Models\Review;
 use App\Services\CloudinaryService;
 
 class AdminController extends Controller
@@ -774,5 +796,2071 @@ class AdminController extends Controller
                 ->update(['sort_order' => $item['sort_order']]);
         }
         return response()->json(['success' => true]);
+    }
+
+    // ─────────────────────────────────────────
+    // Assignments
+    // ─────────────────────────────────────────
+
+    public function assignments(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Assignment::with(['lesson.chapter.course'])->withCount('submissions');
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->whereHas('lesson', function($l) use ($q) {
+                $l->where('title', 'like', "%{$q}%")
+                  ->orWhereHas('chapter.course', function($c) use ($q) {
+                      $c->where('title', 'like', "%{$q}%");
+                  });
+            });
+        }
+
+        $assignments = $query->latest()->paginate(15);
+
+        return response()->json([
+            'success'     => true,
+            'assignments' => $assignments,
+        ]);
+    }
+
+    public function getLessonsForAssignment($courseId)
+    {
+        $this->ensureAdmin();
+        
+        $lessons = Lesson::whereHas('chapter', function($c) use ($courseId) {
+                $c->where('course_id', $courseId);
+            })
+            ->whereDoesntHave('assignment')
+            ->orderBy('sort_order')
+            ->select('id', 'title')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'lessons' => $lessons,
+        ]);
+    }
+
+    public function storeAssignment(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $request->validate([
+            'lesson_id'        => 'required|exists:lessons,id|unique:assignments,lesson_id',
+            'total_points'     => 'required|integer|min:1',
+            'due_date'         => 'nullable|date',
+            'file_requirement' => 'required|in:required,optional,none',
+        ]);
+
+        $assignment = Assignment::create($request->only([
+            'lesson_id', 'total_points', 'due_date', 'file_requirement'
+        ]));
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'এসাইনমেন্ট তৈরি করা হয়েছে।',
+            'assignment' => $assignment->load('lesson.chapter.course')->loadCount('submissions'),
+        ]);
+    }
+
+    public function updateAssignment(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $assignment = Assignment::findOrFail($id);
+
+        $request->validate([
+            'total_points'     => 'required|integer|min:1',
+            'due_date'         => 'nullable|date',
+            'file_requirement' => 'required|in:required,optional,none',
+        ]);
+
+        $assignment->update($request->only([
+            'total_points', 'due_date', 'file_requirement'
+        ]));
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'এসাইনমেন্ট আপডেট সম্পন্ন হয়েছে।',
+            'assignment' => $assignment->fresh()->load('lesson.chapter.course')->loadCount('submissions'),
+        ]);
+    }
+
+    public function destroyAssignment($id)
+    {
+        $this->ensureAdmin();
+        $assignment = Assignment::findOrFail($id);
+        
+        $assignment->submissions()->delete();
+        $assignment->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এসাইনমেন্ট এবং এর সাবমিশনগুলো মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Submissions & Grading
+    // ─────────────────────────────────────────
+
+    public function getSubmissions(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = AssignmentSubmission::with(['user:id,name,email', 'assignment.lesson.chapter.course']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('assignment_id')) {
+            $query->where('assignment_id', $request->assignment_id);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->whereHas('user', function($u) use ($q) {
+                $u->where('name', 'like', "%{$q}%")
+                  ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        $submissions = $query->latest()->paginate(15);
+
+        return response()->json([
+            'success'     => true,
+            'submissions' => $submissions,
+        ]);
+    }
+
+    public function gradeSubmission(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $submission = AssignmentSubmission::with('assignment')->findOrFail($id);
+
+        $request->validate([
+            'grade'    => 'required|integer|min:0|max:' . $submission->assignment->total_points,
+            'feedback' => 'nullable|string',
+            'status'   => 'required|in:graded,passed,rejected,returned',
+        ]);
+
+        $submission->update([
+            'grade'    => $request->grade,
+            'feedback' => $request->feedback,
+            'status'   => $request->status,
+        ]);
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'এসাইনমেন্ট সফলভাবে গ্রেড করা হয়েছে।',
+            'submission' => $submission->fresh()->load(['user:id,name,email', 'assignment.lesson.chapter.course']),
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Payment Gateways
+    // ─────────────────────────────────────────
+
+    public function paymentGateways(Request $request)
+    {
+        $this->ensureAdmin();
+        $gateways = PaymentGateway::orderBy('sort_order')->get();
+        return response()->json([
+            'success'  => true,
+            'gateways' => $gateways,
+        ]);
+    }
+
+    public function storePaymentGateway(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'type'        => 'required|in:automatic,manual',
+            'mode'        => 'required|in:live,sandbox',
+            'config'      => 'nullable|array',
+            'description' => 'nullable|string',
+            'is_active'   => 'required|boolean',
+            'sort_order'  => 'nullable|integer',
+        ]);
+
+        $gateway = PaymentGateway::create([
+            'name'        => $request->name,
+            'key'         => Str::slug($request->name) . '-' . uniqid(),
+            'type'        => $request->type,
+            'mode'        => $request->mode,
+            'config'      => $request->config ?? [],
+            'description' => $request->description,
+            'is_active'   => $request->is_active,
+            'sort_order'  => $request->sort_order ?? 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পেমেন্ট গেটওয়ে সফলভাবে তৈরি করা হয়েছে।',
+            'gateway' => $gateway,
+        ]);
+    }
+
+    public function updatePaymentGateway(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $gateway = PaymentGateway::findOrFail($id);
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'mode'        => 'required|in:live,sandbox',
+            'config'      => 'nullable|array',
+            'description' => 'nullable|string',
+            'is_active'   => 'required|boolean',
+            'sort_order'  => 'nullable|integer',
+        ]);
+
+        $gateway->update([
+            'name'        => $request->name,
+            'mode'        => $request->mode,
+            'config'      => $request->config ?? [],
+            'description' => $request->description,
+            'is_active'   => $request->is_active,
+            'sort_order'  => $request->sort_order ?? 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পেমেন্ট গেটওয়ে আপডেট সম্পন্ন হয়েছে।',
+            'gateway' => $gateway->fresh(),
+        ]);
+    }
+
+    public function destroyPaymentGateway($id)
+    {
+        $this->ensureAdmin();
+        $gateway = PaymentGateway::findOrFail($id);
+        $gateway->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পেমেন্ট গেটওয়ে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Coupons
+    // ─────────────────────────────────────────
+
+    public function coupons(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Coupon::query();
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where('code', 'like', "%{$q}%")
+                  ->orWhere('name', 'like', "%{$q}%");
+        }
+
+        $coupons = $query->latest()->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'coupons' => $coupons,
+        ]);
+    }
+
+    public function storeCoupon(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $request->validate([
+            'code'                  => 'required|string|max:255|unique:coupons,code',
+            'name'                  => 'nullable|string|max:255',
+            'description'           => 'nullable|string',
+            'type'                  => 'required|in:percentage,fixed',
+            'value'                 => 'required|numeric|min:0',
+            'min_purchase'          => 'nullable|numeric|min:0',
+            'max_discount'          => 'nullable|numeric|min:0',
+            'usage_limit'           => 'nullable|integer|min:1',
+            'usage_limit_per_user'  => 'required|integer|min:1',
+            'applicable_courses'    => 'nullable|array',
+            'applicable_categories' => 'nullable|array',
+            'starts_at'             => 'nullable|date',
+            'expires_at'            => 'nullable|date|after_or_equal:starts_at',
+            'is_active'             => 'required|boolean',
+        ]);
+
+        $coupon = Coupon::create($request->only([
+            'code', 'name', 'description', 'type', 'value', 'min_purchase', 'max_discount',
+            'usage_limit', 'usage_limit_per_user', 'applicable_courses', 'applicable_categories',
+            'starts_at', 'expires_at', 'is_active'
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'কুপন সফলভাবে তৈরি করা হয়েছে।',
+            'coupon'  => $coupon,
+        ]);
+    }
+
+    public function updateCoupon(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $coupon = Coupon::findOrFail($id);
+
+        $request->validate([
+            'code'                  => 'required|string|max:255|unique:coupons,code,' . $id,
+            'name'                  => 'nullable|string|max:255',
+            'description'           => 'nullable|string',
+            'type'                  => 'required|in:percentage,fixed',
+            'value'                 => 'required|numeric|min:0',
+            'min_purchase'          => 'nullable|numeric|min:0',
+            'max_discount'          => 'nullable|numeric|min:0',
+            'usage_limit'           => 'nullable|integer|min:1',
+            'usage_limit_per_user'  => 'required|integer|min:1',
+            'applicable_courses'    => 'nullable|array',
+            'applicable_categories' => 'nullable|array',
+            'starts_at'             => 'nullable|date',
+            'expires_at'            => 'nullable|date|after_or_equal:starts_at',
+            'is_active'             => 'required|boolean',
+        ]);
+
+        $coupon->update($request->only([
+            'code', 'name', 'description', 'type', 'value', 'min_purchase', 'max_discount',
+            'usage_limit', 'usage_limit_per_user', 'applicable_courses', 'applicable_categories',
+            'starts_at', 'expires_at', 'is_active'
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'কুপন আপডেট সম্পন্ন হয়েছে।',
+            'coupon'  => $coupon->fresh(),
+        ]);
+    }
+
+    public function destroyCoupon($id)
+    {
+        $this->ensureAdmin();
+        $coupon = Coupon::findOrFail($id);
+        $coupon->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'কুপন মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Error Logs
+    // ─────────────────────────────────────────
+
+    public function errorLogs(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = ErrorLog::with(['user:id,name,email', 'resolver:id,name']);
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('severity')) {
+            $query->where('severity', $request->severity);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('message', 'like', "%{$q}%")
+                    ->orWhere('file', 'like', "%{$q}%")
+                    ->orWhere('error_code', 'like', "%{$q}%")
+                    ->orWhere('user_email', 'like', "%{$q}%")
+                    ->orWhere('url', 'like', "%{$q}%");
+            });
+        }
+
+        $logs = $query->latest('id')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'logs'    => $logs,
+        ]);
+    }
+
+    public function updateErrorLog(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $log = ErrorLog::findOrFail($id);
+
+        $request->validate([
+            'status'           => 'required|in:new,investigating,resolved,ignored',
+            'resolution_notes' => 'nullable|string',
+        ]);
+
+        $updateData = [
+            'status'           => $request->status,
+            'resolution_notes' => $request->resolution_notes,
+        ];
+
+        if ($request->status === 'resolved') {
+            $updateData['resolved_by'] = Auth::id();
+            $updateData['resolved_at'] = now();
+        } else {
+            $updateData['resolved_by'] = null;
+            $updateData['resolved_at'] = null;
+        }
+
+        $log->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এরর লগ আপডেট সম্পন্ন হয়েছে।',
+            'log'     => $log->fresh()->load(['user:id,name,email', 'resolver:id,name']),
+        ]);
+    }
+
+    public function destroyErrorLog($id)
+    {
+        $this->ensureAdmin();
+        $log = ErrorLog::findOrFail($id);
+        $log->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এরর লগ মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    public function clearErrorLogs()
+    {
+        $this->ensureAdmin();
+        ErrorLog::truncate();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'সব এরর লগ সফলভাবে সাফ করা হয়েছে।',
+        ]);
+    }
+
+    public function bulkDestroyErrorLogs(Request $request)
+    {
+        $this->ensureAdmin();
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:error_logs,id'
+        ]);
+
+        ErrorLog::whereIn('id', $request->ids)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'নির্বাচিত এরর লগসমূহ মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Announcements
+    // ─────────────────────────────────────────
+
+    public function announcements(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Announcement::with(['creator:id,name,email', 'course:id,title']);
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('title', 'like', "%{$q}%")
+                    ->orWhere('content', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        $announcements = $query->latest('is_pinned')->latest('id')->paginate(15);
+
+        return response()->json([
+            'success'       => true,
+            'announcements' => $announcements,
+        ]);
+    }
+
+    public function announcementResources()
+    {
+        $this->ensureAdmin();
+
+        $courses = Course::select('id', 'title')->get();
+
+        return response()->json([
+            'success' => true,
+            'courses' => $courses,
+        ]);
+    }
+
+    public function storeAnnouncement(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $request->validate([
+            'title'      => 'required|string|max:255',
+            'content'    => 'required|string',
+            'type'       => 'required|in:info,warning,success,danger',
+            'priority'   => 'required|in:low,normal,high,urgent',
+            'is_active'  => 'required|boolean',
+            'is_pinned'  => 'required|boolean',
+            'expires_at' => 'nullable|date',
+            'course_id'  => 'nullable|exists:courses,id',
+        ]);
+
+        $announcement = Announcement::create([
+            'title'      => $request->title,
+            'content'    => $request->content,
+            'type'       => $request->type,
+            'priority'   => $request->priority,
+            'is_active'  => $request->is_active,
+            'is_pinned'  => $request->is_pinned,
+            'expires_at' => $request->expires_at,
+            'course_id'  => $request->course_id,
+            'created_by' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'success'      => true,
+            'message'      => 'ঘোষণা সফলভাবে প্রকাশ করা হয়েছে।',
+            'announcement' => $announcement->load(['creator:id,name,email', 'course:id,title']),
+        ]);
+    }
+
+    public function updateAnnouncement(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $announcement = Announcement::findOrFail($id);
+
+        $request->validate([
+            'title'      => 'required|string|max:255',
+            'content'    => 'required|string',
+            'type'       => 'required|in:info,warning,success,danger',
+            'priority'   => 'required|in:low,normal,high,urgent',
+            'is_active'  => 'required|boolean',
+            'is_pinned'  => 'required|boolean',
+            'expires_at' => 'nullable|date',
+            'course_id'  => 'nullable|exists:courses,id',
+        ]);
+
+        $announcement->update([
+            'title'      => $request->title,
+            'content'    => $request->content,
+            'type'       => $request->type,
+            'priority'   => $request->priority,
+            'is_active'  => $request->is_active,
+            'is_pinned'  => $request->is_pinned,
+            'expires_at' => $request->expires_at,
+            'course_id'  => $request->course_id,
+        ]);
+
+        return response()->json([
+            'success'      => true,
+            'message'      => 'ঘোষণা আপডেট সম্পন্ন হয়েছে।',
+            'announcement' => $announcement->fresh()->load(['creator:id,name,email', 'course:id,title']),
+        ]);
+    }
+
+    public function destroyAnnouncement($id)
+    {
+        $this->ensureAdmin();
+        $announcement = Announcement::findOrFail($id);
+        $announcement->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ঘোষণাটি মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Gifts
+    // ─────────────────────────────────────────
+
+    public function gifts(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Gift::with('creator:id,name,email');
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('title', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhere('code', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        if ($request->filled('is_locked')) {
+            $query->where('is_locked', $request->is_locked);
+        }
+
+        $gifts = $query->latest('id')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'gifts'   => $gifts,
+        ]);
+    }
+
+    public function storeGift(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'code'        => 'nullable|string|max:255',
+            'priority'    => 'required|in:low,normal,high,urgent',
+            'is_active'   => 'required|boolean',
+            'is_locked'   => 'required|boolean',
+            'expires_at'  => 'nullable|date',
+            'image'       => 'nullable|image|max:4096',
+        ]);
+
+        $data = [
+            'title'       => $request->title,
+            'description' => $request->description,
+            'code'        => $request->code,
+            'priority'    => $request->priority,
+            'is_active'   => $request->is_active,
+            'is_locked'   => $request->is_locked,
+            'expires_at'  => $request->expires_at,
+            'created_by'  => Auth::id(),
+        ];
+
+        if ($request->hasFile('image')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('image'), 'gifts');
+            if ($result) {
+                $data['image'] = $result['url'];
+            }
+        }
+
+        $gift = Gift::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'গিফট সফলভাবে তৈরি করা হয়েছে।',
+            'gift'    => $gift->load('creator:id,name,email'),
+        ]);
+    }
+
+    public function updateGift(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $gift = Gift::findOrFail($id);
+
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'code'        => 'nullable|string|max:255',
+            'priority'    => 'required|in:low,normal,high,urgent',
+            'is_active'   => 'required|boolean',
+            'is_locked'   => 'required|boolean',
+            'expires_at'  => 'nullable|date',
+            'image'       => 'nullable|image|max:4096',
+        ]);
+
+        $data = [
+            'title'       => $request->title,
+            'description' => $request->description,
+            'code'        => $request->code,
+            'priority'    => $request->priority,
+            'is_active'   => $request->is_active,
+            'is_locked'   => $request->is_locked,
+            'expires_at'  => $request->expires_at,
+        ];
+
+        if ($request->hasFile('image')) {
+            $cloudinary = new CloudinaryService();
+
+            // delete old image if exists
+            if ($gift->image && $cloudinary->isCloudinaryUrl($gift->image)) {
+                $publicId = $cloudinary->extractPublicId($gift->image);
+                if ($publicId) $cloudinary->deleteImage($publicId);
+            }
+
+            $result = $cloudinary->uploadImage($request->file('image'), 'gifts');
+            if ($result) {
+                $data['image'] = $result['url'];
+            }
+        }
+
+        $gift->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'গিফট আপডেট সম্পন্ন হয়েছে।',
+            'gift'    => $gift->fresh()->load('creator:id,name,email'),
+        ]);
+    }
+
+    public function destroyGift($id)
+    {
+        $this->ensureAdmin();
+        $gift = Gift::findOrFail($id);
+
+        // delete old image if exists
+        if ($gift->image) {
+            $cloudinary = new CloudinaryService();
+            if ($cloudinary->isCloudinaryUrl($gift->image)) {
+                $publicId = $cloudinary->extractPublicId($gift->image);
+                if ($publicId) $cloudinary->deleteImage($publicId);
+            }
+        }
+
+        $gift->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'গিফট মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Social Reviews
+    // ─────────────────────────────────────────
+
+    public function socialReviews(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = SocialReview::with('user:id,name,email');
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('review_url', 'like', "%{$q}%")
+                    ->orWhereHas('user', function($uQuery) use ($q) {
+                        $uQuery->where('name', 'like', "%{$q}%")
+                               ->orWhere('email', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $reviews = $query->latest('id')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'reviews' => $reviews,
+        ]);
+    }
+
+    public function updateSocialReview(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $review = SocialReview::findOrFail($id);
+
+        $request->validate([
+            'status'         => 'required|in:pending,approved,rejected',
+            'admin_feedback' => 'nullable|string',
+        ]);
+
+        $review->update([
+            'status'         => $request->status,
+            'admin_feedback' => $request->admin_feedback,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'সোশ্যাল রিভিউ স্ট্যাটাস আপডেট করা হয়েছে।',
+            'review'  => $review->fresh()->load('user:id,name,email'),
+        ]);
+    }
+
+    public function destroySocialReview($id)
+    {
+        $this->ensureAdmin();
+        $review = SocialReview::findOrFail($id);
+        $review->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'সোশ্যাল রিভিউ মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Tool Categories Management
+    // ─────────────────────────────────────────
+
+    public function toolCategories(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = ToolCategory::withCount('tools');
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where('name', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%");
+        }
+
+        $categories = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function storeToolCategory(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:tool_categories,slug',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:255',
+            'color' => 'required|string|max:7',
+            'order' => 'nullable|integer',
+            'is_active' => 'boolean',
+        ]);
+
+        $category = ToolCategory::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুলস ক্যাটাগরি সফলভাবে তৈরি করা হয়েছে।',
+            'category' => $category,
+        ]);
+    }
+
+    public function updateToolCategory(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $category = ToolCategory::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:tool_categories,slug,' . $id,
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|max:255',
+            'color' => 'required|string|max:7',
+            'order' => 'nullable|integer',
+            'is_active' => 'boolean',
+        ]);
+
+        $category->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুলস ক্যাটাগরি সফলভাবে আপডেট করা হয়েছে।',
+            'category' => $category->fresh(),
+        ]);
+    }
+
+    public function destroyToolCategory($id)
+    {
+        $this->ensureAdmin();
+        $category = ToolCategory::findOrFail($id);
+
+        // Delete associated tools
+        $tools = $category->tools;
+        $cloudinary = new CloudinaryService();
+        foreach ($tools as $tool) {
+            // Delete icon from Cloudinary if exists
+            if ($tool->icon && $cloudinary->isCloudinaryUrl($tool->icon)) {
+                $publicId = $cloudinary->extractPublicId($tool->icon);
+                if ($publicId) {
+                    $cloudinary->deleteImage($publicId);
+                }
+            }
+
+            // Delete thumbnail from Cloudinary if exists
+            if ($tool->thumbnail && $cloudinary->isCloudinaryUrl($tool->thumbnail)) {
+                $publicId = $cloudinary->extractPublicId($tool->thumbnail);
+                if ($publicId) {
+                    $cloudinary->deleteImage($publicId);
+                }
+            }
+            $tool->delete();
+        }
+
+        $category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুলস ক্যাটাগরি এবং এর অধীনস্থ সকল টুলস সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Tools Management
+    // ─────────────────────────────────────────
+
+    public function adminTools(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Tool::with('category');
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where('name', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%")
+                  ->orWhere('url', 'like', "%{$q}%");
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $tools = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'tools' => $tools,
+        ]);
+    }
+
+    public function storeTool(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            'category_id' => 'required|exists:tool_categories,id',
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:tools,slug',
+            'description' => 'nullable|string',
+            'url' => 'required|url',
+            'icon' => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|string',
+            'icon_file' => 'nullable|image|max:2048',
+            'thumbnail_file' => 'nullable|image|max:4096',
+            'is_external' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+            'order' => 'nullable|integer',
+            'button_text' => 'nullable|string|max:255',
+        ]);
+
+        $data = $validated;
+        unset($data['icon_file'], $data['thumbnail_file']);
+
+        // Handle icon upload
+        if ($request->hasFile('icon_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('icon_file'), 'tools/icons', [
+                'transformation' => 'w_256,h_256,c_limit,q_auto'
+            ]);
+            if ($result) {
+                $data['icon'] = $result['url'];
+            }
+        }
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadThumbnail($request->file('thumbnail_file'));
+            if ($result) {
+                $data['thumbnail'] = $result['url'];
+            }
+        }
+
+        // Set booleans safely
+        $data['is_external'] = $request->boolean('is_external', true);
+        $data['is_featured'] = $request->boolean('is_featured', false);
+        $data['is_active'] = $request->boolean('is_active', true);
+
+        $tool = Tool::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুল সফলভাবে তৈরি করা হয়েছে।',
+            'tool' => $tool->load('category'),
+        ]);
+    }
+
+    public function updateTool(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $tool = Tool::findOrFail($id);
+
+        $validated = $request->validate([
+            'category_id' => 'required|exists:tool_categories,id',
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:tools,slug,' . $id,
+            'description' => 'nullable|string',
+            'url' => 'required|url',
+            'icon' => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|string',
+            'icon_file' => 'nullable|image|max:2048',
+            'thumbnail_file' => 'nullable|image|max:4096',
+            'is_external' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+            'order' => 'nullable|integer',
+            'button_text' => 'nullable|string|max:255',
+        ]);
+
+        $data = $validated;
+        unset($data['icon_file'], $data['thumbnail_file']);
+
+        $cloudinary = new CloudinaryService();
+
+        // Handle icon upload
+        if ($request->hasFile('icon_file')) {
+            $result = $cloudinary->uploadImage($request->file('icon_file'), 'tools/icons', [
+                'transformation' => 'w_256,h_256,c_limit,q_auto'
+            ]);
+            if ($result) {
+                $data['icon'] = $result['url'];
+                // Delete old icon
+                if ($tool->icon && $cloudinary->isCloudinaryUrl($tool->icon)) {
+                    $publicId = $cloudinary->extractPublicId($tool->icon);
+                    if ($publicId) {
+                        $cloudinary->deleteImage($publicId);
+                    }
+                }
+            }
+        }
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail_file')) {
+            $result = $cloudinary->uploadThumbnail($request->file('thumbnail_file'));
+            if ($result) {
+                $data['thumbnail'] = $result['url'];
+                // Delete old thumbnail
+                if ($tool->thumbnail && $cloudinary->isCloudinaryUrl($tool->thumbnail)) {
+                    $publicId = $cloudinary->extractPublicId($tool->thumbnail);
+                    if ($publicId) {
+                        $cloudinary->deleteImage($publicId);
+                    }
+                }
+            }
+        }
+
+        // Set booleans safely
+        $data['is_external'] = $request->boolean('is_external', $tool->is_external);
+        $data['is_featured'] = $request->boolean('is_featured', $tool->is_featured);
+        $data['is_active'] = $request->boolean('is_active', $tool->is_active);
+
+        $tool->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুল সফলভাবে আপডেট করা হয়েছে।',
+            'tool' => $tool->fresh()->load('category'),
+        ]);
+    }
+
+    public function destroyTool($id)
+    {
+        $this->ensureAdmin();
+        $tool = Tool::findOrFail($id);
+
+        $cloudinary = new CloudinaryService();
+
+        // Delete icon from Cloudinary if exists
+        if ($tool->icon && $cloudinary->isCloudinaryUrl($tool->icon)) {
+            $publicId = $cloudinary->extractPublicId($tool->icon);
+            if ($publicId) {
+                $cloudinary->deleteImage($publicId);
+            }
+        }
+
+        // Delete thumbnail from Cloudinary if exists
+        if ($tool->thumbnail && $cloudinary->isCloudinaryUrl($tool->thumbnail)) {
+            $publicId = $cloudinary->extractPublicId($tool->thumbnail);
+            if ($publicId) {
+                $cloudinary->deleteImage($publicId);
+            }
+        }
+
+        $tool->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'টুল সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Products Management
+    // ─────────────────────────────────────────
+
+    public function adminProducts(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Product::query();
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where('name', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%");
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $products = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'products' => $products,
+        ]);
+    }
+
+    public function storeProduct(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:products,slug',
+            'description' => 'nullable|string',
+            'features' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'image_file' => 'nullable|image|max:2048',
+            'type' => 'required|in:digital,physical,service',
+            'download_link' => 'nullable|url',
+            'access_instructions' => 'nullable|string',
+            'stock' => 'nullable|integer|min:0',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+            'order' => 'nullable|integer',
+        ]);
+
+        $data = $validated;
+        unset($data['image_file']);
+
+        // Handle image upload with Cloudinary
+        if ($request->hasFile('image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('image_file'), 'products/images', [
+                'transformation' => 'w_800,c_limit,q_auto'
+            ]);
+            if ($result) {
+                $data['image'] = $result['url'];
+            }
+        }
+
+        $data['is_featured'] = $request->boolean('is_featured', false);
+        $data['is_active'] = $request->boolean('is_active', true);
+
+        $product = Product::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পণ্য সফলভাবে তৈরি করা হয়েছে।',
+            'product' => $product,
+        ]);
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:products,slug,' . $id,
+            'description' => 'nullable|string',
+            'features' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'image_file' => 'nullable|image|max:2048',
+            'type' => 'required|in:digital,physical,service',
+            'download_link' => 'nullable|url',
+            'access_instructions' => 'nullable|string',
+            'stock' => 'nullable|integer|min:0',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+            'order' => 'nullable|integer',
+        ]);
+
+        $data = $validated;
+        unset($data['image_file']);
+
+        // Handle image update with Cloudinary (Safe Swap)
+        if ($request->hasFile('image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('image_file'), 'products/images', [
+                'transformation' => 'w_800,c_limit,q_auto'
+            ]);
+            
+            if ($result) {
+                $data['image'] = $result['url'];
+                
+                // Delete old image from Cloudinary if exists (only on success)
+                if ($product->image && $cloudinary->isCloudinaryUrl($product->image)) {
+                    $publicId = $cloudinary->extractPublicId($product->image);
+                    if ($publicId) {
+                        $cloudinary->deleteImage($publicId);
+                    }
+                }
+            }
+        }
+
+        $data['is_featured'] = $request->boolean('is_featured', $product->is_featured);
+        $data['is_active'] = $request->boolean('is_active', $product->is_active);
+
+        $product->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পণ্য সফলভাবে আপডেট করা হয়েছে।',
+            'product' => $product->fresh(),
+        ]);
+    }
+
+    public function destroyProduct($id)
+    {
+        $this->ensureAdmin();
+        $product = Product::findOrFail($id);
+
+        $cloudinary = new CloudinaryService();
+
+        // Delete images from Cloudinary
+        if ($product->image && $cloudinary->isCloudinaryUrl($product->image)) {
+            $publicId = $cloudinary->extractPublicId($product->image);
+            if ($publicId) {
+                $cloudinary->deleteImage($publicId);
+            }
+        }
+
+        // Delete gallery images if any
+        if ($product->gallery) {
+            $gallery = is_string($product->gallery) ? json_decode($product->gallery, true) : $product->gallery;
+            if (is_array($gallery)) {
+                foreach ($gallery as $image) {
+                    if ($image && $cloudinary->isCloudinaryUrl($image)) {
+                        $publicId = $cloudinary->extractPublicId($image);
+                        if ($publicId) {
+                            $cloudinary->deleteImage($publicId);
+                        }
+                    }
+                }
+            }
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'পণ্য সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Product Orders Management
+    // ─────────────────────────────────────────
+
+    public function adminProductOrders(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = ProductOrder::with(['user:id,name,email', 'product:id,name,image,type']);
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('order_number', 'like', "%{$q}%")
+                    ->orWhereHas('user', function($uQuery) use ($q) {
+                        $uQuery->where('name', 'like', "%{$q}%")
+                               ->orWhere('email', 'like', "%{$q}%");
+                    })
+                    ->orWhereHas('product', function($pQuery) use ($q) {
+                        $pQuery->where('name', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->latest('id')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'orders' => $orders,
+        ]);
+    }
+
+    public function updateProductOrderStatus(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $order = ProductOrder::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,completed,cancelled,refunded',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $oldStatus = $order->status;
+        $newStatus = $validated['status'];
+
+        if (isset($validated['notes'])) {
+            $order->notes = $validated['notes'];
+        }
+
+        // If completing, handle stock
+        if ($newStatus === 'completed' && $oldStatus !== 'completed') {
+            $product = $order->product;
+            if ($product->stock !== null) {
+                if ($product->stock < $order->quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'অর্ডারটি সম্পন্ন করার জন্য পণ্যটির পর্যাপ্ত স্টক নেই।',
+                    ], 422);
+                }
+                $product->decrement('stock', $order->quantity);
+            }
+            $order->completed_at = now();
+        }
+
+        // If moving AWAY from completed, restore stock
+        if ($oldStatus === 'completed' && in_array($newStatus, ['cancelled', 'refunded'])) {
+            $product = $order->product;
+            if ($product->stock !== null) {
+                $product->increment('stock', $order->quantity);
+            }
+            $order->completed_at = null;
+        }
+
+        $order->status = $newStatus;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'অর্ডার স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে।',
+            'order' => $order->fresh()->load(['user:id,name,email', 'product:id,name,image,type']),
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Referral Management
+    // ─────────────────────────────────────────
+
+    public function referralIndex(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $settings = ReferralSetting::first();
+        if (!$settings) {
+            $settings = ReferralSetting::create([
+                'commission_percentage' => 10.00,
+                'auto_approve' => false,
+                'is_active' => true,
+                'minimum_payout' => 100.00,
+            ]);
+        }
+
+        // Stats
+        $stats = [
+            'settings' => $settings,
+            'total_referral_users' => ReferralUser::count(),
+            'approved_users' => ReferralUser::where('status', 'approved')->count(),
+            'pending_users' => ReferralUser::where('status', 'pending')->count(),
+            'total_commissions_paid' => ReferralCommission::where('status', 'credited')->sum('commission_amount'),
+            'pending_commissions' => ReferralCommission::where('status', 'pending')->sum('commission_amount'),
+            'total_referrals' => User::whereNotNull('referred_by')->count(),
+        ];
+
+        // Paginated applications / users
+        $query = ReferralUser::with('user:id,name,email');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->whereHas('user', function ($uQuery) use ($q) {
+                $uQuery->where('name', 'like', "%{$q}%")
+                       ->orWhere('email', 'like', "%{$q}%");
+            })->orWhere('referral_code', 'like', "%{$q}%");
+        }
+
+        $referralUsers = $query->latest('id')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'stats' => $stats,
+            'referralUsers' => $referralUsers,
+        ]);
+    }
+
+    public function referralSettings()
+    {
+        $this->ensureAdmin();
+        $settings = ReferralSetting::first();
+        if (!$settings) {
+            $settings = ReferralSetting::create([
+                'commission_percentage' => 10.00,
+                'auto_approve' => false,
+                'is_active' => true,
+                'minimum_payout' => 100.00,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'settings' => $settings,
+        ]);
+    }
+
+    public function updateReferralSettings(Request $request)
+    {
+        $this->ensureAdmin();
+        $settings = ReferralSetting::first();
+        if (!$settings) {
+            $settings = new ReferralSetting();
+        }
+
+        $validated = $request->validate([
+            'commission_percentage' => 'required|numeric|min:0|max:100',
+            'auto_approve' => 'required|boolean',
+            'is_active' => 'required|boolean',
+            'minimum_payout' => 'nullable|numeric|min:0',
+            'terms_conditions' => 'nullable|string',
+        ]);
+
+        $settings->fill($validated)->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'রেফারেল সেটিংস সফলভাবে আপডেট করা হয়েছে।',
+            'settings' => $settings->fresh(),
+        ]);
+    }
+
+    public function showReferralUser($id)
+    {
+        $this->ensureAdmin();
+        $referralUser = ReferralUser::with('user')->findOrFail($id);
+        
+        $commissions = ReferralCommission::where('referrer_id', $referralUser->user_id)
+            ->with(['referred:id,name,email', 'course:id,title', 'payment:id,amount,status'])
+            ->latest('id')
+            ->paginate(10);
+
+        $referredUsers = User::where('referred_by', $referralUser->referral_code)
+            ->select('id', 'name', 'email', 'created_at')
+            ->latest('id')
+            ->get();
+
+        $wallet = UserWallet::where('user_id', $referralUser->user_id)->first();
+        
+        $transactions = [];
+        if ($wallet) {
+            $transactions = WalletTransaction::where('user_id', $referralUser->user_id)
+                ->latest('id')
+                ->paginate(10);
+        }
+
+        return response()->json([
+            'success' => true,
+            'referralUser' => $referralUser,
+            'commissions' => $commissions,
+            'referredUsers' => $referredUsers,
+            'wallet' => $wallet,
+            'transactions' => $transactions,
+        ]);
+    }
+
+    public function approveReferralUser($id)
+    {
+        $this->ensureAdmin();
+        $referralUser = ReferralUser::findOrFail($id);
+        $referralUser->update([
+            'status' => 'approved',
+            'approved_at' => now(),
+            'rejection_reason' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এফিলিয়েট আবেদন সফলভাবে এপ্রুভ করা হয়েছে।',
+            'referralUser' => $referralUser->fresh()->load('user:id,name,email'),
+        ]);
+    }
+
+    public function rejectReferralUser(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $referralUser = ReferralUser::findOrFail($id);
+        $referralUser->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->reason,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এফিলিয়েট আবেদন রিজেক্ট করা হয়েছে।',
+            'referralUser' => $referralUser->fresh()->load('user:id,name,email'),
+        ]);
+    }
+
+    public function suspendReferralUser($id)
+    {
+        $this->ensureAdmin();
+        $referralUser = ReferralUser::findOrFail($id);
+        $referralUser->update([
+            'status' => 'suspended',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'এফিলিয়েট একাউন্ট সফলভাবে সাসপেন্ড করা হয়েছে।',
+            'referralUser' => $referralUser->fresh()->load('user:id,name,email'),
+        ]);
+    }
+
+    public function resetReferralUser($id)
+    {
+        $this->ensureAdmin();
+        $referralUser = ReferralUser::findOrFail($id);
+        $referralUser->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'আবেদন রিসেট করা হয়েছে। ব্যবহারকারী আবার আবেদন করতে পারবেন।',
+        ]);
+    }
+
+    public function referralCommissions(Request $request)
+    {
+        $this->ensureAdmin();
+        $query = ReferralCommission::with(['referrer:id,name,email', 'referred:id,name,email', 'course:id,title', 'payment:id,amount,status']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->whereHas('referrer', function ($rQuery) use ($q) {
+                $rQuery->where('name', 'like', "%{$q}%")
+                       ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        $commissions = $query->latest('id')->paginate(15);
+
+        $totalPaid = ReferralCommission::where('status', 'credited')->sum('commission_amount');
+        $totalPending = ReferralCommission::where('status', 'pending')->sum('commission_amount');
+
+        return response()->json([
+            'success' => true,
+            'commissions' => $commissions,
+            'totalPaid' => $totalPaid,
+            'totalPending' => $totalPending,
+        ]);
+    }
+
+    public function creditReferralCommission($id)
+    {
+        $this->ensureAdmin();
+        $commission = ReferralCommission::findOrFail($id);
+
+        if ($commission->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'এই কমিশনটি ইতিপূর্বে ক্রেডিট করা হয়েছে বা প্রসেসিং যোগ্য নয়।',
+            ], 422);
+        }
+
+        $commission->creditToWallet();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'কমিশন সফলভাবে ওয়ালেটে ক্রেডিট করা হয়েছে।',
+            'commission' => $commission->fresh()->load(['referrer:id,name,email', 'referred:id,name,email', 'course:id,title']),
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Blog Management
+    // ─────────────────────────────────────────
+
+    public function adminBlogPosts(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $posts = BlogPost::with(['author:id,name,email', 'category:id,name', 'tags:id,name'])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('title', 'like', "%{$request->search}%");
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->status);
+            })
+            ->when($request->filled('category'), function ($query) use ($request) {
+                $query->where('blog_category_id', $request->category);
+            })
+            ->latest('id')
+            ->paginate(15);
+
+        $categories = BlogCategory::orderBy('name')->get();
+        $tags = BlogTag::orderBy('name')->get();
+        $courses = Course::where('is_published', true)->orderBy('title')->get(['id', 'title', 'slug']);
+
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'categories' => $categories,
+            'tags' => $tags,
+            'courses' => $courses,
+        ]);
+    }
+
+    public function storeBlogPost(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_posts,slug',
+            'excerpt' => 'nullable|string|max:500',
+            'content' => 'required|string',
+            'blog_category_id' => 'nullable|exists:blog_categories,id',
+            'featured_image_file' => 'nullable|image|max:2048',
+            'featured_image_alt' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:255',
+            'og_image_file' => 'nullable|image|max:2048',
+            'schema_type' => 'nullable|in:Article,BlogPosting,NewsArticle',
+            'is_indexable' => 'boolean',
+            'is_followable' => 'boolean',
+            'status' => 'required|in:draft,published,scheduled',
+            'published_at' => 'nullable|date',
+            'scheduled_at' => 'nullable|date|after:now',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:blog_tags,id',
+            'related_courses' => 'nullable|array',
+            'related_courses.*' => 'exists:courses,id',
+        ]);
+
+        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['title']);
+        
+        // Ensure unique slug
+        $baseSlug = $validated['slug'];
+        $counter = 1;
+        while (BlogPost::where('slug', $validated['slug'])->exists()) {
+            $validated['slug'] = $baseSlug . '-' . $counter++;
+        }
+
+        // Upload featured image with Cloudinary
+        if ($request->hasFile('featured_image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('featured_image_file'), 'blog_posts');
+            if ($result) {
+                $validated['featured_image'] = $result;
+            }
+        }
+
+        // Upload OG image with Cloudinary
+        if ($request->hasFile('og_image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('og_image_file'), 'blog_posts_og');
+            if ($result) {
+                $validated['og_image'] = $result;
+            }
+        }
+
+        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+
+        $validated['user_id'] = auth()->id() ?: 1;
+
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
+
+        $post = BlogPost::create($validated);
+
+        if (!empty($tags)) {
+            $post->tags()->sync($tags);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ব্লগ পোস্টটি সফলভাবে তৈরি করা হয়েছে।',
+            'post' => $post->load(['category', 'tags']),
+        ]);
+    }
+
+    public function updateBlogPost(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $post = BlogPost::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_posts,slug,' . $post->id,
+            'excerpt' => 'nullable|string|max:500',
+            'content' => 'required|string',
+            'blog_category_id' => 'nullable|exists:blog_categories,id',
+            'featured_image_file' => 'nullable|image|max:2048',
+            'featured_image_alt' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:255',
+            'og_image_file' => 'nullable|image|max:2048',
+            'schema_type' => 'nullable|in:Article,BlogPosting,NewsArticle',
+            'is_indexable' => 'boolean',
+            'is_followable' => 'boolean',
+            'status' => 'required|in:draft,published,scheduled',
+            'published_at' => 'nullable|date',
+            'scheduled_at' => 'nullable|date|after:now',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:blog_tags,id',
+            'related_courses' => 'nullable|array',
+            'related_courses.*' => 'exists:courses,id',
+        ]);
+
+        if (!empty($validated['slug']) && $validated['slug'] !== $post->slug) {
+            $baseSlug = $validated['slug'];
+            $counter = 1;
+            while (BlogPost::where('slug', $validated['slug'])->where('id', '!=', $post->id)->exists()) {
+                $validated['slug'] = $baseSlug . '-' . $counter++;
+            }
+        }
+
+        // Upload featured image with Cloudinary
+        if ($request->hasFile('featured_image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('featured_image_file'), 'blog_posts');
+            if ($result) {
+                // Delete old image if exists
+                if ($post->featured_image && str_contains($post->featured_image, 'cloudinary.com')) {
+                    $parts = explode('/v2_uploads/', $post->featured_image);
+                    if (count($parts) > 1) {
+                        $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
+                        $cloudinary->deleteImage($pId);
+                    }
+                }
+                $validated['featured_image'] = $result;
+            }
+        }
+
+        // Upload OG image with Cloudinary
+        if ($request->hasFile('og_image_file')) {
+            $cloudinary = new CloudinaryService();
+            $result = $cloudinary->uploadImage($request->file('og_image_file'), 'blog_posts_og');
+            if ($result) {
+                if ($post->og_image && str_contains($post->og_image, 'cloudinary.com')) {
+                    $parts = explode('/v2_uploads/', $post->og_image);
+                    if (count($parts) > 1) {
+                        $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
+                        $cloudinary->deleteImage($pId);
+                    }
+                }
+                $validated['og_image'] = $result;
+            }
+        }
+
+        if ($validated['status'] === 'published' && $post->status !== 'published' && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
+
+        $post->update($validated);
+        $post->tags()->sync($tags);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ব্লগ পোস্টটি সফলভাবে আপডেট করা হয়েছে।',
+            'post' => $post->fresh()->load(['category', 'tags']),
+        ]);
+    }
+
+    public function destroyBlogPost($id)
+    {
+        $this->ensureAdmin();
+        $post = BlogPost::findOrFail($id);
+
+        $cloudinary = new CloudinaryService();
+        if ($post->featured_image && str_contains($post->featured_image, 'cloudinary.com')) {
+            $parts = explode('/v2_uploads/', $post->featured_image);
+            if (count($parts) > 1) {
+                $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
+                $cloudinary->deleteImage($pId);
+            }
+        }
+
+        if ($post->og_image && str_contains($post->og_image, 'cloudinary.com')) {
+            $parts = explode('/v2_uploads/', $post->og_image);
+            if (count($parts) > 1) {
+                $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
+                $cloudinary->deleteImage($pId);
+            }
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ব্লগ পোস্টটি সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    public function adminBlogCategories()
+    {
+        $this->ensureAdmin();
+        $categories = BlogCategory::withCount('posts')
+            ->orderBy('name')
+            ->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function storeBlogCategory(Request $request)
+    {
+        $this->ensureAdmin();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_categories,slug',
+            'description' => 'nullable|string',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+        ]);
+
+        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
+
+        $category = BlogCategory::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ক্যাটাগরি সফলভাবে তৈরি করা হয়েছে।',
+            'category' => $category,
+        ]);
+    }
+
+    public function updateBlogCategory(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $category = BlogCategory::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_categories,slug,' . $category->id,
+            'description' => 'nullable|string',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+        ]);
+
+        if (!empty($validated['slug']) && $validated['slug'] !== $category->slug) {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+
+        $category->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ক্যাটাগরি সফলভাবে আপডেট করা হয়েছে।',
+            'category' => $category->fresh(),
+        ]);
+    }
+
+    public function destroyBlogCategory($id)
+    {
+        $this->ensureAdmin();
+        $category = BlogCategory::findOrFail($id);
+        $category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ক্যাটাগরি সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    public function adminBlogTags()
+    {
+        $this->ensureAdmin();
+        $tags = BlogTag::withCount('posts')
+            ->orderBy('name')
+            ->paginate(30);
+
+        return response()->json([
+            'success' => true,
+            'tags' => $tags,
+        ]);
+    }
+
+    public function storeBlogTag(Request $request)
+    {
+        $this->ensureAdmin();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_tags,slug',
+        ]);
+
+        $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
+
+        $tag = BlogTag::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ট্যাগ সফলভাবে তৈরি করা হয়েছে।',
+            'tag' => $tag,
+        ]);
+    }
+
+    public function updateBlogTag(Request $request, $id)
+    {
+        $this->ensureAdmin();
+        $tag = BlogTag::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_tags,slug,' . $tag->id,
+        ]);
+
+        if (!empty($validated['slug']) && $validated['slug'] !== $tag->slug) {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+
+        $tag->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ট্যাগ সফলভাবে আপডেট করা হয়েছে।',
+            'tag' => $tag->fresh(),
+        ]);
+    }
+
+    public function destroyBlogTag($id)
+    {
+        $this->ensureAdmin();
+        $tag = BlogTag::findOrFail($id);
+        $tag->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ট্যাগ সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    // ─────────────────────────────────────────
+    // Reviews Management
+    // ─────────────────────────────────────────
+
+    public function adminReviews(Request $request)
+    {
+        $this->ensureAdmin();
+
+        $query = Review::with(['user:id,name,email', 'course:id,title']);
+
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active' ? 1 : 0);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function ($sQuery) use ($q) {
+                $sQuery->where('comment', 'like', "%{$q}%")
+                       ->orWhereHas('user', function ($uQuery) use ($q) {
+                           $uQuery->where('name', 'like', "%{$q}%")
+                                  ->orWhere('email', 'like', "%{$q}%");
+                       })
+                       ->orWhereHas('course', function ($cQuery) use ($q) {
+                           $cQuery->where('title', 'like', "%{$q}%");
+                       });
+            });
+        }
+
+        $reviews = $query->latest('id')->paginate(15);
+
+        // Stats summary
+        $totalReviews = Review::count();
+        $activeReviews = Review::where('is_active', 1)->count();
+        $pendingReviews = Review::where('is_active', 0)->count();
+        $avgRating = Review::avg('rating') ?: 0;
+
+        return response()->json([
+            'success' => true,
+            'reviews' => $reviews,
+            'stats' => [
+                'total' => $totalReviews,
+                'active' => $activeReviews,
+                'pending' => $pendingReviews,
+                'average' => round($avgRating, 1),
+            ],
+        ]);
+    }
+
+    public function toggleReviewStatus($id)
+    {
+        $this->ensureAdmin();
+        $review = Review::findOrFail($id);
+        $review->is_active = !$review->is_active;
+        $review->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'রিভিউ স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে।',
+            'review' => $review->fresh()->load(['user:id,name,email', 'course:id,title']),
+        ]);
+    }
+
+    public function destroyReview($id)
+    {
+        $this->ensureAdmin();
+        $review = Review::findOrFail($id);
+        $review->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'রিভিউটি সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
     }
 }
