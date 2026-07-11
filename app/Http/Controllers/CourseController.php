@@ -32,6 +32,20 @@ class CourseController extends Controller
         ]);
     }
 
+    public function publicBlogs()
+    {
+        $posts = \App\Models\BlogPost::with('author:id,name,avatar', 'category:id,name,slug')
+            ->where('status', 'published')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'posts' => $posts
+        ]);
+    }
+
     public function show($slug)
     {
         $course = Course::with(['user:id,name,avatar', 'chapters' => function($q) {
@@ -242,5 +256,74 @@ class CourseController extends Controller
             ],
             'enrollments' => $formattedEnrollments
         ]);
+    }
+
+    public function publicBlogShow($slug)
+    {
+        $post = \App\Models\BlogPost::with(['author:id,name,avatar', 'category:id,name,slug', 'tags'])
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
+
+        // Increment view count (once per session)
+        $viewKey = 'blog_post_viewed_' . $post->id;
+        if (!session()->has($viewKey)) {
+            $post->increment('views_count');
+            session()->put($viewKey, true);
+        }
+
+        // Get related posts
+        $relatedPosts = \App\Models\BlogPost::where('status', 'published')
+            ->where('id', '!=', $post->id)
+            ->where('blog_category_id', $post->blog_category_id)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        // Get related courses
+        $relatedCourses = [];
+        if (!empty($post->related_courses)) {
+            $relatedCourses = \App\Models\Course::whereIn('id', $post->related_courses)->get();
+        } else {
+            $relatedCourses = \App\Models\Course::where('is_published', true)->latest()->take(2)->get();
+        }
+
+        // Previous and Next posts for navigation
+        $previousPost = \App\Models\BlogPost::where('status', 'published')
+            ->where('published_at', '<', $post->published_at)
+            ->orderByDesc('published_at')
+            ->first(['id', 'title', 'slug', 'featured_image']);
+
+        $nextPost = \App\Models\BlogPost::where('status', 'published')
+            ->where('published_at', '>', $post->published_at)
+            ->orderBy('published_at')
+            ->first(['id', 'title', 'slug', 'featured_image']);
+
+        // Table of contents
+        $tableOfContents = $this->extractTableOfContents($post->content ?? '');
+
+        return response()->json([
+            'success' => true,
+            'post' => $post,
+            'relatedPosts' => $relatedPosts,
+            'relatedCourses' => $relatedCourses,
+            'previousPost' => $previousPost,
+            'nextPost' => $nextPost,
+            'tableOfContents' => $tableOfContents,
+        ]);
+    }
+
+    private function extractTableOfContents(string $html): array
+    {
+        $toc = [];
+        preg_match_all('/<h([23])[^>]*id=["\']([^"\']+)["\'][^>]*>(.+?)<\/h\1>/i', $html, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $toc[] = [
+                'level' => (int) $match[1],
+                'id' => $match[2],
+                'text' => strip_tags($match[3]),
+            ];
+        }
+        return $toc;
     }
 }

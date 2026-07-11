@@ -105,111 +105,26 @@ export default function Navbar() {
         <>
             <nav className="fixed top-0 left-0 w-full z-50 bg-white border-t-[0px] border-[#4E6178] border-b border-slate-100 shadow-sm transition-all duration-300 py-3.5 px-6">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-
                     {/* Left Section: Logo & Search */}
                     <div className="flex items-center gap-4 flex-1 max-w-xl">
                         {/* Logo Wrapper */}
                         <Link to="/" className="flex items-center shrink-0">
-                            {/* BD Map Globe Icon */}
-                            <div className="relative w-10 h-10 rounded-full bg-[#FF5A00] flex items-center justify-center overflow-hidden shadow-sm hover:scale-105 transition-transform duration-300 shrink-0">
-                                {/* Stylized Bangladesh Map in grid/dots format inside circle */}
-                                <svg viewBox="0 0 100 100" className="w-8 h-8 text-white">
-                                    <circle cx="50" cy="18" r="2.5" className="fill-white animate-pulse" />
-                                    <circle cx="45" cy="25" r="2.5" className="fill-white" />
-                                    <circle cx="53" cy="25" r="2.5" className="fill-white" />
-                                    <circle cx="40" cy="33" r="2.5" className="fill-white" />
-                                    <circle cx="48" cy="33" r="2.5" className="fill-white" />
-                                    <circle cx="56" cy="33" r="2.5" className="fill-white" />
-                                    <circle cx="64" cy="33" r="2.5" className="fill-white" />
-                                    <circle cx="36" cy="41" r="2.5" className="fill-white" />
-                                    <circle cx="44" cy="41" r="2.5" className="fill-white" />
-                                    <circle cx="52" cy="41" r="2.5" className="fill-white" />
-                                    <circle cx="60" cy="41" r="2.5" className="fill-white" />
-                                    <circle cx="68" cy="41" r="2.5" className="fill-white animate-pulse" />
-                                    <circle cx="76" cy="41" r="2.5" className="fill-white" />
-                                    <circle cx="33" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="41" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="49" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="57" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="65" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="73" cy="49" r="2.5" className="fill-white" />
-                                    <circle cx="37" cy="57" r="2.5" className="fill-white" />
-                                    <circle cx="45" cy="57" r="2.5" className="fill-white" />
-                                    <circle cx="53" cy="57" r="2.5" className="fill-white" />
-                                    <circle cx="61" cy="57" r="2.5" className="fill-white" />
-                                    <circle cx="69" cy="57" r="2.5" className="fill-white" />
-                                    <circle cx="42" cy="65" r="2.5" className="fill-white" />
-                                    <circle cx="50" cy="65" r="2.5" className="fill-white" />
-                                    <circle cx="58" cy="65" r="2.5" className="fill-white" />
-                                    <circle cx="66" cy="65" r="2.5" className="fill-white" />
-                                    <circle cx="47" cy="73" r="2.5" className="fill-white" />
-                                    <circle cx="55" cy="73" r="2.5" className="fill-white" />
-                                    <circle cx="70" cy="73" r="2.5" className="fill-white" />
-                                    <circle cx="74" cy="79" r="2.5" className="fill-white" />
-                                    <circle cx="78" cy="85" r="2.5" className="fill-white animate-pulse" />
-                                    <circle cx="82" cy="91" r="2.5" className="fill-white" />
-
-                                    <line x1="50" y1="18" x2="45" y2="25" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="50" y1="18" x2="53" y2="25" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="45" y1="25" x2="40" y2="33" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="45" y1="25" x2="48" y2="33" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="53" y1="25" x2="56" y2="33" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="56" y1="33" x2="64" y2="33" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="48" y1="33" x2="52" y2="41" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="56" y1="33" x2="60" y2="41" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="64" y1="33" x2="68" y2="41" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="68" y1="41" x2="76" y2="41" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="44" y1="41" x2="41" y2="49" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="52" y1="41" x2="49" y2="49" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="60" y1="41" x2="57" y2="49" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="68" y1="41" x2="73" y2="49" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="49" y1="49" x2="53" y2="57" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="57" y1="49" x2="61" y2="57" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="65" y1="49" x2="69" y2="57" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="53" y1="57" x2="50" y2="65" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="61" y1="57" x2="58" y2="65" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="69" y1="57" x2="66" y2="65" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="50" y1="65" x2="47" y2="73" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="58" y1="65" x2="55" y2="73" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="66" y1="65" x2="70" y2="73" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="70" y1="73" x2="74" y2="79" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="74" y1="79" x2="78" y2="85" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                    <line x1="78" y1="85" x2="82" y2="91" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" />
-                                </svg>
-                            </div>
-
-                            {/* Gray vertical separator line */}
-                            <div className="h-8 w-[1.5px] bg-slate-200 mx-3.5"></div>
-
-                            {/* Brand text — shows custom logo or fallback text */}
-                            <div className="flex flex-col justify-center leading-none">
-                                {navLogo ? (
-                                    <img
-                                        src={navLogo}
-                                        alt={siteName}
-                                        className="h-8 max-w-[140px] object-contain"
-                                    />
-                                ) : (
-                                    <div className="flex items-end font-bold text-2xl tracking-tight select-none">
-                                        <span className="text-[#0D6EFD]">Learn</span>
-                                        <span className="text-[#0D6EFD]">in</span>
-                                        <span className="text-[#FF5A00] relative flex items-center">
-                                            g
-                                            {/* Cap icon above g */}
-                                            <span className="absolute -top-[7.5px] -right-[4.5px] text-[#FF5A00] rotate-[12deg]">
-                                                <svg className="w-3.5 h-3.5 fill-[#FF5A00]" viewBox="0 0 24 24">
-                                                    <path d="M12 2L1 7l11 5 9-4.09V14.5c0 1.5-2.5 2.5-6 2.5s-6-1-6-2.5V8H7v6.5C7 17.5 10 20 14 20s7-2.5 7-5.5V8.82L23 7 12 2z" />
-                                                </svg>
-                                            </span>
-                                        </span>
+                            {navLogo ? (
+                                <img
+                                    src={navLogo}
+                                    alt={siteName}
+                                    className="h-9 max-w-[160px] object-contain"
+                                />
+                            ) : (
+                                <>
+                                    <div className="w-9 h-9 rounded-lg bg-[#FF5A00] flex items-center justify-center font-black text-white text-xl shadow-sm">
+                                        {siteName.charAt(0).toUpperCase()}
                                     </div>
-                                )}
-                                <div className="mt-0.5">
-                                    <span className="bg-[#FF5A00] text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-[0.2em] leading-none inline-block">
+                                    <span className="text-2xl font-extrabold text-slate-900 tracking-tight ml-2.5">
                                         {siteName}
                                     </span>
-                                </div>
-                            </div>
+                                </>
+                            )}
                         </Link>
 
                         {/* Desktop Search Bar (Hidden on Mobile) */}

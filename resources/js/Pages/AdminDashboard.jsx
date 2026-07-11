@@ -25,6 +25,10 @@ import AdminBlog from './Admin/AdminBlog';
 import AdminReviews from './Admin/AdminReviews';
 import AdminSettings from './Admin/AdminSettings';
 import AdminModules from './Admin/AdminModules';
+import AdminEmailTemplates from './Admin/AdminEmailTemplates';
+import AdminPages from './Admin/AdminPages';
+import AdminHelp from './Admin/AdminHelp';
+import AdminFaqs from './Admin/AdminFaqs';
 import AdminLayout from '../Components/AdminLayout';
 
 // ── Coming Soon Placeholder ───────────────────────────────────
@@ -58,7 +62,7 @@ export default function AdminDashboard() {
         navigate(key === 'dashboard' ? '/admin' : `/admin/${key}`);
     };
 
-    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules'];
+    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq'];
 
     if (loading) {
         return (
@@ -96,6 +100,11 @@ export default function AdminDashboard() {
             {activeTab === 'reviews' && <AdminReviews />}
             {activeTab === 'settings' && <AdminSettings />}
             {activeTab === 'modules' && <AdminModules />}
+            {activeTab === 'email_tpl' && <AdminEmailTemplates />}
+            {activeTab === 'pages' && <AdminPages />}
+            {activeTab === 'help' && <AdminHelp />}
+            {activeTab === 'support' && <AdminTickets />}
+            {activeTab === 'faq' && <AdminFaqs />}
 
             {/* Coming Soon tabs */}
             {!activeTabs.includes(activeTab) && (

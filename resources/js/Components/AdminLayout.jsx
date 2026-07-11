@@ -29,17 +29,17 @@ const MAIN_MENU = [
     { key: 'blog', label: 'ব্লগ', icon: BookMarked, active: true, path: '/admin/blog' },
     { key: 'reviews', label: 'রিভিউ', icon: MessageSquare, active: true, path: '/admin/reviews' },
     { key: 'tickets', label: 'সাপোর্ট টিকেট', icon: Ticket, active: true, path: '/admin/tickets' },
-    { key: 'email_tpl', label: 'ইমেইল টেমপ্লেট', icon: Mail, active: false, path: '#' },
+    { key: 'email_tpl', label: 'ইমেইল টেমপ্লেট', icon: Mail, active: true, path: '/admin/email_tpl' },
     { key: 'error_logs', label: 'এরর লগ', icon: AlertTriangle, active: true, path: '/admin/error_logs' },
 ];
 
 const BOTTOM_MENU = [
-    { key: 'pages', label: 'পেজ', icon: Globe, active: false, path: '#' },
+    { key: 'pages', label: 'পেজ', icon: Globe, active: true, path: '/admin/pages' },
     { key: 'modules', label: 'মডিউল', icon: Puzzle, active: true, path: '/admin/modules' },
-    { key: 'help', label: 'সাহায্য', icon: HelpCircle, active: false, path: '#' },
+    { key: 'help', label: 'সাহায্য', icon: HelpCircle, active: true, path: '/admin/help' },
     { key: 'settings', label: 'সেটিংস', icon: Settings, active: true, path: '/admin/settings' },
-    { key: 'support', label: 'সাপোর্ট', icon: HeadphonesIcon, active: false, path: '#' },
-    { key: 'faq', label: 'প্রশ্নাবলী', icon: MessageCircleQuestion, active: false, path: '#' },
+    { key: 'support', label: 'সাপোর্ট', icon: HeadphonesIcon, active: true, path: '/admin/support' },
+    { key: 'faq', label: 'প্রশ্নাবলী', icon: MessageCircleQuestion, active: true, path: '/admin/faq' },
 ];
 
 const PAGE_TITLES = {
@@ -59,6 +59,11 @@ const PAGE_TITLES = {
     reviews: 'কোর্স রিভিউ ম্যানেজমেন্ট',
     settings: 'সাইট সেটিংস',
     modules: 'মডিউল ম্যানেজমেন্ট',
+    email_tpl: 'ইমেইল টেমপ্লেট',
+    pages: 'পেজ ম্যানেজমেন্ট',
+    help: 'সাহায্য ও গাইড সেন্টার',
+    support: 'সাপোর্ট টিকেট',
+    faq: 'প্রশ্নাবলী (FAQ) সেটিংস',
 };
 
 export default function AdminLayout({ children, activeTab, headerContent }) {

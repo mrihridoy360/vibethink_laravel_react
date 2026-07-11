@@ -135,6 +135,25 @@ class AdminController extends Controller
         ]);
     }
 
+    public function systemInfo()
+    {
+        $this->ensureAdmin();
+
+        return response()->json([
+            'success' => true,
+            'info' => [
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version(),
+                'server_os' => PHP_OS,
+                'db_driver' => config('database.default'),
+                'cache_driver' => config('cache.default'),
+                'mail_mailer' => config('mail.default'),
+                'app_env' => config('app.env'),
+                'debug_mode' => config('app.debug') ? 'ON' : 'OFF',
+            ]
+        ]);
+    }
+
     // ─────────────────────────────────────────
     // Courses
     // ─────────────────────────────────────────

@@ -6,23 +6,24 @@ import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 export default function Footer() {
     const { settings } = useSiteSettings();
 
-    const general    = settings?.general    || {};
+    const general = settings?.general || {};
     const appearance = settings?.appearance || {};
-    const footer     = settings?.footer     || {};
+    const footer = settings?.footer || {};
 
-    const siteName    = general.site_name        || 'VibeThink';
-    const footerDesc  = footer.footer_description || 'বাংলাদেশের প্র্যাকটিক্যাল লার্নিং প্ল্যাটফর্ম। শিখুন, তৈরি করুন এবং এগিয়ে যান।';
-    const email       = footer.contact_email      || null;
-    const phone       = footer.contact_phone      || null;
-    const address     = footer.contact_address    || 'Dhaka, Bangladesh';
-    const copyright   = footer.copyright_text     || `© ${new Date().getFullYear()} ${siteName.toUpperCase()} - ALL RIGHTS RESERVED`;
-    const footerLogo  = appearance.footer_logo    || appearance.site_logo || null;
+    const siteName = general.site_name || 'VibeThink';
+    const footerDesc = footer.footer_description || 'বাংলাদেশের প্র্যাকটিক্যাল লার্নিং প্ল্যাটফর্ম। শিখুন, তৈরি করুন এবং এগিয়ে যান।';
+    const email = footer.contact_email || null;
+    const phone = footer.contact_phone || null;
+    const address = footer.contact_address || 'Dhaka, Bangladesh';
+    const copyright = footer.copyright_text || `© ${new Date().getFullYear()} ${siteName.toUpperCase()} - ALL RIGHTS RESERVED`;
+    const footerLogo = appearance.footer_logo || appearance.site_logo || null;
+    const footerWatermark = footer.footer_watermark || '';
 
     const socials = [
-        { key: 'social_facebook',  icon: Facebook,     href: footer.social_facebook  || null },
-        { key: 'social_twitter',   icon: Twitter,      href: footer.social_twitter   || null },
-        { key: 'social_instagram', icon: Instagram,    href: footer.social_instagram || null },
-        { key: 'social_linkedin',  icon: Linkedin,     href: footer.social_linkedin  || null },
+        { key: 'social_facebook', icon: Facebook, href: footer.social_facebook || null },
+        { key: 'social_twitter', icon: Twitter, href: footer.social_twitter || null },
+        { key: 'social_instagram', icon: Instagram, href: footer.social_instagram || null },
+        { key: 'social_linkedin', icon: Linkedin, href: footer.social_linkedin || null },
     ].filter((s) => s.href);
 
     // Format copyright: support {year} placeholder
@@ -159,7 +160,7 @@ export default function Footer() {
 
             {/* Middle: Giant Watermark */}
             <div className="w-full text-center pointer-events-none select-none overflow-hidden font-black text-[16vw] tracking-[-0.02em] text-[#F3F4F6] dark:text-slate-800/10 leading-none my-6">
-                {siteName}.
+                {footerWatermark}.
             </div>
 
             {/* Lower Section */}

@@ -474,6 +474,14 @@ export default function AdminSettings() {
                                 placeholder="© 2026 VibeThink — All rights reserved."
                                 hint="বছর স্বয়ংক্রিয়ভাবে আপডেট করতে {year} ব্যবহার করুন।"
                             />
+                            <SettingInput
+                                label="ফুটার ওয়াটারমার্ক টেক্সট"
+                                id="footer_watermark"
+                                value={footer.footer_watermark}
+                                onChange={setF('footer_watermark')}
+                                placeholder="Vibe Think"
+                                hint="ফুটারের নিচে বড় করে প্রদর্শিত টেক্সট।"
+                            />
                         </SectionCard>
 
                         <SectionCard title="সোশ্যাল মিডিয়া লিংক" description="ফুটারে সোশ্যাল আইকনগুলির লিংক।">

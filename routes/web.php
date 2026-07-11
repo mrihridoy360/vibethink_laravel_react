@@ -6,6 +6,8 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EmailTemplateController;
+use App\Http\Controllers\AdminPageController;
 
 // API Routes
 Route::prefix('api')->group(function () {
@@ -18,6 +20,8 @@ Route::prefix('api')->group(function () {
     // Course Routes
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
+    Route::get('/blogs', [CourseController::class, 'publicBlogs']);
+    Route::get('/blogs/{slug}', [CourseController::class, 'publicBlogShow']);
 
     // Public Settings (no auth required)
     Route::get('/settings', [AdminController::class, 'publicSettings']);
@@ -63,6 +67,7 @@ Route::prefix('api')->group(function () {
         // ── Admin Routes ──────────────────────────────────────
         Route::prefix('admin')->group(function () {
             Route::get('/stats',                           [AdminController::class, 'stats']);
+            Route::get('/system-info',                     [AdminController::class, 'systemInfo']);
             Route::get('/courses',                         [AdminController::class, 'courses']);
             Route::get('/courses/{id}',                    [AdminController::class, 'showCourse']);
             Route::post('/courses',                        [AdminController::class, 'storeCourse']);
@@ -190,6 +195,22 @@ Route::prefix('api')->group(function () {
             Route::get('/settings',                                 [AdminController::class, 'getSettings']);
             Route::post('/settings',                                [AdminController::class, 'updateSettings']);
             Route::post('/settings/upload-image',                   [AdminController::class, 'uploadSettingsImage']);
+
+            // ── Email Templates ────────────────────────────────────────
+            Route::get('/email-templates',                          [EmailTemplateController::class, 'index']);
+            Route::get('/email-templates/{id}',                     [EmailTemplateController::class, 'show']);
+            Route::put('/email-templates/{id}',                     [EmailTemplateController::class, 'update']);
+            Route::post('/email-templates/{id}/toggle',             [EmailTemplateController::class, 'toggleStatus']);
+            Route::post('/email-templates/{id}/test',               [EmailTemplateController::class, 'sendTest']);
+            Route::post('/email-templates/{id}/reset',              [EmailTemplateController::class, 'resetToDefault']);
+
+            // ── Page Management ────────────────────────────────────────
+            Route::get('/pages',                                    [AdminPageController::class, 'index']);
+            Route::get('/pages/{id}',                               [AdminPageController::class, 'show']);
+            Route::post('/pages',                                   [AdminPageController::class, 'store']);
+            Route::put('/pages/{id}',                               [AdminPageController::class, 'update']);
+            Route::delete('/pages/{id}',                            [AdminPageController::class, 'destroy']);
+            Route::post('/pages/{id}/toggle',                       [AdminPageController::class, 'toggleStatus']);
 
 
             // ── Curriculum: Chapters ──────────────────────────────
