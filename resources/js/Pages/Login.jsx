@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
-import { GraduationCap, Mail, Lock, AlertCircle } from 'lucide-react';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
+import { GraduationCap, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
     const { login, user, loading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from || '/';
+    const { settings } = useSiteSettings();
+    const siteFavicon = settings?.appearance?.site_favicon || null;
 
-    useEffect(() => {
-        if (!loading && user) {
-            navigate(from, { replace: true });
-        }
-    }, [user, loading, navigate, from]);
-
+    const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
@@ -46,10 +44,14 @@ export default function Login() {
                 <div className="absolute bottom-0 left-0 w-20 h-20 bg-purple-500/5 rounded-full blur-2xl -z-10" />
 
                 {/* Logo / Header */}
-                <div className="text-center mb-8">
-                    <div className="inline-block p-3 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-2xl shadow-lg mb-4">
-                        <GraduationCap className="h-7 w-7 text-white" />
-                    </div>
+                    <div className="text-center mb-8">
+                        <div className="mb-4 flex justify-center">
+                            {siteFavicon ? (
+                                <img src={siteFavicon} alt="Site" className="h-12 w-12 object-contain" />
+                            ) : (
+                                <GraduationCap className="h-10 w-10 theme-primary-text" />
+                            )}
+                        </div>
                     <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
                     <p className="text-sm text-slate-500 mt-1.5 font-normal">Sign in to your VibeThink account</p>
                 </div>
@@ -86,14 +88,23 @@ export default function Login() {
                         </label>
                         <div className="relative">
                             <input
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:border-purple-605 focus:ring-2 focus:ring-purple-600/10 text-slate-800 bg-white"
+                                className="w-full pl-11 pr-11 py-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:border-purple-605 focus:ring-2 focus:ring-purple-600/10 text-slate-800 bg-white"
                                 placeholder="••••••••"
                             />
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(v => !v)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                                tabIndex={-1}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
                         </div>
                     </div>
 
@@ -103,16 +114,20 @@ export default function Login() {
                                 type="checkbox"
                                 checked={remember}
                                 onChange={(e) => setRemember(e.target.checked)}
-                                className="w-4.5 h-4.5 accent-purple-600 rounded border-slate-200 text-purple-605 focus:ring-purple-600/10"
+                                className="w-4.5 h-4.5 rounded border-slate-200 text-purple-605 focus:ring-purple-600/10"
+                                style={{ accentColor: 'var(--primary-color)' }}
                             />
-                            <span>লগইন সেশন মনে রাখুন (Remember login)</span>
+                            <span>লগইন সেশন মনে রাখুন</span>
                         </label>
+                        <Link to="/forgot-password" className="text-purple-600 hover:text-purple-800 transition-colors">
+                            পাসওয়ার্ড ভুলে গেছেন?
+                        </Link>
                     </div>
 
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full py-3 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-700 text-white shadow-sm transition-all"
+                        className="w-full py-3 rounded-xl font-bold text-sm theme-primary-bg hover:brightness-95 text-white shadow-sm transition-all"
                     >
                         {submitting ? 'Signing in...' : 'Sign In'}
                     </button>

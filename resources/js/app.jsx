@@ -11,6 +11,8 @@ import CourseDetail from './Pages/CourseDetail';
 import LearnPlayer from './Pages/LearnPlayer';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
+import ForgotPassword from './Pages/ForgotPassword';
+import ResetPassword from './Pages/ResetPassword';
 import Dashboard from './Pages/Dashboard';
 import AdminDashboard from './Pages/AdminDashboard';
 import AdminCourseCreate from './Pages/Admin/AdminCourseCreate';
@@ -92,8 +94,10 @@ function AppLayout() {
                     <Route path="/ebooks" element={<Ebooks />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<BlogDetail />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/payment/success" element={<PaymentSuccess />} />
                     <Route path="/payment/failed" element={<PaymentFailed />} />
                     <Route path="/dashboard" element={<Dashboard />} />

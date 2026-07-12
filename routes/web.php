@@ -16,6 +16,8 @@ Route::prefix('api')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth');
     Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
     // Course Routes
     Route::get('/courses', [CourseController::class, 'index']);

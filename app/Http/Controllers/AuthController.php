@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -114,5 +117,58 @@ class AuthController extends Controller
             'success' => false,
             'user' => null
         ], 401);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // Point the reset link back to the SPA origin
+        $origin = $request->header('Origin') ?: config('app.url');
+        ResetPassword::createUrlUsing(function ($notifiable, $token) use ($origin) {
+            return $origin . '/reset-password?token=' . $token
+                . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
+        });
+
+        // Avoid user enumeration: always return a generic success
+        Password::sendResetLink($request->only('email'));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'যদি এই ইমেইল দিয়ে কোনো অ্যাকাউন্ট থাকে, তবে রিসেট লিংক পাঠানো হয়েছে।',
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'success' => true,
+                'message' => 'পাসওয়ার্ড রিসেট সফল হয়েছে।',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'রিসেট টোকেন ভুল বা মেয়াদ উত্তীর্ণ হয়েছে।',
+        ], 400);
     }
 }
