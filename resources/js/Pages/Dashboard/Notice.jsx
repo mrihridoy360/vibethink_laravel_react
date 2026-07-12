@@ -77,7 +77,7 @@ export default function Notice() {
                                     <div className="flex items-center gap-1.5">
                                         <Pin className="h-4 w-4 text-blue-500 rotate-45" />
                                         {notice.priority === 'high' && (
-                                            <span className="px-2.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                                            <span className="px-2.5 py-0.5 bg-orange-500 text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
                                                 উচ্চ
                                             </span>
                                         )}
@@ -93,7 +93,7 @@ export default function Notice() {
                                     {notice.content}
                                 </div>
 
-                                <div className="flex items-center justify-between text-xs text-gray-400 mt-2">
+                                <div className="flex items-center justify-between text-sm text-gray-400 mt-2">
                                     <span className="flex items-center gap-1 font-medium">
                                         <Clock className="h-4 w-4" />
                                         {formatDate(notice.created_at)}
@@ -138,7 +138,7 @@ export default function Notice() {
                                     {notice.content}
                                 </div>
 
-                                <div className="flex items-center justify-between text-xs text-gray-400 mt-2">
+                                <div className="flex items-center justify-between text-sm text-gray-400 mt-2">
                                     <span className="flex items-center gap-1 font-medium">
                                         <Clock className="h-4 w-4" />
                                         {formatDate(notice.created_at)}

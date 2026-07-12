@@ -37,7 +37,7 @@ export default function Wallet() {
             {/* Header */}
             <div>
                 <h2 className="text-base font-bold text-gray-900">ওয়ালেট</h2>
-                <p className="text-xs text-gray-400 mt-0.5">আপনার ব্যালেন্স ও লেনদেনের ইতিহাস</p>
+                <p className="text-sm text-gray-400 mt-0.5">আপনার ব্যালেন্স ও লেনদেনের ইতিহাস</p>
             </div>
 
             {/* Balance Card */}
@@ -47,7 +47,7 @@ export default function Wallet() {
                 <div className="relative">
                     <div className="flex items-center gap-2 mb-2">
                         <WalletIcon className="h-5 w-5 text-indigo-200" />
-                        <span className="text-xs text-indigo-200 font-medium">বর্তমান ব্যালেন্স</span>
+                        <span className="text-sm text-indigo-200 font-medium">বর্তমান ব্যালেন্স</span>
                     </div>
                     <p className="text-4xl font-extrabold tracking-tight">
                         ৳{parseFloat(wallet.balance).toFixed(2)}
@@ -62,21 +62,21 @@ export default function Wallet() {
                         <TrendingUp className="h-4 w-4 text-green-600" />
                     </div>
                     <p className="text-sm font-extrabold text-gray-900">৳{parseFloat(wallet.total_earned).toFixed(2)}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">মোট আয়</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">মোট আয়</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <div className="inline-flex p-2 bg-blue-100 rounded-xl mb-2">
                         <TrendingDown className="h-4 w-4 text-blue-600" />
                     </div>
                     <p className="text-sm font-extrabold text-gray-900">৳{parseFloat(wallet.total_withdrawn).toFixed(2)}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">উত্তোলন</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">উত্তোলন</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <div className="inline-flex p-2 bg-red-100 rounded-xl mb-2">
                         <TrendingDown className="h-4 w-4 text-red-500" />
                     </div>
                     <p className="text-sm font-extrabold text-gray-900">৳{parseFloat(wallet.total_spent).toFixed(2)}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">মোট খরচ</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">মোট খরচ</p>
                 </div>
             </div>
 
@@ -84,14 +84,14 @@ export default function Wallet() {
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2">
                     <History className="h-4 w-4 text-purple-500" />
-                    <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">লেনদেনের ইতিহাস</h3>
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">লেনদেনের ইতিহাস</h3>
                 </div>
 
                 {transactions.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                         <WalletIcon className="h-10 w-10 text-gray-200 mb-3" />
                         <p className="text-sm font-bold text-gray-500">কোনো লেনদেন নেই</p>
-                        <p className="text-xs text-gray-400 mt-1">কোর্স কিনলে বা রেফারেল কমিশন পেলে এখানে দেখাবে।</p>
+                        <p className="text-sm text-gray-400 mt-1">কোর্স কিনলে বা রেফারেল কমিশন পেলে এখানে দেখাবে।</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-50">
@@ -109,8 +109,8 @@ export default function Wallet() {
 
                                 {/* Description */}
                                 <div className="flex-grow min-w-0">
-                                    <p className="text-xs font-semibold text-gray-900 truncate">{tx.description}</p>
-                                    <p className="text-[10px] text-gray-400 mt-0.5">
+                                    <p className="text-sm font-semibold text-gray-900 truncate">{tx.description}</p>
+                                    <p className="text-[11px] text-gray-400 mt-0.5">
                                         {new Date(tx.created_at).toLocaleDateString('bn-BD', {
                                             year: 'numeric', month: 'long', day: 'numeric'
                                         })}
@@ -124,7 +124,7 @@ export default function Wallet() {
                                     }`}>
                                         {tx.type === 'credit' ? '+' : '-'}৳{parseFloat(tx.amount).toFixed(2)}
                                     </p>
-                                    <p className="text-[10px] text-gray-300">ব্যালেন্স: ৳{parseFloat(tx.balance_after).toFixed(2)}</p>
+                                    <p className="text-[11px] text-gray-300">ব্যালেন্স: ৳{parseFloat(tx.balance_after).toFixed(2)}</p>
                                 </div>
                             </div>
                         ))}

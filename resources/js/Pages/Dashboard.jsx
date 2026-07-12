@@ -197,7 +197,7 @@ export default function Dashboard() {
                     {/* Menu */}
                     <div>
                         {!sidebarCollapsed && (
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                            <span className="px-3 text-sm font-bold uppercase tracking-wider text-gray-400 block mb-2">
                                 মেনু
                             </span>
                         )}
@@ -209,7 +209,7 @@ export default function Dashboard() {
                     {/* Service */}
                     <div>
                         {!sidebarCollapsed && (
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                            <span className="px-3 text-sm font-bold uppercase tracking-wider text-gray-400 block mb-2">
                                 সার্ভিস
                             </span>
                         )}
@@ -222,7 +222,7 @@ export default function Dashboard() {
                     {user?.role === 'admin' && (
                         <div>
                             {!sidebarCollapsed && (
-                                <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                                <span className="px-3 text-sm font-bold uppercase tracking-wider text-gray-400 block mb-2">
                                     ADMIN
                                 </span>
                             )}
@@ -291,7 +291,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
-                                    <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                                    <p className="text-sm text-gray-400 truncate">{user?.email}</p>
                                 </div>
                             </div>
                             <button
@@ -351,7 +351,7 @@ export default function Dashboard() {
                         <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
                             <div className="text-right hidden sm:block">
                                 <p className="text-sm font-bold text-gray-900">{user.name}</p>
-                                <p className="text-xs text-gray-400">{user.email}</p>
+                                <p className="text-sm text-gray-400">{user.email}</p>
                             </div>
                             <div className="h-10 w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm uppercase shadow-md shadow-orange-500/20">
                                 {user.name.slice(0, 2)}
@@ -374,7 +374,7 @@ export default function Dashboard() {
                                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/40 rounded-full blur-3xl -z-10" />
                                         <h2 className="text-lg font-bold text-gray-900">স্বাগতম, {user.name.split(' ')[0]}! 👋</h2>
-                                        <p className="text-xs text-gray-400 mt-1 font-light">আজই নতুন কিছু শিখতে শুরু করুন!</p>
+                                        <p className="text-sm text-gray-400 mt-1 font-light">আজই নতুন কিছু শিখতে শুরু করুন!</p>
                                     </div>
 
                                     {/* Stats */}
@@ -391,7 +391,7 @@ export default function Dashboard() {
                                                 className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md hover:border-blue-500/20 transition-all group text-left"
                                             >
                                                 <div>
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">{label}</span>
+                                                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">{label}</span>
                                                     <span className="text-2xl font-extrabold text-gray-900 mt-1.5 block">{value}</span>
                                                 </div>
                                                 <div className={`p-3 rounded-xl bg-${color}-50 text-${color}-600 group-hover:scale-110 transition-transform`}>
@@ -404,13 +404,13 @@ export default function Dashboard() {
                                     {/* Continue Learning */}
                                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                                            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+                                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
                                                 <PlayCircle className="h-4 w-4 text-blue-500" /> পড়া চালিয়ে যান
                                             </h3>
                                             {ongoingEnrollment && (
                                                 <button
                                                     onClick={() => setActiveTab('enrolled')}
-                                                    className="text-[10px] font-bold text-blue-500 hover:text-blue-600"
+                                                    className="text-[11px] font-bold text-blue-500 hover:text-blue-600"
                                                 >
                                                     সবগুলো দেখুন &gt;
                                                 </button>
@@ -433,19 +433,19 @@ export default function Dashboard() {
                                                         )}
                                                     </div>
                                                     <div className="flex-grow w-full">
-                                                        <span className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">{ongoingEnrollment.instructor_name}</span>
+                                                        <span className="text-[11px] text-blue-500 font-bold uppercase tracking-wider">{ongoingEnrollment.instructor_name}</span>
                                                         <h4 className="text-sm font-bold text-gray-900 mt-1 line-clamp-1">{ongoingEnrollment.title}</h4>
-                                                        <p className="text-[11px] text-gray-400 mt-1">{ongoingEnrollment.completed_lessons_count}/{ongoingEnrollment.total_lessons_count} টি লেসন সম্পন্ন</p>
+                                                        <p className="text-xs text-gray-400 mt-1">{ongoingEnrollment.completed_lessons_count}/{ongoingEnrollment.total_lessons_count} টি লেসন সম্পন্ন</p>
                                                         <div className="flex items-center gap-3 mt-4">
                                                             <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                                                                 <div className="bg-blue-500 h-full rounded-full" style={{ width: `${ongoingEnrollment.progress}%` }} />
                                                             </div>
-                                                            <span className="text-xs font-bold text-blue-500">{ongoingEnrollment.progress}%</span>
+                                                            <span className="text-sm font-bold text-blue-500">{ongoingEnrollment.progress}%</span>
                                                         </div>
                                                     </div>
                                                     <Link
                                                         to={`/courses/${ongoingEnrollment.slug}/learn`}
-                                                        className="px-5 py-3 rounded-xl text-xs font-bold shrink-0 shadow-md shadow-blue-500/10 flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                                        className="px-5 py-3 rounded-xl text-sm font-bold shrink-0 shadow-md shadow-blue-500/10 flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                                                     >
                                                         <PlayCircle className="h-4 w-4" /> পড়া চালিয়ে যান
                                                     </Link>
@@ -455,9 +455,9 @@ export default function Dashboard() {
                                                     <div className="p-3 bg-gray-50 rounded-full mb-3 text-gray-400 border border-gray-100">
                                                         <GraduationCap className="h-8 w-8" />
                                                     </div>
-                                                    <h4 className="text-xs font-bold text-gray-800">কোনো চলমান কোর্স নেই</h4>
-                                                    <p className="text-[10px] text-gray-400 mt-1 max-w-xs font-light">আপনার শেখার যাত্রা শুরু করতে নিচের বাটনটি চাপুন!</p>
-                                                    <Link to="/" className="mt-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/15">
+                                                    <h4 className="text-sm font-bold text-gray-800">কোনো চলমান কোর্স নেই</h4>
+                                                    <p className="text-[11px] text-gray-400 mt-1 max-w-xs font-light">আপনার শেখার যাত্রা শুরু করতে নিচের বাটনটি চাপুন!</p>
+                                                    <Link to="/" className="mt-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/15">
                                                         <BookOpen className="h-3.5 w-3.5" /> কোর্স ব্রাউজ করুন
                                                     </Link>
                                                 </>
@@ -468,10 +468,10 @@ export default function Dashboard() {
                                     {/* Quick enrolled list */}
                                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                                         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                                            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+                                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
                                                 <BookOpen className="h-4 w-4 text-blue-500" /> আমার এনরোল করা কোর্স
                                             </h3>
-                                            <button onClick={() => setActiveTab('enrolled')} className="text-[10px] font-bold text-blue-500 hover:text-blue-600">
+                                            <button onClick={() => setActiveTab('enrolled')} className="text-[11px] font-bold text-blue-500 hover:text-blue-600">
                                                 সবগুলো দেখুন &gt;
                                             </button>
                                         </div>
@@ -494,14 +494,14 @@ export default function Dashboard() {
                                                                 )}
                                                             </div>
                                                             <div className="flex-grow min-w-0 pr-4">
-                                                                <h4 className="text-xs font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">{item.title}</h4>
-                                                                <span className="text-[10px] text-gray-400 block mt-0.5">{item.instructor_name}</span>
-                                                                <span className="text-[10px] text-gray-400 block mt-0.5">{item.completed_lessons_count}/{item.total_lessons_count} টি লেসন</span>
+                                                                <h4 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">{item.title}</h4>
+                                                                <span className="text-[11px] text-gray-400 block mt-0.5">{item.instructor_name}</span>
+                                                                <span className="text-[11px] text-gray-400 block mt-0.5">{item.completed_lessons_count}/{item.total_lessons_count} টি লেসন</span>
                                                                 <div className="flex items-center gap-2 mt-3.5">
                                                                     <div className="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden border border-gray-100">
                                                                         <div className="bg-blue-500 h-full rounded-full transition-all duration-300" style={{ width: `${item.progress}%` }} />
                                                                     </div>
-                                                                    <span className="text-[10px] font-bold text-gray-500 whitespace-nowrap">{item.progress}%</span>
+                                                                    <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap">{item.progress}%</span>
                                                                 </div>
                                                             </div>
                                                             <Link to={`/courses/${item.slug}/learn`} className="absolute inset-0 z-10 rounded-xl" aria-label="Study course" />
@@ -509,7 +509,7 @@ export default function Dashboard() {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="text-center py-12 italic text-gray-400 text-xs">
+                                                <div className="text-center py-12 italic text-gray-400 text-sm">
                                                     আপনি কোনো কোর্সে এনরোল করেননি
                                                 </div>
                                             )}
@@ -542,7 +542,7 @@ export default function Dashboard() {
                 </main>
 
                 {/* Footer */}
-                <footer className="h-14 bg-white border-t border-gray-200 px-8 flex items-center justify-between text-[10px] text-gray-400 shrink-0">
+                <footer className="h-14 bg-white border-t border-gray-200 px-8 flex items-center justify-between text-[11px] text-gray-400 shrink-0">
                     <p>&copy; {new Date().getFullYear()} Vibe Think Academy. সর্বস্বত্ব সংরক্ষিত.</p>
                     <p>তৈরি করেছে ❤️ Md. Hridoy</p>
                 </footer>
@@ -573,7 +573,7 @@ function ComingSoon({ tab }) {
             </div>
             <h3 className="text-xl font-extrabold text-gray-800 mb-2">{cfg.title}</h3>
             <p className="text-sm text-gray-400 max-w-xs mb-6">{cfg.desc}</p>
-            <span className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-md shadow-blue-500/25">
+            <span className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-md shadow-blue-500/25">
                 <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
                 শীঘ্রই আসছে
             </span>

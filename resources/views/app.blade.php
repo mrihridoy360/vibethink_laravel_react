@@ -6,7 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>VibeThink LMS</title>
+    <title>{{ $meta['site_name'] ?? 'VibeThink LMS' }}</title>
+    <meta name="description" content="{{ $meta['site_description'] ?? '' }}">
+
+    @if(!empty($meta['site_favicon']))
+        <link rel="icon" href="{{ $meta['site_favicon'] }}">
+    @endif
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $meta['site_name'] ?? 'VibeThink LMS' }}">
+    <meta property="og:description" content="{{ $meta['site_description'] ?? '' }}">
+    @if(!empty($meta['site_logo']))
+        <meta property="og:image" content="{{ $meta['site_logo'] }}">
+    @endif
+    <meta property="og:site_name" content="{{ $meta['site_name'] ?? 'VibeThink LMS' }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $meta['site_name'] ?? 'VibeThink LMS' }}">
+    <meta name="twitter:description" content="{{ $meta['site_description'] ?? '' }}">
+    @if(!empty($meta['site_logo']))
+        <meta name="twitter:image" content="{{ $meta['site_logo'] }}">
+    @endif
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,6 +49,11 @@
         }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     </script>
     <!-- End Meta Pixel Code Base -->
+
+    <!-- Preload site settings to avoid flash of fallback content (FOUC) -->
+    <script>
+        window.__INITIAL_SITE_SETTINGS__ = @json($initialSettings ?? new \stdClass());
+    </script>
 
     <!-- Styles and Scripts -->
     @viteReactRefresh

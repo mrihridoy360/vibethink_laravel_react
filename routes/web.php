@@ -248,5 +248,38 @@ Route::get('/payment/zinipay/callback', [App\Http\Controllers\ZiniPayController:
 
 // Fallback Route for React SPA
 Route::get('/{any}', function () {
-    return view('app');
+    $meta = [
+        'site_name'        => 'VibeThink LMS',
+        'site_description' => '',
+        'site_favicon'     => null,
+        'site_logo'        => null,
+    ];
+
+    $initialSettings = [];
+
+    try {
+        $rows = \App\Models\Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features'])->get();
+        foreach ($rows as $row) {
+            if ($row->group === 'marketing' && $row->key === 'meta_capi_access_token') {
+                continue;
+            }
+            if ($row->group === 'general' && $row->key === 'site_name') {
+                $meta['site_name'] = $row->value;
+            }
+            if ($row->group === 'general' && $row->key === 'site_description') {
+                $meta['site_description'] = $row->value;
+            }
+            if ($row->group === 'appearance' && $row->key === 'site_favicon') {
+                $meta['site_favicon'] = $row->value;
+            }
+            if ($row->group === 'appearance' && $row->key === 'site_logo') {
+                $meta['site_logo'] = $row->value;
+            }
+            $initialSettings[$row->group][$row->key] = $row->value;
+        }
+    } catch (\Exception $e) {
+        // Use defaults
+    }
+
+    return view('app', ['meta' => $meta, 'initialSettings' => $initialSettings]);
 })->where('any', '^(?!api).*$');

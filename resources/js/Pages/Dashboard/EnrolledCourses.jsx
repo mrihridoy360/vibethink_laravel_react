@@ -120,13 +120,13 @@ export default function EnrolledCourses() {
                                 <h4 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
                                     {item.title}
                                 </h4>
-                                <p className="text-xs text-gray-400 mt-0.5">{item.instructor_name}</p>
-                                <p className="text-xs text-gray-400 mt-0.5">
+                                <p className="text-sm text-gray-400 mt-0.5">{item.instructor_name}</p>
+                                <p className="text-sm text-gray-400 mt-0.5">
                                     {item.completed_lessons_count}/{item.total_lessons_count} টি লেসন সম্পন্ন
                                 </p>
 
                                 {/* Badge */}
-                                <span className={`inline-block mt-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                <span className={`inline-block mt-1.5 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                                     item.progress === 100
                                         ? 'bg-green-100 text-green-700'
                                         : item.progress > 0
@@ -146,7 +146,7 @@ export default function EnrolledCourses() {
                                             style={{ width: `${item.progress}%` }}
                                         />
                                     </div>
-                                    <span className="text-xs font-bold text-gray-500 whitespace-nowrap">
+                                    <span className="text-sm font-bold text-gray-500 whitespace-nowrap">
                                         {item.progress}%
                                     </span>
                                 </div>
@@ -167,10 +167,10 @@ export default function EnrolledCourses() {
                         <GraduationCap className="h-10 w-10 text-gray-300" />
                     </div>
                     <h3 className="text-sm font-bold text-gray-700">কোনো কোর্স পাওয়া যায়নি</h3>
-                    <p className="text-xs text-gray-400 mt-1">এই ফিল্টারে কোনো কোর্স নেই।</p>
+                    <p className="text-sm text-gray-400 mt-1">এই ফিল্টারে কোনো কোর্স নেই।</p>
                     <Link
                         to="/"
-                        className="mt-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/15"
+                        className="mt-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/15"
                     >
                         <BookOpen className="h-3.5 w-3.5" /> কোর্স ব্রাউজ করুন
                     </Link>

@@ -97,7 +97,7 @@ export default function Certificates() {
             {/* Header */}
             <div>
                 <h2 className="text-base font-bold text-gray-900">আমার সার্টিফিকেট</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-sm text-gray-400 mt-0.5">
                     {certs.length}টি সার্টিফিকেট অর্জিত
                     {pendingCerts.length > 0 && `, ${pendingCerts.length}টি প্রক্রিয়াধীন`}
                 </p>
@@ -110,7 +110,7 @@ export default function Certificates() {
                         <GraduationCap className="h-12 w-12 text-yellow-400" />
                     </div>
                     <h3 className="text-sm font-bold text-gray-700">এখনো কোনো সার্টিফিকেট নেই</h3>
-                    <p className="text-xs text-gray-400 mt-1 max-w-xs">কোর্স ১০০% সম্পন্ন করলে সার্টিফিকেট পাবেন।</p>
+                    <p className="text-sm text-gray-400 mt-1 max-w-xs">কোর্স ১০০% সম্পন্ন করলে সার্টিফিকেট পাবেন।</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -129,24 +129,24 @@ export default function Certificates() {
                                     <div className="p-2.5 bg-blue-600 rounded-xl shadow-md shadow-blue-500/30">
                                         <Award className="h-5 w-5 text-white" />
                                     </div>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
                                         ✓ অর্জিত
                                     </span>
                                 </div>
-                                <h3 className="text-xs font-bold text-gray-900 line-clamp-2 mb-1">
+                                <h3 className="text-sm font-bold text-gray-900 line-clamp-2 mb-1">
                                     {cert.course?.title || 'Course'}
                                 </h3>
-                                <p className="text-[10px] text-gray-500 mb-4">
+                                <p className="text-[11px] text-gray-500 mb-4">
                                     প্রদানের তারিখ: {new Date(cert.issued_at).toLocaleDateString('bn-BD')}
                                 </p>
                                 {cert.certificate_id && (
-                                    <p className="text-[9px] text-gray-400 mb-3 font-mono">
+                                    <p className="text-[10px] text-gray-400 mb-3 font-mono">
                                         ID: {cert.certificate_id}
                                     </p>
                                 )}
                                 <button
                                     onClick={() => handlePrint(cert, cert.course?.title)}
-                                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
                                 >
                                     <Download className="h-3.5 w-3.5" /> সার্টিফিকেট ডাউনলোড
                                 </button>
@@ -164,17 +164,17 @@ export default function Certificates() {
                                 <div className="p-2.5 bg-gray-400 rounded-xl">
                                     <Award className="h-5 w-5 text-white" />
                                 </div>
-                                <span className="text-[9px] font-bold uppercase tracking-wider bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
                                     প্রক্রিয়াধীন
                                 </span>
                             </div>
-                            <h3 className="text-xs font-bold text-gray-700 line-clamp-2 mb-1">
+                            <h3 className="text-sm font-bold text-gray-700 line-clamp-2 mb-1">
                                 {enrollment.course?.title}
                             </h3>
-                            <p className="text-[10px] text-gray-400 mb-4">সার্টিফিকেট তৈরি হচ্ছে...</p>
+                            <p className="text-[11px] text-gray-400 mb-4">সার্টিফিকেট তৈরি হচ্ছে...</p>
                             <button
                                 onClick={() => handlePrint(null, enrollment.course?.title)}
-                                className="flex items-center gap-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
                             >
                                 <Download className="h-3.5 w-3.5" /> প্রিন্ট করুন
                             </button>

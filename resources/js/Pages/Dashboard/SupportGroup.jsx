@@ -67,7 +67,7 @@ export default function SupportGroup() {
             {/* Header */}
             <div>
                 <h2 className="text-base font-bold text-gray-900">সাপোর্ট গ্রুপ</h2>
-                <p className="text-xs text-gray-400 mt-0.5">আমাদের কমিউনিটি গ্রুপে যোগ দিন এবং সাহায্য পান</p>
+                <p className="text-sm text-gray-400 mt-0.5">আমাদের কমিউনিটি গ্রুপে যোগ দিন এবং সাহায্য পান</p>
             </div>
 
             {allGroups.length === 0 ? (
@@ -76,7 +76,7 @@ export default function SupportGroup() {
                         <Users className="h-10 w-10 text-gray-300" />
                     </div>
                     <h3 className="text-sm font-bold text-gray-600">কোনো সাপোর্ট গ্রুপ নেই</h3>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                         কোর্সে এনরোল করলে সংশ্লিষ্ট সাপোর্ট গ্রুপের লিংক এখানে দেখাবে।
                     </p>
                 </div>
@@ -85,7 +85,7 @@ export default function SupportGroup() {
                     {/* Course Groups */}
                     {groups.length > 0 && (
                         <div>
-                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">কোর্স সাপোর্ট গ্রুপ</h3>
+                            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">কোর্স সাপোর্ট গ্রুপ</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {groups.map(group => {
                                     const platform = group.platform?.toLowerCase();
@@ -97,15 +97,15 @@ export default function SupportGroup() {
                                                     <PlatformIcon platform={platform} size={22} />
                                                 </div>
                                                 <div className="flex-grow min-w-0">
-                                                    <p className="text-xs font-bold text-gray-900">{cfg.label}</p>
-                                                    <p className="text-[10px] text-gray-500 truncate">{group.course?.title}</p>
+                                                    <p className="text-sm font-bold text-gray-900">{cfg.label}</p>
+                                                    <p className="text-[11px] text-gray-500 truncate">{group.course?.title}</p>
                                                 </div>
                                             </div>
                                             <a
                                                 href={group.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-bold text-white transition-all hover:opacity-90 shadow-sm"
+                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 shadow-sm"
                                                 style={{ backgroundColor: cfg.color }}
                                             >
                                                 <ExternalLink className="h-3.5 w-3.5" /> গ্রুপে যোগ দিন
@@ -120,7 +120,7 @@ export default function SupportGroup() {
                     {/* General Groups */}
                     {generalGroups.length > 0 && (
                         <div>
-                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">সাধারণ কমিউনিটি</h3>
+                            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">সাধারণ কমিউনিটি</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {generalGroups.map(group => {
                                     const platform = group.platform?.toLowerCase();
@@ -132,15 +132,15 @@ export default function SupportGroup() {
                                                     <PlatformIcon platform={platform} size={22} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-gray-900">{cfg.label}</p>
-                                                    <p className="text-[10px] text-gray-500">সাধারণ সাপোর্ট</p>
+                                                    <p className="text-sm font-bold text-gray-900">{cfg.label}</p>
+                                                    <p className="text-[11px] text-gray-500">সাধারণ সাপোর্ট</p>
                                                 </div>
                                             </div>
                                             <a
                                                 href={group.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-bold text-white transition-all hover:opacity-90 shadow-sm"
+                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 shadow-sm"
                                                 style={{ backgroundColor: cfg.color }}
                                             >
                                                 <ExternalLink className="h-3.5 w-3.5" /> গ্রুপে যোগ দিন

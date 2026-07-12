@@ -121,7 +121,7 @@ export default function SupportTickets() {
             <div className="space-y-5">
                 <button
                     onClick={() => { setView('list'); setTicketDetail(null); }}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 font-semibold transition-colors"
+                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-semibold transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" /> টিকেট তালিকায় ফিরুন
                 </button>
@@ -135,16 +135,16 @@ export default function SupportTickets() {
                             <div className="flex items-start justify-between gap-3 mb-3">
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-900">{ticketDetail.subject}</h3>
-                                    <p className="text-[10px] text-gray-400 mt-0.5 font-mono">{ticketDetail.ticket_number}</p>
+                                    <p className="text-[11px] text-gray-400 mt-0.5 font-mono">{ticketDetail.ticket_number}</p>
                                 </div>
-                                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 ${cfg.color}`}>
+                                <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full shrink-0 ${cfg.color}`}>
                                     <Icon className="h-3 w-3" /> {cfg.label}
                                 </span>
                             </div>
-                            <div className="bg-gray-50 rounded-xl p-4 text-xs text-gray-700 leading-relaxed">
+                            <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
                                 {ticketDetail.message}
                             </div>
-                            <p className="text-[10px] text-gray-300 mt-2">
+                            <p className="text-[11px] text-gray-300 mt-2">
                                 {new Date(ticketDetail.created_at).toLocaleString('bn-BD')}
                             </p>
                         </div>
@@ -161,20 +161,20 @@ export default function SupportTickets() {
                                     }`}
                                 >
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                                        <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                                             reply.is_admin_reply ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
                                         }`}>
                                             {reply.user?.name?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
-                                        <span className="text-[10px] font-bold text-gray-700">{reply.user?.name}</span>
+                                        <span className="text-[11px] font-bold text-gray-700">{reply.user?.name}</span>
                                         {reply.is_admin_reply && (
-                                            <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold">Admin</span>
+                                            <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold">Admin</span>
                                         )}
-                                        <span className="text-[10px] text-gray-300 ml-auto">
+                                        <span className="text-[11px] text-gray-300 ml-auto">
                                             {new Date(reply.created_at).toLocaleString('bn-BD')}
                                         </span>
                                     </div>
-                                    <p className="text-xs text-gray-700">{reply.message}</p>
+                                    <p className="text-sm text-gray-700">{reply.message}</p>
                                 </div>
                             ))}
                         </div>
@@ -182,19 +182,19 @@ export default function SupportTickets() {
                         {/* Reply box */}
                         {!['resolved', 'closed'].includes(ticketDetail.status) && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                                <h4 className="text-xs font-bold text-gray-700 mb-2">রিপ্লাই করুন</h4>
+                                <h4 className="text-sm font-bold text-gray-700 mb-2">রিপ্লাই করুন</h4>
                                 <textarea
                                     value={replyText}
                                     onChange={e => setReplyText(e.target.value)}
                                     rows={4}
                                     placeholder="আপনার বার্তা লিখুন..."
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs text-gray-700 focus:outline-none focus:border-blue-500 resize-none"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-blue-500 resize-none"
                                 />
                                 <div className="flex justify-end mt-3">
                                     <button
                                         onClick={handleReply}
                                         disabled={sending || !replyText.trim()}
-                                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+                                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
                                     >
                                         {sending ? (
                                             <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -216,7 +216,7 @@ export default function SupportTickets() {
             <div className="space-y-5">
                 <button
                     onClick={() => setView('list')}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 font-semibold transition-colors"
+                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-semibold transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" /> ফিরুন
                 </button>
@@ -224,19 +224,19 @@ export default function SupportTickets() {
                 <div className="bg-white rounded-2xl border border-gray-100 p-6">
                     <h3 className="text-sm font-bold text-gray-900 mb-5">নতুন সাপোর্ট টিকেট</h3>
                     {error && (
-                        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-xl">
+                        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
                             {error}
                         </div>
                     )}
                     <form onSubmit={handleCreate} className="space-y-4">
                         {/* Category */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1.5">বিভাগ *</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">বিভাগ *</label>
                             <select
                                 value={form.category_id}
                                 onChange={e => setForm(f => ({ ...f, category_id: e.target.value }))}
                                 required
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:border-blue-500"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-500"
                             >
                                 <option value="">বিভাগ নির্বাচন করুন</option>
                                 {categories.map(cat => (
@@ -247,27 +247,27 @@ export default function SupportTickets() {
 
                         {/* Subject */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1.5">বিষয় *</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">বিষয় *</label>
                             <input
                                 type="text"
                                 value={form.subject}
                                 onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
                                 required
                                 placeholder="সমস্যার সংক্ষিপ্ত বিবরণ"
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:border-blue-500"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-500"
                             />
                         </div>
 
                         {/* Priority */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1.5">অগ্রাধিকার</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">অগ্রাধিকার</label>
                             <div className="flex gap-2 flex-wrap">
                                 {Object.entries(priorityConfig).map(([key, cfg]) => (
                                     <button
                                         type="button"
                                         key={key}
                                         onClick={() => setForm(f => ({ ...f, priority: key }))}
-                                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                                        className={`px-3 py-1.5 rounded-xl text-sm font-semibold border transition-all ${
                                             form.priority === key
                                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                 : 'border-gray-200 bg-gray-50 text-gray-500'
@@ -281,14 +281,14 @@ export default function SupportTickets() {
 
                         {/* Message */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1.5">বার্তা *</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">বার্তা *</label>
                             <textarea
                                 value={form.message}
                                 onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
                                 required
                                 rows={5}
                                 placeholder="বিস্তারিত সমস্যার বিবরণ লিখুন..."
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs text-gray-700 focus:outline-none focus:border-blue-500 resize-none"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-blue-500 resize-none"
                             />
                         </div>
 
@@ -296,14 +296,14 @@ export default function SupportTickets() {
                             <button
                                 type="button"
                                 onClick={() => setView('list')}
-                                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors"
+                                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-colors"
                             >
                                 বাতিল
                             </button>
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition-colors"
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold transition-colors"
                             >
                                 {submitting ? (
                                     <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -324,11 +324,11 @@ export default function SupportTickets() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-base font-bold text-gray-900">সাপোর্ট টিকেট</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">মোট {tickets.length}টি টিকেট</p>
+                    <p className="text-sm text-gray-400 mt-0.5">মোট {tickets.length}টি টিকেট</p>
                 </div>
                 <button
                     onClick={() => setView('create')}
-                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-3.5 py-2 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                     <Plus className="h-3.5 w-3.5" /> নতুন টিকেট
                 </button>
@@ -341,10 +341,10 @@ export default function SupportTickets() {
                         <Ticket className="h-10 w-10 text-gray-300" />
                     </div>
                     <h3 className="text-sm font-bold text-gray-600">কোনো টিকেট নেই</h3>
-                    <p className="text-xs text-gray-400 mt-1">সমস্যা হলে নতুন সাপোর্ট টিকেট তৈরি করুন।</p>
+                    <p className="text-sm text-gray-400 mt-1">সমস্যা হলে নতুন সাপোর্ট টিকেট তৈরি করুন।</p>
                     <button
                         onClick={() => setView('create')}
-                        className="mt-4 flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-colors"
+                        className="mt-4 flex items-center gap-1.5 bg-blue-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-colors"
                     >
                         <Plus className="h-3.5 w-3.5" /> নতুন টিকেট তৈরি করুন
                     </button>
@@ -366,31 +366,31 @@ export default function SupportTickets() {
                                 </div>
                                 <div className="flex-grow min-w-0">
                                     <div className="flex items-start justify-between gap-2">
-                                        <p className="text-xs font-bold text-gray-900 truncate">{ticket.subject}</p>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${cfg.color}`}>
+                                        <p className="text-sm font-bold text-gray-900 truncate">{ticket.subject}</p>
+                                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 ${cfg.color}`}>
                                             {cfg.label}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <p className="text-[10px] text-gray-400 font-mono">{ticket.ticket_number}</p>
+                                        <p className="text-[11px] text-gray-400 font-mono">{ticket.ticket_number}</p>
                                         <span className="text-gray-200">•</span>
-                                        <span className={`text-[10px] font-semibold ${pCfg.color}`}>{pCfg.label}</span>
+                                        <span className={`text-[11px] font-semibold ${pCfg.color}`}>{pCfg.label}</span>
                                         {ticket.category && (
                                             <>
                                                 <span className="text-gray-200">•</span>
-                                                <span className="text-[10px] text-gray-400">{ticket.category.name}</span>
+                                                <span className="text-[11px] text-gray-400">{ticket.category.name}</span>
                                             </>
                                         )}
                                         {ticket.replies_count > 0 && (
                                             <>
                                                 <span className="text-gray-200">•</span>
-                                                <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                                                <span className="flex items-center gap-0.5 text-[11px] text-gray-400">
                                                     <MessageSquare className="h-2.5 w-2.5" /> {ticket.replies_count}
                                                 </span>
                                             </>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-gray-300 mt-0.5">
+                                    <p className="text-[11px] text-gray-300 mt-0.5">
                                         {new Date(ticket.created_at).toLocaleDateString('bn-BD')}
                                     </p>
                                 </div>

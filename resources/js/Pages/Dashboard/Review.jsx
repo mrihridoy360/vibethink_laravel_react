@@ -78,7 +78,7 @@ export default function Review() {
                         </div>
                         <h1 className="text-xl font-bold text-gray-900">রিভিউ সাবমিট করুন</h1>
                     </div>
-                    <p className="text-xs text-gray-400 ml-10">নিচের ধাপগুলো অনুসরণ করে বোনাস গিফট আনলক করুন</p>
+                    <p className="text-sm text-gray-400 ml-10">নিচের ধাপগুলো অনুসরণ করে বোনাস গিফট আনলক করুন</p>
                 </div>
 
                 {review && review.status !== 'rejected' ? (
@@ -104,13 +104,13 @@ export default function Review() {
                                 }`}>
                                     {review.status === 'approved' ? 'রিভিউ ভেরিফাইড এবং অ্যাপ্রুভড!' : 'ভেরিফিকেশন পেন্ডিং'}
                                 </h4>
-                                <p className="mt-2 text-xs leading-relaxed text-gray-600 font-medium">
+                                <p className="mt-2 text-sm leading-relaxed text-gray-600 font-medium">
                                     {review.status === 'approved' ? (
                                         <span className="flex flex-col gap-2">
                                             <span>🎉 অভিনন্দন! আপনার জন্য সব গিফট আনলক করা হয়েছে।</span>
                                             <Link 
                                                 to="/dashboard/giftbox" 
-                                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold transition-all w-fit shadow-md shadow-green-500/10 mt-1 active:scale-95"
+                                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition-all w-fit shadow-md shadow-green-500/10 mt-1 active:scale-95"
                                             >
                                                 <Sparkles className="w-3.5 h-3.5" />
                                                 গিফট বক্স-এ যান
@@ -121,7 +121,7 @@ export default function Review() {
                                     )}
                                 </p>
 
-                                <div className="mt-4 flex flex-col gap-1 text-[10px] text-gray-400 font-mono">
+                                <div className="mt-4 flex flex-col gap-1 text-[11px] text-gray-400 font-mono">
                                     <div>Submitted URL: <a href={review.review_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline break-all">{review.review_url}</a></div>
                                     <div>Submitted Date: {new Date(review.created_at).toLocaleDateString()}</div>
                                 </div>
@@ -138,7 +138,7 @@ export default function Review() {
                                     </div>
                                     <div className="flex-grow">
                                         <h4 className="text-base font-bold text-red-800">রিভিউ বাতিল করা হয়েছে</h4>
-                                        <p className="mt-1 text-xs leading-relaxed text-red-700 font-medium">
+                                        <p className="mt-1 text-sm leading-relaxed text-red-700 font-medium">
                                             {review.admin_feedback || 'আপনার রিভিউ ভেরিফাই করা সম্ভব হয়নি। ইউআরএল সঠিক কিনা যাচাই করে আবার সাবমিট করুন।'}
                                         </p>
                                     </div>
@@ -154,7 +154,7 @@ export default function Review() {
                                     </div>
                                     <div>
                                         <h4 className="text-base font-bold text-green-800">সাবমিট সম্পন্ন হয়েছে</h4>
-                                        <p className="mt-1 text-xs text-green-700 font-medium">{successMessage}</p>
+                                        <p className="mt-1 text-sm text-green-700 font-medium">{successMessage}</p>
                                     </div>
                                 </div>
                             </div>
@@ -162,17 +162,17 @@ export default function Review() {
 
                         {/* Step 1 */}
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
                                 ১
                             </div>
                             <div className="space-y-3 flex-1">
                                 <h3 className="font-bold text-gray-900 text-sm">আমাদের ফেসবুক পেজে রিভিউ দিন</h3>
-                                <p className="text-gray-400 text-xs leading-relaxed">নিচের বাটনে ক্লিক করে আমাদের অফিসিয়াল ফেসবুক পেজে একটি ভালো রিভিউ ও ৫-স্টার রেটিং প্রদান করুন।</p>
+                                <p className="text-gray-400 text-sm leading-relaxed">নিচের বাটনে ক্লিক করে আমাদের অফিসিয়াল ফেসবুক পেজে একটি ভালো রিভিউ ও ৫-স্টার রেটিং প্রদান করুন।</p>
                                 <a
                                     href="https://web.facebook.com/vibethink.official/"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all w-fit shadow-sm"
+                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all w-fit shadow-sm"
                                 >
                                     <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
                                     ফেসবুক পেজে যান
@@ -182,18 +182,18 @@ export default function Review() {
 
                         {/* Step 2 */}
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
                                 ২
                             </div>
                             <div className="space-y-1.5 flex-1">
                                 <h3 className="font-bold text-gray-900 text-sm">আপনার ফেসবুক প্রোফাইল URL কপি করুন</h3>
-                                <p className="text-gray-400 text-xs leading-relaxed">রিভিউ দেওয়া শেষ হলে, আপনার ফেসবুক প্রোফাইলের লিঙ্ক (URL) কপি করুন (যে অ্যাকাউন্ট থেকে রিভিউ দিয়েছেন)।</p>
+                                <p className="text-gray-400 text-sm leading-relaxed">রিভিউ দেওয়া শেষ হলে, আপনার ফেসবুক প্রোফাইলের লিঙ্ক (URL) কপি করুন (যে অ্যাকাউন্ট থেকে রিভিউ দিয়েছেন)।</p>
                             </div>
                         </div>
 
                         {/* Step 3 */}
                         <div className="flex gap-4">
-                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 mt-0.5 shadow-md shadow-blue-500/10">
                                 ৩
                             </div>
                             <div className="space-y-4 flex-1">
@@ -201,7 +201,7 @@ export default function Review() {
 
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="review_url" className="text-xs text-gray-500 font-bold block">
+                                        <label htmlFor="review_url" className="text-sm text-gray-500 font-bold block">
                                             আপনার ফেসবুক প্রোফাইল URL
                                         </label>
                                         <input
@@ -216,7 +216,7 @@ export default function Review() {
                                             required
                                         />
                                         {error && (
-                                            <p className="text-[11px] text-red-500 font-medium flex items-center gap-1">
+                                            <p className="text-xs text-red-500 font-medium flex items-center gap-1">
                                                 <AlertCircle className="w-3 h-3" />
                                                 {error}
                                             </p>
@@ -225,7 +225,7 @@ export default function Review() {
 
                                     <button
                                         type="submit"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-500/15 disabled:opacity-50 disabled:pointer-events-none"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-500/15 disabled:opacity-50 disabled:pointer-events-none"
                                         disabled={submitting}
                                     >
                                         <Star className="w-3.5 h-3.5 fill-current" />
@@ -236,7 +236,7 @@ export default function Review() {
                         </div>
 
                         {/* Info Box */}
-                        <div className="mt-8 flex gap-3 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-xs text-gray-500">
+                        <div className="mt-8 flex gap-3 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-sm text-gray-500">
                             <Info className="w-4 h-4 shrink-0 text-gray-400" />
                             <p className="leading-relaxed font-medium">সাবমিট করার পর আমাদের অ্যাডমিন প্যানেল থেকে আপনার রিভিউটি ভেরিফাই করা হবে। ভেরিফিকেশন সফল হলে আপনার জন্য বোনাস গিফটগুলো স্বয়ংক্রিয়ভাবে আনলক হয়ে যাবে।</p>
                         </div>

@@ -77,7 +77,7 @@ export default function Settings() {
             {/* Header */}
             <div>
                 <h2 className="text-base font-bold text-gray-900">সেটিংস</h2>
-                <p className="text-xs text-gray-400 mt-0.5">আপনার প্রোফাইল ও নিরাপত্তা তথ্য আপডেট করুন</p>
+                <p className="text-sm text-gray-400 mt-0.5">আপনার প্রোফাইল ও নিরাপত্তা তথ্য আপডেট করুন</p>
             </div>
 
             {/* Avatar Section */}
@@ -96,8 +96,8 @@ export default function Settings() {
                     </div>
                     <div>
                         <p className="text-sm font-bold text-gray-900">{user?.name}</p>
-                        <p className="text-xs text-gray-400">{user?.email}</p>
-                        <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                        <p className="text-sm text-gray-400">{user?.email}</p>
+                        <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                             {user?.role === 'admin' ? 'অ্যাডমিন' : 'শিক্ষার্থী'}
                         </span>
                     </div>
@@ -110,56 +110,56 @@ export default function Settings() {
                     <div className="p-2 bg-blue-50 rounded-xl">
                         <User className="h-4 w-4 text-blue-600" />
                     </div>
-                    <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">ব্যক্তিগত তথ্য</h3>
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">ব্যক্তিগত তথ্য</h3>
                 </div>
 
                 {profileSuccess && (
-                    <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs px-4 py-3 rounded-xl">
+                    <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">
                         <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> {profileSuccess}
                     </div>
                 )}
                 {profileError && (
-                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-xl">
+                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
                         {profileError}
                     </div>
                 )}
 
                 <form onSubmit={handleProfileSave} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">পুরো নাম</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">পুরো নাম</label>
                         <input
                             type="text"
                             value={profileForm.name}
                             onChange={e => setProfileForm(f => ({ ...f, name: e.target.value }))}
                             required
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">ইমেইল</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">ইমেইল</label>
                         <input
                             type="email"
                             value={user?.email || ''}
                             disabled
-                            className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-400 cursor-not-allowed"
+                            className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-400 cursor-not-allowed"
                         />
-                        <p className="text-[10px] text-gray-400 mt-1">ইমেইল পরিবর্তন করা যাবে না।</p>
+                        <p className="text-[11px] text-gray-400 mt-1">ইমেইল পরিবর্তন করা যাবে না।</p>
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">ফোন নম্বর</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">ফোন নম্বর</label>
                         <input
                             type="text"
                             value={profileForm.phone}
                             onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))}
                             placeholder="+880XXXXXXXXXX"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
                     <div className="flex justify-end pt-1">
                         <button
                             type="submit"
                             disabled={profileLoading}
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-blue-500/20"
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-blue-500/20"
                         >
                             {profileLoading ? (
                                 <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -176,16 +176,16 @@ export default function Settings() {
                     <div className="p-2 bg-red-50 rounded-xl">
                         <Lock className="h-4 w-4 text-red-500" />
                     </div>
-                    <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">পাসওয়ার্ড পরিবর্তন</h3>
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">পাসওয়ার্ড পরিবর্তন</h3>
                 </div>
 
                 {passSuccess && (
-                    <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs px-4 py-3 rounded-xl">
+                    <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">
                         <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> {passSuccess}
                     </div>
                 )}
                 {passError && (
-                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-xl">
+                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
                         {passError}
                     </div>
                 )}
@@ -197,14 +197,14 @@ export default function Settings() {
                         { key: 'confirm', label: 'পাসওয়ার্ড নিশ্চিত করুন', field: 'password_confirmation' },
                     ].map(({ key, label, field }) => (
                         <div key={key}>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1.5">{label}</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{label}</label>
                             <div className="relative">
                                 <input
                                     type={showPass[key] ? 'text' : 'password'}
                                     value={passForm[field]}
                                     onChange={e => setPassForm(f => ({ ...f, [field]: e.target.value }))}
                                     required
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-xs text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm text-gray-700 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
                                 />
                                 <button
                                     type="button"
@@ -220,7 +220,7 @@ export default function Settings() {
                         <button
                             type="submit"
                             disabled={passLoading}
-                            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-red-500/20"
+                            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-red-500/20"
                         >
                             {passLoading ? (
                                 <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

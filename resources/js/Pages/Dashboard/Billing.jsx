@@ -45,10 +45,10 @@ export default function Billing() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h2 className="text-base font-bold text-gray-900">বিলিং ও পেমেন্ট</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">মোট {payments.length}টি লেনদেন</p>
+                    <p className="text-sm text-gray-400 mt-0.5">মোট {payments.length}টি লেনদেন</p>
                 </div>
                 <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-center">
-                    <p className="text-[10px] text-gray-400 font-medium">মোট খরচ</p>
+                    <p className="text-[11px] text-gray-400 font-medium">মোট খরচ</p>
                     <p className="text-lg font-extrabold text-blue-600">৳{totalSpent.toFixed(2)}</p>
                 </div>
             </div>
@@ -64,7 +64,7 @@ export default function Billing() {
                                 <Icon className="h-3.5 w-3.5" />
                             </div>
                             <p className="text-lg font-extrabold text-gray-900">{count}</p>
-                            <p className="text-[10px] text-gray-400">{cfg.label}</p>
+                            <p className="text-[11px] text-gray-400">{cfg.label}</p>
                         </div>
                     );
                 })}
@@ -80,7 +80,7 @@ export default function Billing() {
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2">
                         <Receipt className="h-4 w-4 text-blue-500" />
-                        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">পেমেন্ট ইতিহাস</h3>
+                        <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">পেমেন্ট ইতিহাস</h3>
                     </div>
                     <div className="divide-y divide-gray-50">
                         {payments.map(payment => {
@@ -103,15 +103,15 @@ export default function Billing() {
 
                                     {/* Details */}
                                     <div className="flex-grow min-w-0">
-                                        <p className="text-xs font-semibold text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">
                                             {payment.course?.title || 'Course'}
                                         </p>
-                                        <p className="text-[10px] text-gray-400 mt-0.5">
+                                        <p className="text-[11px] text-gray-400 mt-0.5">
                                             {payment.payment_method?.toUpperCase()} •{' '}
                                             {new Date(payment.created_at).toLocaleDateString('bn-BD')}
                                         </p>
                                         {payment.transaction_id && (
-                                            <p className="text-[9px] text-gray-300 font-mono mt-0.5">
+                                            <p className="text-[10px] text-gray-300 font-mono mt-0.5">
                                                 {payment.transaction_id}
                                             </p>
                                         )}
@@ -121,9 +121,9 @@ export default function Billing() {
                                     <div className="text-right shrink-0">
                                         <p className="text-sm font-extrabold text-gray-900">৳{parseFloat(payment.amount).toFixed(2)}</p>
                                         {parseFloat(payment.coupon_discount) > 0 && (
-                                            <p className="text-[9px] text-green-600">-৳{parseFloat(payment.coupon_discount).toFixed(2)} ছাড়</p>
+                                            <p className="text-[10px] text-green-600">-৳{parseFloat(payment.coupon_discount).toFixed(2)} ছাড়</p>
                                         )}
-                                        <span className={`inline-flex items-center gap-0.5 mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${cfg.color}`}>
+                                        <span className={`inline-flex items-center gap-0.5 mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${cfg.color}`}>
                                             <Icon className="h-2.5 w-2.5" /> {cfg.label}
                                         </span>
                                     </div>

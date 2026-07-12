@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import CourseCard from '../Components/CourseCard';
 import BlogCard from '../Components/BlogCard';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     Search, BookOpen, Clock, Tag, ArrowRight, HelpCircle, ChevronDown,
     ChevronUp, FileText
@@ -14,8 +15,22 @@ export default function Home() {
     const search = searchParams.get('search') || '';
     const [loading, setLoading] = useState(true);
 
-    // Dynamic FAQs and Blogs states
-    const [faqs, setFaqs] = useState([]);
+    const { settings } = useSiteSettings();
+
+    // FAQs are already available from the preloaded site settings,
+    // so no separate /api/settings request is needed here.
+    const faqs = useMemo(() => {
+        try {
+            const raw = settings?.general?.faqs;
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error('Error parsing FAQs:', e);
+            return [];
+        }
+    }, [settings]);
+
+    // Dynamic Blogs state
     const [blogs, setBlogs] = useState([]);
     const [loadingBlogs, setLoadingBlogs] = useState(true);
     const [expandedFaq, setExpandedFaq] = useState(null);
@@ -34,29 +49,15 @@ export default function Home() {
         }
     };
 
-    const fetchFaqsAndBlogs = async () => {
+    const fetchBlogs = async () => {
         setLoadingBlogs(true);
         try {
-            // Fetch FAQs from public settings
-            const settingsRes = await axios.get('/api/settings');
-            if (settingsRes.data.success && settingsRes.data.settings?.general?.faqs) {
-                try {
-                    const parsedFaqs = JSON.parse(settingsRes.data.settings.general.faqs);
-                    if (Array.isArray(parsedFaqs)) {
-                        setFaqs(parsedFaqs);
-                    }
-                } catch (e) {
-                    console.error('Error parsing FAQs:', e);
-                }
-            }
-
-            // Fetch latest blog posts
             const blogsRes = await axios.get('/api/blogs');
             if (blogsRes.data.success) {
                 setBlogs(blogsRes.data.posts);
             }
         } catch (error) {
-            console.error('Error fetching FAQs and Blogs:', error);
+            console.error('Error fetching blogs:', error);
         } finally {
             setLoadingBlogs(false);
         }
@@ -67,7 +68,7 @@ export default function Home() {
     }, [search]);
 
     useEffect(() => {
-        fetchFaqsAndBlogs();
+        fetchBlogs();
     }, []);
 
     return (
@@ -131,22 +132,28 @@ export default function Home() {
             </div>
 
             {/* Blog Section */}
-            {blogs.length > 0 && (
-                <div className="space-y-8">
-                    <div>
-                        <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
-                            <FileText className="h-6 w-6 text-pink-555" style={{ color: '#ec4899' }} /> রিসেন্ট ব্লগ ও আর্টিকেলস
-                        </h2>
-                        <p className="text-xs text-slate-450 mt-1 font-semibold">আপনার জ্ঞান বৃদ্ধিতে আমাদের রিসেন্ট পাবলিশ হওয়া আর্টিকেলসমূহ পড়ুন।</p>
-                    </div>
+            <div className="space-y-8">
+                <div>
+                    <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                        <FileText className="h-6 w-6 text-pink-555" style={{ color: '#ec4899' }} /> রিসেন্ট ব্লগ ও আর্টিকেলস
+                    </h2>
+                    <p className="text-xs text-slate-450 mt-1 font-semibold">আপনার জ্ঞান বৃদ্ধিতে আমাদের রিসেন্ট পাবলিশ হওয়া আর্টিকেলসমূহ পড়ুন।</p>
+                </div>
 
+                {loadingBlogs ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        {[1, 2, 3].map((n) => (
+                            <div key={n} className="bg-white border border-slate-100 shadow-sm h-80 rounded-2xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : blogs.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {blogs.map((post) => (
                             <BlogCard key={post.id} post={post} />
                         ))}
                     </div>
-                </div>
-            )}
+                ) : null}
+            </div>
 
             {/* FAQ Section */}
             {faqs.length > 0 && (

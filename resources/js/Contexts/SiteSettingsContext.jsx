@@ -34,9 +34,21 @@ const DEFAULTS = {
     features: {},
 };
 
+// Preload settings injected by the server (app.blade.php) so the first
+// client render already shows the real dynamic content instead of DEFAULTS.
+const PRELOADED = (typeof window !== 'undefined' && window.__INITIAL_SITE_SETTINGS__)
+    ? {
+        general:    { ...DEFAULTS.general,    ...(window.__INITIAL_SITE_SETTINGS__.general    || {}) },
+        appearance: { ...DEFAULTS.appearance, ...(window.__INITIAL_SITE_SETTINGS__.appearance || {}) },
+        footer:     { ...DEFAULTS.footer,     ...(window.__INITIAL_SITE_SETTINGS__.footer     || {}) },
+        marketing:  { ...DEFAULTS.marketing,  ...(window.__INITIAL_SITE_SETTINGS__.marketing  || {}) },
+        features:   window.__INITIAL_SITE_SETTINGS__.features || {},
+    }
+    : null;
+
 export const SiteSettingsProvider = ({ children }) => {
-    const [settings, setSettings] = useState(DEFAULTS);
-    const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState(PRELOADED || DEFAULTS);
+    const [loading, setLoading] = useState(!PRELOADED);
 
     const fetchSettings = async () => {
         try {
@@ -62,6 +74,51 @@ export const SiteSettingsProvider = ({ children }) => {
     useEffect(() => {
         fetchSettings();
     }, []);
+
+    // Keep document head (favicon, title, meta description, OG/Twitter) in sync
+    // with the dynamic site settings so changes apply without a rebuild.
+    useEffect(() => {
+        const general    = settings.general || {};
+        const appearance = settings.appearance || {};
+        const name   = general.site_name || 'VibeThink LMS';
+        const desc   = general.site_description || '';
+        const favicon = appearance.site_favicon || null;
+        const logo   = appearance.site_logo || null;
+
+        if (typeof document === 'undefined') return;
+
+        document.title = name;
+
+        if (favicon) {
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = favicon;
+        }
+
+        const setMeta = (selector, attr, key, content) => {
+            if (!content) return;
+            let m = document.querySelector(selector);
+            if (!m) {
+                m = document.createElement('meta');
+                if (attr === 'name') m.name = key;
+                else m.setAttribute('property', key);
+                document.head.appendChild(m);
+            }
+            m.content = content;
+        };
+
+        setMeta("meta[name='description']", 'name', 'description', desc);
+        setMeta("meta[property='og:title']", 'property', 'og:title', name);
+        setMeta("meta[property='og:description']", 'property', 'og:description', desc);
+        setMeta("meta[property='og:image']", 'property', 'og:image', logo);
+        setMeta("meta[name='twitter:title']", 'name', 'twitter:title', name);
+        setMeta("meta[name='twitter:description']", 'name', 'twitter:description', desc);
+        setMeta("meta[name='twitter:image']", 'name', 'twitter:image', logo);
+    }, [settings]);
 
     /**
      * Helper to re-fetch (e.g., after admin saves settings).

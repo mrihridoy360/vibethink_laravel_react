@@ -72,13 +72,13 @@ export default function GiftBox() {
                                             <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mb-2.5 shadow-sm border border-gray-100">
                                                 <Lock className="w-4 h-4 text-gray-500" />
                                             </div>
-                                            <h4 className="font-bold text-gray-800 text-xs mb-0.5">গিফটটি লক করা আছে</h4>
-                                            <p className="text-[10px] text-gray-500 mb-3 max-w-[180px]">
+                                            <h4 className="font-bold text-gray-800 text-sm mb-0.5">গিফটটি লক করা আছে</h4>
+                                            <p className="text-[11px] text-gray-500 mb-3 max-w-[180px]">
                                                 ফেসবুকে আমাদের রিভিউ দিয়ে এই প্রিমিয়াম গিফটটি আনলক করুন।
                                             </p>
                                             <Link
                                                 to="/dashboard/review"
-                                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-xl transition-all shadow-sm active:scale-95"
+                                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-xl transition-all shadow-sm active:scale-95"
                                             >
                                                 আনলক করুন <ArrowRight className="w-3 h-3" />
                                             </Link>
@@ -107,7 +107,7 @@ export default function GiftBox() {
                                             {gift.description}
                                         </div>
 
-                                        <div className="flex items-center justify-between text-xs text-gray-400 mt-2">
+                                        <div className="flex items-center justify-between text-sm text-gray-400 mt-2">
                                             <span className="flex items-center gap-1 font-medium">
                                                 <Clock className="h-4 w-4" />
                                                 {formatDate(gift.created_at)}
