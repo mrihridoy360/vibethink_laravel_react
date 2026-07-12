@@ -83,7 +83,7 @@ class MetaCapiService
 
         try {
             // Graph API version v18.0 is long-term stable
-            $response = Http::post("https://graph.facebook.com/v18.0/{$pixelId}/events?access_token={$accessToken}", $payload);
+            $response = Http::withoutVerifying()->post("https://graph.facebook.com/v18.0/{$pixelId}/events?access_token={$accessToken}", $payload);
 
             if ($response->failed()) {
                 Log::error("Meta CAPI failed response: " . $response->body());
