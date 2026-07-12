@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
     Search, GraduationCap, ChevronLeft, ChevronRight, CheckCircle2,
-    Clock, Plus, X, Loader2, CheckCircle, AlertCircle, BookOpen, User
+    Clock, Plus, X, Loader2, CheckCircle, AlertCircle, BookOpen, User, Ban
 } from 'lucide-react';
 
 // ── Toast Notification ────────────────────────────────────────────────────────
@@ -174,6 +174,54 @@ function ManualEnrollmentModal({ onClose, onSaved }) {
     );
 }
 
+// ── Cancel Enrollment Modal ─────────────────────────────────────────────────
+function CancelEnrollmentModal({ enrollment, onClose, onConfirm, saving }) {
+    if (!enrollment) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                    <div>
+                        <h2 className="text-base font-bold text-gray-900">ইনরোলমেন্ট বাতিল করুন</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">শিক্ষার্থীর কোর্সে এনরোলমেন্ট বাতিল হয়ে যাবে</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                <div className="px-6 py-5 space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                        <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">
+                            {enrollment.user?.name?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 truncate">{enrollment.user?.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{enrollment.course?.title || '—'}</p>
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                        এই এনরোলমেন্টটি সম্পূর্ণরূপে মুছে ফেলা হবে এবং শিক্ষার্থীর প্রগ্রেস হারিয়ে যাবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।
+                    </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+                    <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                        বাতিল
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={saving}
+                        className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition-all disabled:opacity-60 flex items-center gap-2 shadow-sm"
+                    >
+                        {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> বাতিল হচ্ছে...</> : <><Ban className="h-4 w-4" /> এনরোলমেন্ট বাতিল করুন</>}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ── Main AdminEnrollments ─────────────────────────────────────────────────────
 export default function AdminEnrollments() {
     const [enrollments, setEnrollments] = useState([]);
@@ -183,9 +231,28 @@ export default function AdminEnrollments() {
     const [page, setPage] = useState(1);
 
     const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+    const [cancelTarget, setCancelTarget] = useState(null);
+    const [cancelling, setCancelling] = useState(false);
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'success') => setToast({ message, type });
+
+    const handleCancelConfirm = async () => {
+        if (!cancelTarget) return;
+        setCancelling(true);
+        try {
+            const res = await axios.delete(`/api/admin/enrollments/${cancelTarget.id}`);
+            if (res.data.success) {
+                setEnrollments(prev => prev.filter(e => e.id !== cancelTarget.id));
+                showToast(res.data.message || 'ইনরোলমেন্টটি সফলভাবে বাতিল করা হয়েছে।');
+                setCancelTarget(null);
+            }
+        } catch (err) {
+            showToast(err.response?.data?.message || 'ইনরোলমেন্ট বাতিল করতে সমস্যা হয়েছে।', 'error');
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     const fetchEnrollments = async () => {
         setLoading(true);
@@ -217,6 +284,16 @@ export default function AdminEnrollments() {
                 <ManualEnrollmentModal
                     onClose={() => setIsEnrollModalOpen(false)}
                     onSaved={handleEnrollSaved}
+                />
+            )}
+
+            {/* Cancel Enrollment Modal */}
+            {cancelTarget && (
+                <CancelEnrollmentModal
+                    enrollment={cancelTarget}
+                    onClose={() => setCancelTarget(null)}
+                    onConfirm={handleCancelConfirm}
+                    saving={cancelling}
                 />
             )}
 
@@ -253,14 +330,15 @@ export default function AdminEnrollments() {
                                 <th className="text-left px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell text-xs">কোর্স</th>
                                 <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">অগ্রগতি</th>
                                 <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">স্ট্যাটাস</th>
+                                <th className="text-center px-4 py-3 font-bold text-gray-500 uppercase tracking-wider text-xs">অ্যাকশন</th>
                                 <th className="text-right px-4 py-3 font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell text-xs">তারিখ</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {loading ? Array(5).fill(0).map((_, i) => (
-                                <tr key={i}>{[1,2,3,4,5].map(j => <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>)}</tr>
+                                <tr key={i}>{[1,2,3,4,5,6].map(j => <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>)}</tr>
                             )) : enrollments.length === 0 ? (
-                                <tr><td colSpan={5} className="px-5 py-16 text-center text-gray-400">কোনো এনরোলমেন্ট পাওয়া যায়নি</td></tr>
+                                <tr><td colSpan={6} className="px-5 py-16 text-center text-gray-400">কোনো এনরোলমেন্ট পাওয়া যায়নি</td></tr>
                             ) : enrollments.map(e => {
                                 const progress = parseInt(e.progress || 0);
                                 return (
@@ -297,6 +375,15 @@ export default function AdminEnrollments() {
                                                     <Clock className="h-3 w-3" /> চলমান
                                                 </span>
                                             )}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <button
+                                                onClick={() => setCancelTarget(e)}
+                                                className="p-2 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+                                                title="ইনরোলমেন্ট ক্যান্সেল করুন"
+                                            >
+                                                <Ban className="h-4 w-4" />
+                                            </button>
                                         </td>
                                         <td className="px-4 py-3 text-right hidden sm:table-cell text-gray-400">
                                             {new Date(e.created_at).toLocaleDateString('bn-BD')}

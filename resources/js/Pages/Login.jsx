@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
 import { GraduationCap, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function Login() {
     const { login, user, loading } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from || '/';
 
     useEffect(() => {
         if (!loading && user) {
-            navigate('/');
+            navigate(from, { replace: true });
         }
-    }, [user, loading, navigate]);
+    }, [user, loading, navigate, from]);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,7 +28,7 @@ export default function Login() {
         try {
             const res = await login(email, password, remember);
             if (res.success) {
-                navigate('/');
+                navigate(from, { replace: true });
             } else {
                 setError(res.message || 'Incorrect credentials');
             }

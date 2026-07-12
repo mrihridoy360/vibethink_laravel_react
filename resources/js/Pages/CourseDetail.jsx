@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import { Play, BookOpen, CheckCircle, FileText, ChevronRight, Award, HelpCircle } from 'lucide-react';
@@ -9,6 +9,7 @@ export default function CourseDetail() {
     const { slug } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [course, setCourse] = useState(null);
     const [isEnrolled, setIsEnrolled] = useState(false);
     const [completedLessons, setCompletedLessons] = useState([]);
@@ -56,7 +57,7 @@ export default function CourseDetail() {
 
     const handleEnroll = async () => {
         if (!user) {
-            navigate('/login');
+            navigate('/login', { state: { from: location.pathname } });
             return;
         }
         

@@ -106,6 +106,7 @@ Route::prefix('api')->group(function () {
             Route::get('/enrollments',                     [AdminController::class, 'enrollments']);
             Route::get('/enrollments/resources',           [AdminController::class, 'enrollmentResources']);
             Route::post('/enrollments',                    [AdminController::class, 'storeEnrollment']);
+            Route::delete('/enrollments/{id}',             [AdminController::class, 'cancelEnrollment']);
             Route::get('/payments',                        [AdminController::class, 'payments']);
 
             // ── Payment Gateways ──────────────────────────────────

@@ -573,6 +573,27 @@ class AdminController extends Controller
         ]);
     }
 
+    public function cancelEnrollment($id)
+    {
+        $this->ensureAdmin();
+
+        $enrollment = Enrollment::find($id);
+
+        if (!$enrollment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ইনরোলমেন্টটি পাওয়া যায়নি।',
+            ], 404);
+        }
+
+        $enrollment->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ইনরোলমেন্টটি সফলভাবে বাতিল করা হয়েছে।',
+        ]);
+    }
+
 
     // ─────────────────────────────────────────
     // Payments
