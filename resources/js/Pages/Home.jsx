@@ -168,7 +168,7 @@ export default function Home() {
                                                 </>
                                             ) : (
                                                 <span className="text-base font-extrabold text-slate-900">
-                                                    {parseFloat(course.price) === 0 ? 'Free' : `৳${course.price}`}
+                                                    {parseFloat(course.price) === 0 ? 'ফ্রি' : `৳${course.price}`}
                                                 </span>
                                             )}
                                         </div>

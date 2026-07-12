@@ -46,17 +46,31 @@ export default function CourseDetail() {
             navigate('/login');
             return;
         }
-
+        
         setEnrolling(true);
         try {
-            const response = await axios.post(`/api/courses/${course.id}/enroll`);
-            if (response.data.success) {
-                setIsEnrolled(true);
-                // Redirect straight to learn mode
-                navigate(`/courses/${course.slug}/learn`);
+            const price = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
+            
+            if (price > 0) {
+                // Paid course, initialize payment gateway checkout
+                const response = await axios.post(`/api/payment/zinipay/init/${course.id}`);
+                if (response.data.success && response.data.payment_url) {
+                    window.location.href = response.data.payment_url;
+                } else {
+                    alert(response.data.message || 'পেমেন্ট চেকআউট চালু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                    setEnrolling(false);
+                }
+            } else {
+                // Free course, direct enrollment
+                const response = await axios.post(`/api/courses/${course.id}/enroll`);
+                if (response.data.success) {
+                    setIsEnrolled(true);
+                    // Redirect straight to learn mode
+                    navigate(`/courses/${course.slug}/learn`);
+                }
             }
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to enroll');
+            alert(error.response?.data?.message || 'ইনরোলমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
         } finally {
             setEnrolling(false);
         }
@@ -130,12 +144,12 @@ export default function CourseDetail() {
                     <div className="mb-6 flex items-baseline gap-2">
                         {parseFloat(course.discount_price) > 0 ? (
                             <>
-                                <span className="text-3xl font-extrabold text-slate-900">${course.discount_price}</span>
-                                <span className="text-sm text-slate-400 line-through">${course.price}</span>
+                                <span className="text-3xl font-extrabold text-slate-900">৳{course.discount_price}</span>
+                                <span className="text-sm text-slate-400 line-through">৳{course.price}</span>
                             </>
                         ) : (
                             <span className="text-3xl font-extrabold text-slate-900">
-                                {parseFloat(course.price) === 0 ? 'Free' : `$${course.price}`}
+                                {parseFloat(course.price) === 0 ? 'ফ্রি' : `৳${course.price}`}
                             </span>
                         )}
                     </div>

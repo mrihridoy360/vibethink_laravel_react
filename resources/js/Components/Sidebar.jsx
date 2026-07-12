@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, ShoppingBag,
     Award, CreditCard, Users, Wallet, MessageSquare, Ticket, Settings,
@@ -30,6 +31,11 @@ const SERVICE_ITEMS = [
 export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollapsed }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const { settings } = useSiteSettings();
+
+    const siteLogo = settings?.appearance?.site_logo || null;
+    const siteFavicon = settings?.appearance?.site_favicon || null;
+    const siteName = settings?.general?.site_name || 'VibeThink';
 
     const handleLogout = async () => {
         await logout();
@@ -60,9 +66,36 @@ export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollaps
             {/* Brand Logo & Toggle */}
             <div className="h-16 px-4 flex items-center justify-between shrink-0 border-b border-gray-100">
                 <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
-                    <span className="text-2xl font-extrabold tracking-tight text-blue-600">
-                        V{sidebarCollapsed ? '' : 'ibe'}<span className="text-gray-900">{sidebarCollapsed ? 'T' : 'Think'}</span>
-                    </span>
+                    {sidebarCollapsed ? (
+                        siteFavicon ? (
+                            <img
+                                src={siteFavicon}
+                                alt="Favicon"
+                                className="h-8 w-8 object-contain"
+                            />
+                        ) : (
+                            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                {siteName.charAt(0).toUpperCase()}
+                            </div>
+                        )
+                    ) : (
+                        siteLogo ? (
+                            <img
+                                src={siteLogo}
+                                alt={siteName}
+                                className="h-8 max-w-[150px] object-contain"
+                            />
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                    {siteName.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-xl font-extrabold text-slate-900 tracking-tight">
+                                    {siteName}
+                                </span>
+                            </div>
+                        )
+                    )}
                 </Link>
                 {!sidebarCollapsed && (
                     <button

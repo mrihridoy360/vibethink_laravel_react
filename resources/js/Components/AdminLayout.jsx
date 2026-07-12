@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     LayoutDashboard, BookOpen, FileText, Tag, Users, ShoppingCart,
     CreditCard, Cpu, Gift, Megaphone, Package, Star, Wrench,
@@ -70,6 +71,11 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
     const { user, loading, logout } = useAuth();
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const { settings } = useSiteSettings();
+
+    const siteLogo = settings?.appearance?.site_logo || null;
+    const siteFavicon = settings?.appearance?.site_favicon || null;
+    const siteName = settings?.general?.site_name || 'VibeThink';
 
     useEffect(() => {
         if (loading) return;
@@ -123,11 +129,38 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
             <aside className={`bg-white border-r border-gray-200 flex flex-col shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
                 {/* Brand Logo */}
                 <div className="h-16 flex items-center justify-between px-4 shrink-0 border-b border-gray-100">
-                    {!sidebarCollapsed && (
-                        <Link to="/" className="text-xl font-extrabold tracking-tight">
-                            <span className="text-blue-600">Vibe</span><span className="text-gray-900">Think</span>
-                        </Link>
-                    )}
+                    <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
+                        {sidebarCollapsed ? (
+                            siteFavicon ? (
+                                <img
+                                    src={siteFavicon}
+                                    alt="Favicon"
+                                    className="h-8 w-8 object-contain"
+                                />
+                            ) : (
+                                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                    {siteName.charAt(0).toUpperCase()}
+                                </div>
+                            )
+                        ) : (
+                            siteLogo ? (
+                                <img
+                                    src={siteLogo}
+                                    alt={siteName}
+                                    className="h-8 max-w-[150px] object-contain"
+                                />
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                        {siteName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="text-xl font-extrabold text-slate-900 tracking-tight">
+                                        {siteName}
+                                    </span>
+                                </div>
+                            )
+                        )}
+                    </Link>
                     <button
                         onClick={() => setSidebarCollapsed(p => !p)}
                         className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0 cursor-pointer"

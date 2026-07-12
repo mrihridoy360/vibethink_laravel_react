@@ -15,6 +15,8 @@ import AdminDashboard from './Pages/AdminDashboard';
 import AdminCourseCreate from './Pages/Admin/AdminCourseCreate';
 import AdminCourseEdit from './Pages/Admin/AdminCourseEdit';
 import BlogDetail from './Pages/BlogDetail';
+import PaymentSuccess from './Pages/PaymentSuccess';
+import PaymentFailed from './Pages/PaymentFailed';
 
 function AppLayout() {
     const location = useLocation();
@@ -35,6 +37,8 @@ function AppLayout() {
                     <Route path="/blog/:slug"              element={<BlogDetail />} />
                     <Route path="/login"                   element={<Login />} />
                     <Route path="/register"                element={<Register />} />
+                    <Route path="/payment/success"         element={<PaymentSuccess />} />
+                    <Route path="/payment/failed"          element={<PaymentFailed />} />
                     <Route path="/dashboard"               element={<Dashboard />} />
                     <Route path="/dashboard/:tab"          element={<Dashboard />} />
                     <Route path="/admin"                        element={<AdminDashboard />} />

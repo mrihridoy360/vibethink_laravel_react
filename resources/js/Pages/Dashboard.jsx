@@ -6,7 +6,8 @@ import {
     LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, ShoppingBag,
     Award, CreditCard, Users, Wallet, MessageSquare, Ticket, Settings,
     ShieldAlert, LogOut, Search, Home as HomeIcon, BarChart2, Moon,
-    BookOpenCheck, CheckCircle2, Clock, PlayCircle, GraduationCap
+    BookOpenCheck, CheckCircle2, Clock, PlayCircle, GraduationCap,
+    ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 // Tab page components
@@ -22,6 +23,8 @@ import SupportGroup from './Dashboard/SupportGroup';
 import SupportTickets from './Dashboard/SupportTickets';
 import SettingsPage from './Dashboard/Settings';
 import Review from './Dashboard/Review';
+import Loader from '../Components/Loader';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 
 // ── Sidebar nav config ───────────────────────────────────────
 const MENU_ITEMS = [
@@ -63,14 +66,22 @@ const PAGE_TITLES = {
 };
 
 export default function Dashboard() {
-    const { user, logout } = useAuth();
+    const { user, loading: authLoading, logout } = useAuth();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const { tab } = useParams();
     const activeTab = (tab && PAGE_TITLES[tab]) ? tab : 'dashboard';
 
+    const { settings } = useSiteSettings();
+    const siteLogo = settings?.appearance?.site_logo || null;
+    const siteFavicon = settings?.appearance?.site_favicon || null;
+    const siteName = settings?.general?.site_name || 'VibeThink';
+
     useEffect(() => {
+        if (authLoading) return;
+
         if (!user) {
             navigate('/login');
             return;
@@ -87,20 +98,15 @@ export default function Dashboard() {
             }
         };
         fetchDashboardData();
-    }, [user, navigate]);
+    }, [user, authLoading, navigate]);
 
     const handleLogout = async () => {
         await logout();
         navigate('/login');
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-[#f4f6fc]">
-                <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                <span className="text-gray-500 ml-4 font-medium">ড্যাশবোর্ড লোড হচ্ছে...</span>
-            </div>
-        );
+    if (authLoading) {
+        return <Loader text="ড্যাশবোর্ড লোড হচ্ছে..." />;
     }
 
     const stats = data?.stats || { enrolled_count: 0, active_count: 0, completed_count: 0, pending_count: 0 };
@@ -114,13 +120,14 @@ export default function Dashboard() {
         return (
             <Link
                 to={item.key === 'dashboard' ? '/dashboard' : `/dashboard/${item.key}`}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${isActive
+                className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                     }`}
+                title={sidebarCollapsed ? item.label : undefined}
             >
                 <Icon className="h-5 w-5 shrink-0" />
-                <span>{item.label}</span>
+                {!sidebarCollapsed && <span>{item.label}</span>}
             </Link>
         );
     };
@@ -129,23 +136,61 @@ export default function Dashboard() {
         <div className="flex h-screen overflow-hidden bg-[#f4f6fc] text-gray-800 font-sans">
 
             {/* ── Sidebar ─────────────────────────────────── */}
-            <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
-                {/* Brand */}
-                <div className="h-16 px-6 flex items-center shrink-0">
-                    <Link to="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-extrabold tracking-tight text-blue-600">
-                            Vibe<span className="text-gray-900">Think</span>
-                        </span>
+            <aside className={`bg-white border-r border-gray-200 flex flex-col shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+                {/* Brand Logo & Toggle */}
+                <div className="h-16 px-4 flex items-center justify-between shrink-0 border-b border-gray-100">
+                    <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
+                        {sidebarCollapsed ? (
+                            siteFavicon ? (
+                                <img
+                                    src={siteFavicon}
+                                    alt="Favicon"
+                                    className="h-8 w-8 object-contain"
+                                />
+                            ) : (
+                                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                    {siteName.charAt(0).toUpperCase()}
+                                </div>
+                            )
+                        ) : (
+                            siteLogo ? (
+                                <img
+                                    src={siteLogo}
+                                    alt={siteName}
+                                    className="h-8 max-w-[150px] object-contain"
+                                />
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                        {siteName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="text-xl font-extrabold text-slate-900 tracking-tight">
+                                        {siteName}
+                                    </span>
+                                </div>
+                            )
+                        )}
                     </Link>
+                    {!sidebarCollapsed && (
+                        <button
+                            onClick={() => setSidebarCollapsed(true)}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 cursor-pointer"
+                            title="Collapse Sidebar"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </button>
+                    )}
                 </div>
 
                 {/* Nav */}
                 <div className="flex-grow overflow-y-auto no-scrollbar px-4 py-4 space-y-6">
                     {/* Menu */}
                     <div>
-                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                            মেনু
-                        </span>
+                        {!sidebarCollapsed && (
+                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                                মেনু
+                            </span>
+                        )}
                         <div className="space-y-1">
                             {MENU_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
                         </div>
@@ -153,9 +198,11 @@ export default function Dashboard() {
 
                     {/* Service */}
                     <div>
-                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                            সার্ভিস
-                        </span>
+                        {!sidebarCollapsed && (
+                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                                সার্ভিস
+                            </span>
+                        )}
                         <div className="space-y-1">
                             {SERVICE_ITEMS.map(item => <NavItem key={item.key} item={item} />)}
                         </div>
@@ -164,39 +211,60 @@ export default function Dashboard() {
                     {/* Admin (conditional) */}
                     {user?.role === 'admin' && (
                         <div>
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                                ADMIN
-                            </span>
+                            {!sidebarCollapsed && (
+                                <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                                    ADMIN
+                                </span>
+                            )}
                             <div className="space-y-1">
                                 <Link
                                     to="/admin"
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all"
+                                    className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all`}
+                                    title={sidebarCollapsed ? 'এডমিন প্যানেল' : undefined}
                                 >
                                     <ShieldAlert className="h-5 w-5 shrink-0" />
-                                    <span>এডমিন প্যানেল</span>
+                                    {!sidebarCollapsed && <span>এডমিন প্যানেল</span>}
                                 </Link>
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* User footer */}
-                <div className="p-4 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
-                            {user.name.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                {/* Sidebar Footer User & Toggle */}
+                <div className="p-4 border-t border-gray-100 flex flex-col gap-2 shrink-0">
+                    {sidebarCollapsed && (
+                        <button
+                            onClick={() => setSidebarCollapsed(false)}
+                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors mx-auto cursor-pointer"
+                            title="Expand Sidebar"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </button>
+                    )}
+
+                    {/* User avatar details */}
+                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} gap-2 min-w-0`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                                {user?.name?.charAt(0) || 'U'}
+                            </div>
+                            {!sidebarCollapsed && (
+                                <div className="min-w-0">
+                                    <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+                                    <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
+
+                    {/* Logout Button */}
                     <button
                         onClick={handleLogout}
-                        className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0"
-                        title="Logout"
+                        className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all cursor-pointer`}
+                        title={sidebarCollapsed ? 'লগআউট' : undefined}
                     >
-                        <LogOut className="h-4 w-4" />
+                        <LogOut className="h-5 w-5 shrink-0 text-red-500" />
+                        {!sidebarCollapsed && <span>লগআউট</span>}
                     </button>
                 </div>
             </aside>
@@ -248,7 +316,10 @@ export default function Dashboard() {
 
                 {/* Content */}
                 <main className="flex-grow overflow-y-auto p-8">
-                    <div className="max-w-6xl w-full mx-auto">
+                    {loading ? (
+                        <Loader text="ড্যাশবোর্ড লোড হচ্ছে..." />
+                    ) : (
+                        <div className="max-w-6xl w-full mx-auto">
 
                         {/* ── Dashboard Overview ─────────────────────── */}
                         {activeTab === 'dashboard' && (
@@ -420,7 +491,8 @@ export default function Dashboard() {
                             <ComingSoon tab={activeTab} />
                         )}
 
-                    </div>
+                        </div>
+                    )}
                 </main>
 
                 {/* Footer */}

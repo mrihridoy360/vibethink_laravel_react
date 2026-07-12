@@ -26,10 +26,16 @@ Route::prefix('api')->group(function () {
     // Public Settings (no auth required)
     Route::get('/settings', [AdminController::class, 'publicSettings']);
 
+    // ZiniPay Webhook (Public, no auth)
+    Route::post('/payment/zinipay/webhook', [App\Http\Controllers\ZiniPayController::class, 'webhook'])->name('payment.zinipay.webhook');
+
 
     // Authenticated API Routes
     Route::middleware('auth')->group(function () {
         Route::post('/courses/{id}/enroll', [CourseController::class, 'enroll']);
+
+        // ZiniPay Payment Initialization
+        Route::post('/payment/zinipay/init/{courseId}', [App\Http\Controllers\ZiniPayController::class, 'initPayment']);
         Route::post('/lessons/{lessonId}/toggle-progress', [CourseController::class, 'toggleLessonProgress']);
         Route::get('/dashboard-data', [CourseController::class, 'dashboard']);
 
@@ -232,6 +238,9 @@ Route::prefix('api')->group(function () {
         });
     });
 });
+
+// ZiniPay redirect callback web route (browser redirect)
+Route::get('/payment/zinipay/callback', [App\Http\Controllers\ZiniPayController::class, 'callback'])->name('payment.zinipay.callback');
 
 // Fallback Route for React SPA
 Route::get('/{any}', function () {
