@@ -58,6 +58,10 @@ Route::prefix('api')->group(function () {
         Route::get('/gifts', [UserController::class, 'gifts']);
         Route::get('/tools', [UserController::class, 'tools']);
 
+        // Social Review
+        Route::get('/social-review', [UserController::class, 'socialReview']);
+        Route::post('/social-review', [UserController::class, 'storeSocialReview']);
+
         // Support Tickets
         Route::get('/support-tickets', [SupportTicketController::class, 'index']);
         Route::post('/support-tickets', [SupportTicketController::class, 'store']);

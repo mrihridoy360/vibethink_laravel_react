@@ -230,9 +230,14 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $giftsUnlocked = \App\Models\SocialReview::where('user_id', Auth::id())
+            ->where('status', 'approved')
+            ->exists();
+
         return response()->json([
             'success' => true,
             'gifts' => $gifts,
+            'gifts_unlocked' => $giftsUnlocked,
         ]);
     }
 
@@ -252,6 +257,37 @@ class UserController extends Controller
             'success' => true,
             'categories' => $categories,
             'tools' => $tools,
+        ]);
+    }
+
+    public function socialReview()
+    {
+        $review = \App\Models\SocialReview::where('user_id', Auth::id())->first();
+
+        return response()->json([
+            'success' => true,
+            'review'  => $review,
+        ]);
+    }
+
+    public function storeSocialReview(Request $request)
+    {
+        $request->validate([
+            'review_url' => 'required|url'
+        ]);
+
+        $review = \App\Models\SocialReview::updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'review_url' => $request->review_url,
+                'status' => 'pending'
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'রিভিউ সফলভাবে সাবমিট করা হয়েছে। অ্যাডমিন ভেরিফিকেশনের জন্য অপেক্ষা করুন।',
+            'review' => $review,
         ]);
     }
 }

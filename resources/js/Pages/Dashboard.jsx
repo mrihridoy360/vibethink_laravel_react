@@ -21,6 +21,7 @@ import WalletPage from './Dashboard/Wallet';
 import SupportGroup from './Dashboard/SupportGroup';
 import SupportTickets from './Dashboard/SupportTickets';
 import SettingsPage from './Dashboard/Settings';
+import Review from './Dashboard/Review';
 
 // ── Sidebar nav config ───────────────────────────────────────
 const MENU_ITEMS = [
@@ -404,6 +405,7 @@ export default function Dashboard() {
                         {activeTab === 'enrolled' && <EnrolledCourses />}
                         {activeTab === 'notice' && <Notice />}
                         {activeTab === 'giftbox' && <GiftBox />}
+                        {activeTab === 'review' && <Review />}
                         {activeTab === 'tools' && <Tools />}
                         {activeTab === 'certificates' && <Certificates />}
                         {activeTab === 'billing' && <Billing />}
@@ -414,7 +416,7 @@ export default function Dashboard() {
                         {activeTab === 'settings' && <SettingsPage />}
 
                         {/* ── Coming Soon Pages ─────────────────── */}
-                        {['review', 'products'].includes(activeTab) && (
+                        {['products'].includes(activeTab) && (
                             <ComingSoon tab={activeTab} />
                         )}
 
