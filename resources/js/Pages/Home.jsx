@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import CourseCard from '../Components/CourseCard';
+import BlogCard from '../Components/BlogCard';
 import {
     Search, BookOpen, Clock, Tag, ArrowRight, HelpCircle, ChevronDown,
-    ChevronUp, FileText, Calendar, Eye
+    ChevronUp, FileText
 } from 'lucide-react';
 
 export default function Home() {
@@ -116,72 +118,7 @@ export default function Home() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {courses.map((course) => (
-                            <div key={course.id} className="bg-white border border-slate-200/60 flex flex-col rounded-3xl overflow-hidden transition-all duration-300 group shadow-sm hover:shadow-md hover:-translate-y-0.5">
-                                {/* Thumbnail */}
-                                <div className="relative aspect-video w-full bg-slate-100 overflow-hidden">
-                                    {course.thumbnail ? (
-                                        <img
-                                            src={course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`}
-                                            alt={course.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
-                                            <BookOpen className="h-10 w-10 text-purple-400" />
-                                        </div>
-                                    )}
-                                    <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-800/10 text-white uppercase tracking-wider">
-                                        {course.language || 'English'}
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-6 flex flex-col flex-grow">
-                                    <h3 className="text-base font-bold text-slate-800 mb-2 line-clamp-1 group-hover:text-purple-650 transition-colors">
-                                        {course.title}
-                                    </h3>
-                                    <p className="text-slate-500 text-xs mb-4 line-clamp-2 font-normal leading-relaxed">
-                                        {course.short_description || 'No description available for this course.'}
-                                    </p>
-
-                                    {/* Author & Stats */}
-                                    <div className="flex items-center gap-2 mb-6 mt-auto">
-                                        <div className="h-6 w-6 rounded-full bg-purple-50 text-purple-600 border border-purple-100 text-[10px] font-bold flex items-center justify-center">
-                                            {course.user?.name ? course.user.name.charAt(0) : 'I'}
-                                        </div>
-                                        <span className="text-xs text-slate-450 font-medium">
-                                            By {course.user?.name || 'Instructor'}
-                                        </span>
-                                    </div>
-
-                                    {/* Footer */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                                        <div className="flex items-baseline gap-1.5">
-                                            {parseFloat(course.discount_price) > 0 ? (
-                                                <>
-                                                    <span className="text-base font-extrabold text-slate-900">
-                                                        ৳{course.discount_price}
-                                                    </span>
-                                                    <span className="text-xs text-slate-400 line-through">
-                                                        ৳{course.price}
-                                                    </span>
-                                                </>
-                                            ) : (
-                                                <span className="text-base font-extrabold text-slate-900">
-                                                    {parseFloat(course.price) === 0 ? 'ফ্রি' : `৳${course.price}`}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <Link
-                                            to={`/courses/${course.slug}`}
-                                            className="text-xs text-purple-600 hover:text-purple-800 font-bold flex items-center gap-1 group/btn"
-                                        >
-                                            View Details <ArrowRight className="h-3 w-3 group-hover/btn:translate-x-0.5 transition-transform" />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                            <CourseCard key={course.id} course={course} />
                         ))}
                     </div>
                 ) : (
@@ -205,46 +142,7 @@ export default function Home() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {blogs.map((post) => (
-                            <div key={post.id} className="bg-white border border-slate-200/60 flex flex-col rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group">
-                                {/* Thumbnail Link */}
-                                <Link to={`/blog/${post.slug}`} className="relative aspect-video w-full bg-slate-100 overflow-hidden block">
-                                    {post.featured_image ? (
-                                        <img
-                                            src={post.featured_image.startsWith('http') ? post.featured_image : `/storage/${post.featured_image}`}
-                                            alt={post.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-50/50 to-purple-50/50">
-                                            <FileText className="h-10 w-10 text-pink-400" />
-                                        </div>
-                                    )}
-                                    {post.category && (
-                                        <div className="absolute top-3 left-3 bg-pink-500/90 text-[9px] font-bold px-2 py-0.5 rounded text-white uppercase tracking-wider">
-                                            {post.category.name}
-                                        </div>
-                                    )}
-                                </Link>
-
-                                {/* Content */}
-                                <div className="p-6 flex flex-col flex-grow">
-                                    <Link to={`/blog/${post.slug}`}>
-                                        <h3 className="text-sm font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-pink-600 transition-colors">
-                                            {post.title}
-                                        </h3>
-                                    </Link>
-                                    <p className="text-slate-500 text-[11.5px] mb-4 line-clamp-2 leading-relaxed font-semibold">
-                                        {post.excerpt || 'আর্টিকেলের অংশবিশেষ পড়তে চোখ রাখুন আমাদের ব্লগে...'}
-                                    </p>
-
-                                    {/* Meta Row */}
-                                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold mt-auto pt-4 border-t border-slate-100">
-                                        <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {post.formatted_date}</span>
-                                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {post.reading_time} মিনিট</span>
-                                        <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {post.views_count || 0}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <BlogCard key={post.id} post={post} />
                         ))}
                     </div>
                 </div>

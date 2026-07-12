@@ -201,10 +201,10 @@ export default function CourseDetail() {
                     {/* What you'll learn */}
                     {course.what_youll_learn && Array.isArray(course.what_youll_learn) && course.what_youll_learn.length > 0 && (
                         <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-2xl sm:rounded-3xl">
-                            <h2 className="text-lg font-bold text-slate-900 mb-6">What you'll learn</h2>
+                            <h2 className="text-xl font-bold text-slate-900 mb-6">What you'll learn</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {course.what_youll_learn.map((item, idx) => (
-                                    <div key={idx} className="flex gap-2 text-sm text-slate-600 font-normal">
+                                    <div key={idx} className="flex gap-2 text-base text-slate-600 font-normal">
                                         <CheckCircle className="h-5 w-5 text-purple-600 shrink-0" />
                                         <span>{renderText(item)}</span>
                                     </div>
@@ -215,16 +215,16 @@ export default function CourseDetail() {
 
                     {/* Description */}
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900 mb-4">Course Description</h2>
-                        <div className="text-slate-600 text-sm font-normal leading-relaxed whitespace-pre-line">
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">Course Description</h2>
+                        <div className="text-slate-600 text-base font-normal leading-relaxed whitespace-pre-line">
                             {course.description}
                         </div>
                     </div>
 
                     {/* Syllabus / Curriculum */}
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900 mb-2">Course Curriculum</h2>
-                        <p className="text-xs text-slate-400 mb-6 font-semibold">Browse chapters and check lessons preview</p>
+                        <h2 className="text-xl font-bold text-slate-900 mb-2">Course Curriculum</h2>
+                        <p className="text-sm text-slate-400 mb-6 font-semibold">Browse chapters and check lessons preview</p>
 
                         <div className="space-y-4">
                             {course.chapters && course.chapters.length > 0 ? (
@@ -244,7 +244,7 @@ export default function CourseDetail() {
                                                     <div key={lesson.id} className="px-4 sm:px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/50 transition-all">
                                                         <div className="flex items-center gap-3">
                                                             <Play className="h-3.5 w-3.5 text-slate-400" />
-                                                            <span className="text-sm text-slate-650 font-normal">{lesson.title}</span>
+                                                            <span className="text-base text-slate-650 font-normal">{lesson.title}</span>
                                                         </div>
                                                         {lesson.is_preview && (
                                                             <span className="text-[10px] text-emerald-600 font-bold px-2 py-0.5 bg-emerald-50 rounded-md border border-emerald-100">
@@ -277,7 +277,7 @@ export default function CourseDetail() {
                             </h3>
                             <ul className="space-y-2">
                                 {course.requirements.map((item, idx) => (
-                                    <li key={idx} className="text-xs text-slate-500 font-medium list-disc list-inside">
+                                    <li key={idx} className="text-sm text-slate-500 font-medium list-disc list-inside">
                                         {renderText(item)}
                                     </li>
                                 ))}
@@ -292,7 +292,7 @@ export default function CourseDetail() {
                             </h3>
                             <ul className="space-y-2">
                                 {course.this_course_includes.map((item, idx) => (
-                                    <li key={idx} className="text-xs text-slate-500 font-medium flex items-center gap-2">
+                                    <li key={idx} className="text-sm text-slate-500 font-medium flex items-center gap-2">
                                         <ChevronRight className="h-3 w-3 text-purple-600 shrink-0" />
                                         <span>{renderText(item)}</span>
                                     </li>

@@ -48,7 +48,7 @@ export default function Footer() {
                                 />
                             ) : (
                                 <>
-                                    <div className="w-9 h-9 rounded-lg bg-[#FF5A00] flex items-center justify-center font-black text-white text-xl shadow-sm">
+                                    <div className="w-9 h-9 rounded-lg theme-primary-bg flex items-center justify-center font-black text-white text-xl shadow-sm">
                                         {siteName.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="text-2xl font-extrabold text-slate-900 tracking-tight ml-2.5">
@@ -68,7 +68,7 @@ export default function Footer() {
                             {email && (
                                 <a
                                     href={`mailto:${email}`}
-                                    className="flex items-center gap-3 text-sm font-semibold text-slate-500 hover:text-[#FF5A00] transition-colors w-fit"
+                                    className="flex items-center gap-3 text-sm font-semibold text-slate-500 theme-primary-text-hover transition-colors w-fit"
                                 >
                                     <div className="w-8 h-8 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-500 border border-slate-200/30">
                                         <Mail className="w-3.5 h-3.5" />
@@ -79,7 +79,7 @@ export default function Footer() {
                             {phone && (
                                 <a
                                     href={`tel:${phone}`}
-                                    className="flex items-center gap-3 text-sm font-semibold text-slate-500 hover:text-[#FF5A00] transition-colors w-fit"
+                                    className="flex items-center gap-3 text-sm font-semibold text-slate-500 theme-primary-text-hover transition-colors w-fit"
                                 >
                                     <div className="w-8 h-8 rounded-full bg-slate-100/80 flex items-center justify-center text-slate-500 border border-slate-200/30">
                                         <Phone className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export default function Footer() {
                                         href={href}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-8 h-8 rounded-full border border-slate-200 hover:border-[#FF5A00] flex items-center justify-center text-slate-500 hover:text-[#FF5A00] transition-all hover:scale-105 duration-200"
+                                        className="w-8 h-8 rounded-full border border-slate-200 theme-primary-border-hover flex items-center justify-center text-slate-500 theme-primary-text-hover transition-all hover:scale-105 duration-200"
                                     >
                                         <Icon className="w-4 h-4" />
                                     </a>
@@ -119,49 +119,49 @@ export default function Footer() {
                     <div className="lg:col-span-3 grid grid-cols-3 gap-4 sm:gap-8">
                         {/* Explore Column */}
                         <div className="flex flex-col gap-4">
-                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                            <span className="text-[10px] sm:text-xs font-extrabold theme-primary-text tracking-[0.15em] uppercase select-none">
                                 / EXPLORE
                             </span>
                             <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
-                                <Link to="/courses" className="hover:text-[#FF5A00] transition-colors">All Courses</Link>
+                                <Link to="/courses" className="theme-primary-text-hover transition-colors">All Courses</Link>
                                 {(settings?.features?.feature_bundles === '1' || settings?.features?.feature_bundles === 1 || settings?.features?.feature_bundles === true) && (
-                                    <Link to="/bundles" className="hover:text-[#FF5A00] transition-colors">Course Bundles</Link>
+                                    <Link to="/bundles" className="theme-primary-text-hover transition-colors">Course Bundles</Link>
                                 )}
                                 {(settings?.features?.feature_workshops === '1' || settings?.features?.feature_workshops === 1 || settings?.features?.feature_workshops === true) && (
-                                    <Link to="/workshops" className="hover:text-[#FF5A00] transition-colors">Live Workshops</Link>
+                                    <Link to="/workshops" className="theme-primary-text-hover transition-colors">Live Workshops</Link>
                                 )}
                                 {(settings?.features?.feature_ebooks === '1' || settings?.features?.feature_ebooks === 1 || settings?.features?.feature_ebooks === true) && (
-                                    <Link to="/ebooks" className="hover:text-[#FF5A00] transition-colors">E-Books</Link>
+                                    <Link to="/ebooks" className="theme-primary-text-hover transition-colors">E-Books</Link>
                                 )}
                                 {(settings?.features?.feature_blog === '1' || settings?.features?.feature_blog === 1 || settings?.features?.feature_blog === true || settings?.features?.feature_blog === undefined) && (
-                                    <Link to="/blog" className="hover:text-[#FF5A00] transition-colors">AI News / Blog</Link>
+                                    <Link to="/blog" className="theme-primary-text-hover transition-colors">AI News / Blog</Link>
                                 )}
                             </div>
                         </div>
 
                         {/* Account Column */}
                         <div className="flex flex-col gap-4">
-                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                            <span className="text-[10px] sm:text-xs font-extrabold theme-primary-text tracking-[0.15em] uppercase select-none">
                                 / ACCOUNT
                             </span>
                             <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
-                                <Link to="/login" className="hover:text-[#FF5A00] transition-colors">Login</Link>
-                                <Link to="/register" className="hover:text-[#FF5A00] transition-colors">Register</Link>
-                                <Link to="/dashboard" className="hover:text-[#FF5A00] transition-colors">Dashboard</Link>
-                                <Link to="/#marketplace" className="hover:text-[#FF5A00] transition-colors">Marketplace</Link>
+                                <Link to="/login" className="theme-primary-text-hover transition-colors">Login</Link>
+                                <Link to="/register" className="theme-primary-text-hover transition-colors">Register</Link>
+                                <Link to="/dashboard" className="theme-primary-text-hover transition-colors">Dashboard</Link>
+                                <Link to="/#marketplace" className="theme-primary-text-hover transition-colors">Marketplace</Link>
                             </div>
                         </div>
 
                         {/* Legal Column */}
                         <div className="flex flex-col gap-4">
-                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                            <span className="text-[10px] sm:text-xs font-extrabold theme-primary-text tracking-[0.15em] uppercase select-none">
                                 / LEGAL
                             </span>
                             <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
-                                <Link to="/#privacy" className="hover:text-[#FF5A00] transition-colors">Privacy Policy</Link>
-                                <Link to="/#terms" className="hover:text-[#FF5A00] transition-colors">Terms of Service</Link>
-                                <Link to="/#refund" className="hover:text-[#FF5A00] transition-colors">Refund Policy</Link>
-                                <Link to="/#contact" className="hover:text-[#FF5A00] transition-colors">Contact</Link>
+                                <Link to="/#privacy" className="theme-primary-text-hover transition-colors">Privacy Policy</Link>
+                                <Link to="/#terms" className="theme-primary-text-hover transition-colors">Terms of Service</Link>
+                                <Link to="/#refund" className="theme-primary-text-hover transition-colors">Refund Policy</Link>
+                                <Link to="/#contact" className="theme-primary-text-hover transition-colors">Contact</Link>
                             </div>
                         </div>
                     </div>
@@ -181,11 +181,11 @@ export default function Footer() {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold tracking-wider text-slate-450 select-none">
                     <div>{copyrightText}</div>
                     <div className="flex gap-4 items-center">
-                        <Link to="/#privacy" className="hover:text-[#FF5A00] transition-colors">PRIVACY</Link>
+                        <Link to="/#privacy" className="theme-primary-text-hover transition-colors">PRIVACY</Link>
                         <span className="text-slate-350">-</span>
-                        <Link to="/#terms" className="hover:text-[#FF5A00] transition-colors">TERMS</Link>
+                        <Link to="/#terms" className="theme-primary-text-hover transition-colors">TERMS</Link>
                         <span className="text-slate-350">-</span>
-                        <Link to="/#refund" className="hover:text-[#FF5A00] transition-colors">REFUND</Link>
+                        <Link to="/#refund" className="theme-primary-text-hover transition-colors">REFUND</Link>
                         <span className="text-slate-350">-</span>
                         <span>Made for Bangladesh</span>
                     </div>

@@ -1,0 +1,80 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { BookOpen, ShoppingCart, Eye } from 'lucide-react';
+
+export default function CourseCard({ course }) {
+    const imageUrl = course.thumbnail
+        ? (course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`)
+        : null;
+
+    const hasDiscount = parseFloat(course.discount_price) > 0;
+    const isFree = parseFloat(course.price) === 0;
+
+    return (
+        <div className="bg-white border border-slate-200/80 flex flex-col rounded-2xl p-4 transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5 theme-primary-border-hover">
+            {/* Thumbnail */}
+            <Link
+                to={`/courses/${course.slug}`}
+                className="relative aspect-[16/10] w-full bg-slate-50 overflow-hidden rounded-xl mb-3 border border-slate-100 block shrink-0"
+            >
+                {imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt={course.title}
+                        className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+                        <BookOpen className="h-8 w-8 text-purple-400" />
+                    </div>
+                )}
+            </Link>
+
+            {/* Content */}
+            <div className="flex flex-col flex-grow">
+                <Link to={`/courses/${course.slug}`}>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-2 line-clamp-1 theme-primary-text-hover transition-colors">
+                        {course.title}
+                    </h3>
+                </Link>
+                <p className="text-slate-500 text-sm mb-4 line-clamp-2 font-normal leading-relaxed">
+                    {course.short_description || 'No description available for this course.'}
+                </p>
+
+                {/* Price */}
+                <div className="flex items-baseline gap-2 mb-5">
+                    {hasDiscount ? (
+                        <>
+                            <span className="text-xl font-black theme-primary-text text-[#FF5A00]">
+                                ৳{Math.round(course.discount_price)}
+                            </span>
+                            <span className="text-sm text-slate-400 line-through font-semibold">
+                                ৳{Math.round(course.price)}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-xl font-black theme-primary-text text-[#FF5A00]">
+                            {isFree ? 'ফ্রি' : `৳${Math.round(course.price)}`}
+                        </span>
+                    )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 mt-auto pt-2">
+                    <Link
+                        to={`/courses/${course.slug}`}
+                        className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100"
+                    >
+                        Add to Cart <ShoppingCart className="w-4 h-4" />
+                    </Link>
+                    <Link
+                        to={`/courses/${course.slug}`}
+                        className="flex-1 py-3 px-2 theme-primary-bg hover:brightness-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 transition-all"
+                    >
+                        View Details <Eye className="w-4 h-4" />
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}

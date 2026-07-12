@@ -27,28 +27,59 @@ import ScrollToTop from './Components/ScrollToTop';
 
 function AppLayout() {
     const location = useLocation();
-    const { getSetting } = useSiteSettings();
+    const { settings, getSetting } = useSiteSettings();
+    const metaPixelId = settings?.marketing?.meta_pixel_id;
+    const trackingEnabled = settings?.marketing?.meta_tracking_enabled || '1';
 
     // Dynamically initialize Pixel and track PageView on every route change
     useEffect(() => {
-        const metaPixelId = getSetting('meta_pixel_id');
-        const trackingEnabled = getSetting('meta_tracking_enabled', '1');
-
         if (trackingEnabled === '1' && metaPixelId) {
             initMetaPixel(metaPixelId);
             if (window.fbq) {
                 window.fbq('track', 'PageView');
             }
         }
-    }, [location.pathname, location.search, getSetting]);
+    }, [location.pathname, location.search, metaPixelId, trackingEnabled]);
 
     // Hide standard navbar/footer on classroom/learning interface, dashboard, or admin
     const hideLayout = location.pathname.includes('/learn')
         || location.pathname.startsWith('/dashboard')
         || location.pathname.startsWith('/admin');
 
+    const primaryColor = getSetting('primary_color', '#FF5A00');
+
     return (
         <div className={`flex flex-col min-h-screen ${!hideLayout ? 'bg-[#f8fafc] text-slate-800 font-sans' : ''}`}>
+            <style>{`
+                :root {
+                    --primary-color: ${primaryColor};
+                }
+                .theme-primary-bg {
+                    background-color: var(--primary-color) !important;
+                }
+                .theme-primary-text {
+                    color: var(--primary-color) !important;
+                }
+                .theme-primary-border {
+                    border-color: var(--primary-color) !important;
+                }
+                .theme-primary-bg-light {
+                    background-color: ${primaryColor}1a !important;
+                }
+                .theme-primary-border-light {
+                    border-color: ${primaryColor}40 !important;
+                }
+                .theme-primary-text-hover:hover {
+                    color: var(--primary-color) !important;
+                }
+                .theme-primary-bg-hover:hover {
+                    background-color: var(--primary-color) !important;
+                    color: white !important;
+                }
+                .theme-primary-border-hover:hover {
+                    border-color: var(--primary-color) !important;
+                }
+            `}</style>
             {!hideLayout && <Navbar />}
             <main className="flex-grow">
                 <Routes>

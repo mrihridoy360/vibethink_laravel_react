@@ -93,7 +93,7 @@ export default function BlogDetail() {
                             {post.title}
                         </h1>
 
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-450 font-semibold pb-4 border-b border-slate-100">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-450 font-semibold pb-4 border-b border-slate-100">
                             <span className="flex items-center gap-1.5">
                                 <User className="h-4 w-4 text-slate-400" />
                                 {post.author?.name || 'এডমিন'}
@@ -127,22 +127,22 @@ export default function BlogDetail() {
                     {/* Excerpt */}
                     {post.excerpt && (
                         <div className="bg-purple-50/50 border-l-4 border-purple-500 px-4 sm:px-5 py-3 sm:py-4 rounded-r-xl sm:rounded-r-2xl">
-                            <p className="text-slate-600 italic text-xs leading-relaxed font-semibold">{post.excerpt}</p>
+                            <p className="text-slate-600 italic text-sm sm:text-base leading-relaxed font-semibold">{post.excerpt}</p>
                         </div>
                     )}
 
                     {/* Article Content */}
                     <div
-                        className="prose prose-slate max-w-none text-slate-700 font-semibold text-xs leading-relaxed space-y-4
+                        className="prose prose-slate max-w-none text-slate-700 font-semibold text-base sm:text-lg leading-relaxed space-y-4
                             prose-headings:font-bold prose-headings:text-slate-900 prose-headings:mt-8 prose-headings:mb-3
-                            prose-h2:text-xl prose-h2:border-b prose-h2:pb-2 prose-h2:border-slate-100
-                            prose-h3:text-sm
+                            prose-h2:text-2xl prose-h2:border-b prose-h2:pb-2 prose-h2:border-slate-100
+                            prose-h3:text-lg
                             prose-p:mb-4
                             prose-a:text-purple-650 prose-a:font-bold hover:prose-a:underline
                             prose-ul:list-disc prose-ul:pl-6 prose-ul:my-4
                             prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-4
                             prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:bg-purple-50/30 prose-blockquote:py-2.5 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:italic
-                            prose-code:bg-slate-100 prose-code:text-pink-600 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[11px] prose-code:font-mono
+                            prose-code:bg-slate-100 prose-code:text-pink-600 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
                             prose-pre:bg-slate-900 prose-pre:text-emerald-400 prose-pre:p-4 prose-pre:rounded-2xl prose-pre:overflow-x-auto"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />

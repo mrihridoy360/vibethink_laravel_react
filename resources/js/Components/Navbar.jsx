@@ -129,7 +129,7 @@ export default function Navbar() {
                                 />
                             ) : (
                                 <>
-                                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-[#FF5A00] flex items-center justify-center font-black text-white text-lg md:text-xl shadow-sm">
+                                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg theme-primary-bg flex items-center justify-center font-black text-white text-lg md:text-xl shadow-sm">
                                         {siteName.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight ml-2">
@@ -146,11 +146,11 @@ export default function Navbar() {
                                 placeholder="Search.."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-[#F1F3F5] border-none text-slate-800 text-xs font-semibold pl-5 pr-12 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-[#6C757D] transition-all duration-300"
+                                className="w-full bg-slate-100 border-none text-slate-800 text-xs font-semibold pl-5 pr-12 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-slate-400 transition-all duration-300"
                             />
                             <button
                                 type="submit"
-                                className="absolute right-1 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full bg-[#0074D9] hover:bg-blue-700 flex items-center justify-center text-white shadow-sm hover:scale-105 transition-all duration-200 cursor-pointer border-none"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full theme-primary-bg hover:brightness-95 flex items-center justify-center text-white shadow-sm hover:scale-105 transition-all duration-200 cursor-pointer border-none"
                             >
                                 <Search className="w-4 h-4 stroke-[2.5]" />
                             </button>
@@ -167,8 +167,8 @@ export default function Navbar() {
                                         key={link.name}
                                         to={link.path}
                                         className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${isActive
-                                            ? 'bg-[#0074D9] text-white shadow-md shadow-blue-500/30 scale-[1.03]'
-                                            : 'text-[#495057] hover:text-[#0074D9]'
+                                            ? 'theme-primary-bg text-white shadow-md scale-[1.03]'
+                                            : 'text-[#495057] theme-primary-text-hover'
                                             }`}
                                     >
                                         {link.name}
@@ -189,9 +189,9 @@ export default function Navbar() {
                                     className="flex items-center gap-2 p-1 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer"
                                 >
                                     {user.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border border-[#FF5A00]/25" />
+                                        <img src={user.avatar} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
                                     ) : (
-                                        <div className="h-8.5 w-8.5 rounded-full bg-[#FF5A00]/10 text-[#FF5A00] flex items-center justify-center font-bold text-xs uppercase border border-[#FF5A00]/25">
+                                        <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
                                             {user.name.charAt(0)}
                                         </div>
                                     )}
@@ -217,7 +217,7 @@ export default function Navbar() {
                                             <Link
                                                 to="/admin"
                                                 onClick={() => setDropdownOpen(false)}
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#0074D9] transition-colors"
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
                                             >
                                                 <Shield className="h-4 w-4 text-slate-400" />
                                                 এডমিন প্যানেল
@@ -227,7 +227,7 @@ export default function Navbar() {
                                         <Link
                                             to="/dashboard"
                                             onClick={() => setDropdownOpen(false)}
-                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#0074D9] transition-colors"
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
                                         >
                                             <LayoutDashboard className="h-4 w-4 text-slate-400" />
                                             ড্যাশবোর্ড
@@ -236,7 +236,7 @@ export default function Navbar() {
                                         <Link
                                             to="/dashboard/enrolled"
                                             onClick={() => setDropdownOpen(false)}
-                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#0074D9] transition-colors"
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
                                         >
                                             <BookOpenCheck className="h-4 w-4 text-slate-400" />
                                             ইনরোলড কোর্সসমূহ
@@ -245,7 +245,7 @@ export default function Navbar() {
                                         <Link
                                             to="/dashboard/settings"
                                             onClick={() => setDropdownOpen(false)}
-                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#0074D9] transition-colors"
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
                                         >
                                             <Settings className="h-4 w-4 text-slate-400" />
                                             প্রোফাইল সেটিংস
@@ -266,7 +266,7 @@ export default function Navbar() {
                         ) : (
                             <Link
                                 to="/login"
-                                className="bg-[#FF5A00] text-white rounded-full font-bold px-6 py-2.5 text-xs flex items-center gap-2 hover:bg-[#E04F00] shadow-md shadow-orange-500/25 active:scale-[0.98] transition-all cursor-pointer"
+                                className="theme-primary-bg text-white rounded-full font-bold px-6 py-2.5 text-xs flex items-center gap-2 hover:brightness-95 active:scale-[0.98] transition-all cursor-pointer"
                             >
                                 সাইন আপ/ লগইন <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                             </Link>
@@ -300,7 +300,7 @@ export default function Navbar() {
                             />
                             <button
                                 type="submit"
-                                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full bg-[#0074D9] flex items-center justify-center text-white"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full theme-primary-bg flex items-center justify-center text-white"
                             >
                                 <Search className="w-4 h-4" />
                             </button>
@@ -316,7 +316,7 @@ export default function Navbar() {
                                         to={link.path}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
-                                            ? 'bg-[#0074D9]/10 text-[#0074D9]'
+                                            ? 'theme-primary-bg-light theme-primary-text'
                                             : 'text-slate-600 hover:bg-slate-50'
                                             }`}
                                     >
@@ -364,7 +364,7 @@ export default function Navbar() {
                                 <Link
                                     to="/login"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="bg-[#FF5A00] text-white rounded-full font-bold py-3 text-xs flex items-center justify-center gap-2 hover:bg-[#E04F00]"
+                                    className="theme-primary-bg text-white rounded-full font-bold py-3 text-xs flex items-center justify-center gap-2 hover:brightness-95"
                                 >
                                     সাইন আপ/ লগইন <ArrowRight className="w-3.5 h-3.5" />
                                 </Link>
