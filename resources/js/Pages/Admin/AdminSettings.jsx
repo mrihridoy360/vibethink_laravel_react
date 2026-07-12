@@ -177,6 +177,7 @@ const TABS = [
     { key: 'footer',     label: 'ফুটার',    icon: AlignLeft },
     { key: 'payment',    label: 'পেমেন্ট',  icon: CreditCard },
     { key: 'email',      label: 'ইমেইল',    icon: Mail },
+    { key: 'marketing',  label: 'মার্কেটিং ও পিক্সেল', icon: Facebook },
 ];
 
 // ── Main component ──────────────────────────────────────────────
@@ -197,6 +198,7 @@ export default function AdminSettings() {
     const [payment, setPayment]       = useState({});
     const [email, setEmail]           = useState({});
     const [features, setFeatures]     = useState({});
+    const [marketing, setMarketing]   = useState({});
 
     const showToast = (type, message) => {
         setToast({ type, message });
@@ -216,6 +218,7 @@ export default function AdminSettings() {
                 setPayment(s.payment    || {});
                 setEmail(s.email        || {});
                 setFeatures(s.features  || {});
+                setMarketing(s.marketing || {});
             }
         } catch (err) {
             showToast('error', 'সেটিংস লোড করতে সমস্যা হয়েছে।');
@@ -251,6 +254,7 @@ export default function AdminSettings() {
             payment:    payment,
             email:      email,
             features:   features,
+            marketing:  marketing,
         };
         saveGroup(activeTab, groupMap[activeTab]);
     };
@@ -281,6 +285,7 @@ export default function AdminSettings() {
     const setP  = (key) => (val) => setPayment((p)     => ({ ...p, [key]: val }));
     const setE  = (key) => (val) => setEmail((p)       => ({ ...p, [key]: val }));
     const setFt = (key) => (val) => setFeatures((p)    => ({ ...p, [key]: val ? '1' : '0' }));
+    const setM  = (key) => (val) => setMarketing((p)   => ({ ...p, [key]: val }));
 
     if (loadingData) {
         return (
@@ -677,6 +682,59 @@ export default function AdminSettings() {
                                 onChange={setE('mail_from_name')}
                                 placeholder="VibeThink Academy"
                             />
+                        </div>
+                    </SectionCard>
+                )}
+
+                {/* ── Marketing & Pixel ──────────────────────── */}
+                {activeTab === 'marketing' && (
+                    <SectionCard title="মেটা পিক্সেল ও Conversions API (CAPI)" description="ব্রাউজার এবং সার্ভার সাইড ট্র্যাকিং কনফিগার করুন।">
+                        <FeatureToggle
+                            label="মেটা ট্র্যাকিং সক্রিয় করুন"
+                            description="মেটা পিক্সেল ও কনভার্সন এপিআই ট্র্যাকিং চালু বা বন্ধ করুন।"
+                            checked={marketing.meta_tracking_enabled === '1'}
+                            onChange={(checked) => setM('meta_tracking_enabled')(checked ? '1' : '0')}
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <SettingInput
+                                label="মেটা পিক্সেল আইডি (Meta Pixel ID)"
+                                id="meta_pixel_id"
+                                value={marketing.meta_pixel_id}
+                                onChange={setM('meta_pixel_id')}
+                                placeholder="যেমন: 123456789012345"
+                                hint="আপনার মেটা ইভেন্ট ম্যানেজার থেকে পিক্সেল আইডিটি কপি করে বসান।"
+                            />
+                            <SettingInput
+                                label="কনভার্সন এপিআই টেস্ট ইভেন্ট কোড (Optional Test Event Code)"
+                                id="meta_capi_test_event_code"
+                                value={marketing.meta_capi_test_event_code}
+                                onChange={setM('meta_capi_test_event_code')}
+                                placeholder="যেমন: TEST12345"
+                                hint="কনভার্সন এপিআই ট্র্যাকিং সফলভাবে কাজ করছে কিনা তা পরীক্ষা করতে টেস্ট কোডটি ব্যবহার করতে পারেন।"
+                            />
+                        </div>
+                        <div className="pt-2">
+                            <label htmlFor="meta_capi_access_token" className="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center justify-between">
+                                <span>Conversions API অ্যাক্সেস টোকেন (System User Access Token)</span>
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="meta_capi_access_token"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={marketing.meta_capi_access_token ?? ''}
+                                    onChange={(e) => setM('meta_capi_access_token')(e.target.value)}
+                                    placeholder="EAAG...."
+                                    className="w-full px-3.5 py-2.5 pr-10 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400/40 focus:border-orange-400 bg-white text-slate-800 placeholder-slate-400 transition-all"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                >
+                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-1">মেটা ইভেন্ট ম্যানেজারের সেটিংস ট্যাব থেকে জেনারেট করা এক্সেস টোকেন এখানে দিন।</p>
                         </div>
                     </SectionCard>
                 )}

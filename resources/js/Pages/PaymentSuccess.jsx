@@ -1,11 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, Play, BookOpen, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function PaymentSuccess() {
     const [searchParams] = useSearchParams();
     const courseSlug = searchParams.get('slug') || '';
     const trxId = searchParams.get('trx') || 'N/A';
+
+    useEffect(() => {
+        if (courseSlug && trxId !== 'N/A') {
+            axios.get(`/api/courses/${courseSlug}`)
+                .then(response => {
+                    if (response.data.success) {
+                        const course = response.data.course;
+                        const value = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
+                        trackPixelEvent('Purchase', {
+                            content_name: course.title,
+                            content_ids: [course.id],
+                            content_type: 'product',
+                            value: value,
+                            currency: 'BDT'
+                        }, { eventId: trxId });
+                    }
+                })
+                .catch(err => console.error('Error tracking purchase event:', err));
+        }
+    }, [courseSlug, trxId]);
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     LayoutDashboard, BookOpen, Bell, Gift, Star, Wrench, ShoppingBag,
     Award, CreditCard, Users, Wallet, MessageSquare, Ticket, Settings,
-    ShieldAlert, LogOut, ChevronLeft, ChevronRight
+    ShieldAlert, LogOut, ChevronLeft, ChevronRight, MoreVertical
 } from 'lucide-react';
 
 const MENU_ITEMS = [
@@ -31,6 +31,7 @@ const SERVICE_ITEMS = [
 export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollapsed }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [showUserMenu, setShowUserMenu] = useState(false);
     const { settings } = useSiteSettings();
 
     const siteLogo = settings?.appearance?.site_logo || null;
@@ -157,7 +158,7 @@ export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollaps
             </div>
 
             {/* Sidebar Footer User & Toggle */}
-            <div className="p-4 border-t border-gray-100 flex flex-col gap-2 shrink-0">
+            <div className="p-4 border-t border-gray-100 flex flex-col gap-2 shrink-0 relative">
                 {sidebarCollapsed && (
                     <button
                         onClick={() => setSidebarCollapsed(false)}
@@ -168,30 +169,57 @@ export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollaps
                     </button>
                 )}
 
+                {showUserMenu && (
+                    <>
+                        {/* Backdrop to close dropdown on click outside */}
+                        <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setShowUserMenu(false)}
+                        />
+                        {/* Dropdown Menu */}
+                        <div className={`absolute ${sidebarCollapsed ? 'left-2 w-40' : 'left-4 right-4'} bottom-16 bg-white border border-gray-200/80 rounded-2xl shadow-xl p-1.5 z-20`}>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                            >
+                                <LogOut className="h-4.5 w-4.5 shrink-0 text-red-500" />
+                                <span>লগআউট</span>
+                            </button>
+                        </div>
+                    </>
+                )}
+
                 {/* User avatar details */}
-                <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} gap-2 min-w-0`}>
-                    <div className="flex items-center gap-2 min-w-0">
+                {sidebarCollapsed ? (
+                    <div 
+                        onClick={() => setShowUserMenu(p => !p)}
+                        className="flex items-center justify-center cursor-pointer hover:bg-slate-100 p-1.5 rounded-xl transition-colors shrink-0"
+                        title="ইউজার মেনু"
+                    >
                         <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
                             {user?.name?.charAt(0) || 'U'}
                         </div>
-                        {!sidebarCollapsed && (
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-between gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                                {user?.name?.charAt(0) || 'U'}
+                            </div>
                             <div className="min-w-0">
                                 <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
                                 <p className="text-xs text-gray-400 truncate">{user?.email}</p>
                             </div>
-                        )}
+                        </div>
+                        <button
+                            onClick={() => setShowUserMenu(p => !p)}
+                            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors shrink-0 cursor-pointer"
+                            title="ইউজার মেনু"
+                        >
+                            <MoreVertical className="h-5 w-5" />
+                        </button>
                     </div>
-                </div>
-
-                {/* Logout Button */}
-                <button
-                    onClick={handleLogout}
-                    className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-all cursor-pointer`}
-                    title={sidebarCollapsed ? 'লগআউট' : undefined}
-                >
-                    <LogOut className="h-5 w-5 shrink-0 text-red-500" />
-                    {!sidebarCollapsed && <span>লগআউট</span>}
-                </button>
+                )}
             </div>
         </aside>
     );

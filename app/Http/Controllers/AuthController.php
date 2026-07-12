@@ -36,6 +36,28 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        // Send Meta CAPI registration event
+        try {
+            $names = explode(' ', $user->name, 2);
+            $firstName = $names[0] ?? '';
+            $lastName = $names[1] ?? '';
+
+            app(\App\Services\MetaCapiService::class)->sendEvent(
+                'CompleteRegistration',
+                [
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                ],
+                [],
+                'reg_' . $user->id,
+                url('/register')
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Meta CAPI Registration tracking failed: ' . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './Contexts/AuthContext';
-import { SiteSettingsProvider } from './Contexts/SiteSettingsContext';
+import { SiteSettingsProvider, useSiteSettings } from './Contexts/SiteSettingsContext';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import Home from './Pages/Home';
@@ -17,9 +17,25 @@ import AdminCourseEdit from './Pages/Admin/AdminCourseEdit';
 import BlogDetail from './Pages/BlogDetail';
 import PaymentSuccess from './Pages/PaymentSuccess';
 import PaymentFailed from './Pages/PaymentFailed';
+import { initMetaPixel } from './Utils/metaPixel';
+import ScrollToTop from './Components/ScrollToTop';
 
 function AppLayout() {
     const location = useLocation();
+    const { getSetting } = useSiteSettings();
+
+    // Dynamically initialize Pixel and track PageView on every route change
+    useEffect(() => {
+        const metaPixelId = getSetting('meta_pixel_id');
+        const trackingEnabled = getSetting('meta_tracking_enabled', '1');
+
+        if (trackingEnabled === '1' && metaPixelId) {
+            initMetaPixel(metaPixelId);
+            if (window.fbq) {
+                window.fbq('track', 'PageView');
+            }
+        }
+    }, [location.pathname, location.search, getSetting]);
 
     // Hide standard navbar/footer on classroom/learning interface, dashboard, or admin
     const hideLayout = location.pathname.includes('/learn')
@@ -58,6 +74,7 @@ if (container) {
     root.render(
         <React.StrictMode>
             <BrowserRouter>
+                <ScrollToTop />
                 <AuthProvider>
                     <SiteSettingsProvider>
                         <AppLayout />

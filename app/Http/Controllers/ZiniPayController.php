@@ -262,6 +262,37 @@ class ZiniPayController extends Controller
         $payment->payment_data = $response;
         $payment->save();
 
+        // Send Meta CAPI Purchase event
+        try {
+            $user = \App\Models\User::find($payment->user_id);
+            if ($user) {
+                $names = explode(' ', $user->name, 2);
+                $firstName = $names[0] ?? '';
+                $lastName = $names[1] ?? '';
+
+                app(\App\Services\MetaCapiService::class)->sendEvent(
+                    'Purchase',
+                    [
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                    ],
+                    [
+                        'value' => (float)$payment->amount,
+                        'currency' => 'BDT',
+                        'content_ids' => [(string)$course->id],
+                        'content_name' => $course->title,
+                        'content_type' => 'product'
+                    ],
+                    $payment->transaction_id,
+                    url("/payment/success?slug={$course->slug}&trx={$payment->transaction_id}")
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Meta CAPI Purchase tracking failed: ' . $e->getMessage());
+        }
+
         // Create or activate enrollment
         $enrollment = Enrollment::where('user_id', $payment->user_id)
             ->where('course_id', $payment->course_id)

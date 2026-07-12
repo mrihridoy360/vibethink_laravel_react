@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
 import { GraduationCap, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-react';
+import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function Register() {
-    const { register } = useAuth();
+    const { register, user, loading } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && user) {
+            navigate('/');
+        }
+    }, [user, loading, navigate]);
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -31,6 +38,9 @@ export default function Register() {
         try {
             const res = await register(name, email, phone, password, passwordConfirmation);
             if (res.success) {
+                if (res.user) {
+                    trackPixelEvent('CompleteRegistration', {}, { eventId: 'reg_' + res.user.id });
+                }
                 navigate('/');
             } else {
                 setErrorMsg(res.message || 'Registration failed');

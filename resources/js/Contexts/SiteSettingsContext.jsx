@@ -26,6 +26,11 @@ const DEFAULTS = {
         social_instagram: null,
         social_linkedin: null,
     },
+    marketing: {
+        meta_tracking_enabled: '1',
+        meta_pixel_id: '',
+        meta_capi_test_event_code: '',
+    },
 };
 
 export const SiteSettingsProvider = ({ children }) => {
@@ -41,6 +46,7 @@ export const SiteSettingsProvider = ({ children }) => {
                     general:    { ...prev.general,    ...(data.settings.general    || {}) },
                     appearance: { ...prev.appearance, ...(data.settings.appearance || {}) },
                     footer:     { ...prev.footer,     ...(data.settings.footer     || {}) },
+                    marketing:  { ...prev.marketing,  ...(data.settings.marketing  || {}) },
                 }));
             }
         } catch (err) {

@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import { Play, BookOpen, CheckCircle, FileText, ChevronRight, Award, HelpCircle } from 'lucide-react';
+import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function CourseDetail() {
     const { slug } = useParams();
@@ -41,6 +42,18 @@ export default function CourseDetail() {
         fetchCourseDetails();
     }, [slug]);
 
+    useEffect(() => {
+        if (course) {
+            trackPixelEvent('ViewContent', {
+                content_name: course.title,
+                content_ids: [course.id],
+                content_type: 'product',
+                value: parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0,
+                currency: 'BDT'
+            });
+        }
+    }, [course]);
+
     const handleEnroll = async () => {
         if (!user) {
             navigate('/login');
@@ -52,6 +65,15 @@ export default function CourseDetail() {
             const price = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
             
             if (price > 0) {
+                // Track InitiateCheckout
+                trackPixelEvent('InitiateCheckout', {
+                    content_name: course.title,
+                    content_ids: [course.id],
+                    content_type: 'product',
+                    value: price,
+                    currency: 'BDT'
+                });
+
                 // Paid course, initialize payment gateway checkout
                 const response = await axios.post(`/api/payment/zinipay/init/${course.id}`);
                 if (response.data.success && response.data.payment_url) {

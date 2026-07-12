@@ -2930,9 +2930,12 @@ class AdminController extends Controller
 
     public function publicSettings()
     {
-        $rows = Setting::whereIn('group', ['general', 'appearance', 'footer'])->get();
+        $rows = Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing'])->get();
         $grouped = [];
         foreach ($rows as $row) {
+            if ($row->group === 'marketing' && $row->key === 'meta_capi_access_token') {
+                continue;
+            }
             $grouped[$row->group][$row->key] = $row->value;
         }
         return response()->json(['success' => true, 'settings' => $grouped]);
