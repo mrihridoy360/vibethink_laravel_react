@@ -15,6 +15,7 @@ export default function Login() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [remember, setRemember] = useState(false);
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
@@ -23,7 +24,7 @@ export default function Login() {
         setError('');
         setSubmitting(true);
         try {
-            const res = await login(email, password);
+            const res = await login(email, password, remember);
             if (res.success) {
                 navigate('/');
             } else {
@@ -37,8 +38,8 @@ export default function Login() {
     };
 
     return (
-        <div className="max-w-md w-full mx-auto px-6 py-20 flex flex-col justify-center min-h-[80vh]">
-            <div className="bg-white border border-slate-200/80 shadow-sm p-8 rounded-3xl relative overflow-hidden">
+        <div className="max-w-md w-full mx-auto px-4 sm:px-6 py-10 sm:py-20 flex flex-col justify-center min-h-[85vh]">
+            <div className="bg-white border border-slate-200/80 shadow-sm p-6 sm:p-8 rounded-2xl sm:rounded-3xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-pink-500/5 rounded-full blur-2xl -z-10" />
                 <div className="absolute bottom-0 left-0 w-20 h-20 bg-purple-500/5 rounded-full blur-2xl -z-10" />
 
@@ -92,6 +93,18 @@ export default function Login() {
                             />
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                            <input
+                                type="checkbox"
+                                checked={remember}
+                                onChange={(e) => setRemember(e.target.checked)}
+                                className="w-4.5 h-4.5 accent-purple-600 rounded border-slate-200 text-purple-605 focus:ring-purple-600/10"
+                            />
+                            <span>লগইন সেশন মনে রাখুন (Remember login)</span>
+                        </label>
                     </div>
 
                     <button

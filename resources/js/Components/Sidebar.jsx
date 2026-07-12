@@ -63,7 +63,18 @@ export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollaps
     };
 
     return (
-        <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        <>
+            {!sidebarCollapsed && (
+                <div 
+                    className="fixed inset-0 bg-slate-900/40 backdrop-blur-[1px] z-40 md:hidden animate-fadeIn"
+                    onClick={() => setSidebarCollapsed(true)}
+                />
+            )}
+            <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col shrink-0 transition-all duration-300 ${
+                sidebarCollapsed 
+                    ? '-translate-x-full md:translate-x-0 md:w-20' 
+                    : 'w-64 translate-x-0'
+            }`}>
             {/* Brand Logo & Toggle */}
             <div className="h-16 px-4 flex items-center justify-between shrink-0 border-b border-gray-100">
                 <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
@@ -222,5 +233,6 @@ export default function Sidebar({ activeTab, sidebarCollapsed, setSidebarCollaps
                 )}
             </div>
         </aside>
+        </>
     );
 }

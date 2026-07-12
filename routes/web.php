@@ -22,6 +22,7 @@ Route::prefix('api')->group(function () {
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
     Route::get('/blogs', [CourseController::class, 'publicBlogs']);
     Route::get('/blogs/{slug}', [CourseController::class, 'publicBlogShow']);
+    Route::get('/products', [CourseController::class, 'publicProducts']);
 
     // Public Settings (no auth required)
     Route::get('/settings', [AdminController::class, 'publicSettings']);

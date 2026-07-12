@@ -93,10 +93,10 @@ export default function EnrolledCourses() {
                     {filtered.map(item => (
                         <div
                             key={item.id}
-                            className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 hover:shadow-lg hover:border-blue-500/20 transition-all group relative"
+                            className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-4 hover:shadow-lg hover:border-blue-500/20 transition-all group relative"
                         >
                             {/* Thumbnail */}
-                            <div className="relative w-32 aspect-video rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                            <div className="relative w-full sm:w-32 aspect-video rounded-xl overflow-hidden bg-gray-100 shrink-0">
                                 {item.thumbnail ? (
                                     <img
                                         src={item.thumbnail.startsWith('http') ? item.thumbnail : `/storage/${item.thumbnail}`}

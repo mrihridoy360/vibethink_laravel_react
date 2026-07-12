@@ -33,11 +33,11 @@ export default function Footer() {
         <footer className="relative w-full bg-[#FCFDFE] border-t border-slate-200/80 pt-16 pb-8 overflow-hidden footer-grid shrink-0">
 
             {/* Upper Section */}
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-6">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-6">
 
                     {/* Branding Info Column */}
-                    <div className="col-span-1 md:col-span-2 flex flex-col gap-3">
+                    <div className="lg:col-span-2 flex flex-col gap-3">
                         {/* Logo */}
                         <Link to="/" className="flex items-center w-fit">
                             {footerLogo ? (
@@ -115,43 +115,54 @@ export default function Footer() {
                         )}
                     </div>
 
-                    {/* Explore Column */}
-                    <div className="flex flex-col gap-4">
-                        <span className="text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
-                            / EXPLORE
-                        </span>
-                        <div className="flex flex-col gap-3 text-[13.5px] font-semibold text-slate-500">
-                            <Link to="/" className="hover:text-[#FF5A00] transition-colors">All Courses</Link>
-                            <Link to="/#reviews" className="hover:text-[#FF5A00] transition-colors">Student Reviews</Link>
-                            <Link to="/#works" className="hover:text-[#FF5A00] transition-colors">Students Works</Link>
-                            <Link to="/#features" className="hover:text-[#FF5A00] transition-colors">All Features</Link>
-                            <Link to="/#blog" className="hover:text-[#FF5A00] transition-colors">AI News / Blog</Link>
+                    {/* Menus Row - Displayed side-by-side in one line */}
+                    <div className="lg:col-span-3 grid grid-cols-3 gap-4 sm:gap-8">
+                        {/* Explore Column */}
+                        <div className="flex flex-col gap-4">
+                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                                / EXPLORE
+                            </span>
+                            <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
+                                <Link to="/courses" className="hover:text-[#FF5A00] transition-colors">All Courses</Link>
+                                {(settings?.features?.feature_bundles === '1' || settings?.features?.feature_bundles === 1 || settings?.features?.feature_bundles === true) && (
+                                    <Link to="/bundles" className="hover:text-[#FF5A00] transition-colors">Course Bundles</Link>
+                                )}
+                                {(settings?.features?.feature_workshops === '1' || settings?.features?.feature_workshops === 1 || settings?.features?.feature_workshops === true) && (
+                                    <Link to="/workshops" className="hover:text-[#FF5A00] transition-colors">Live Workshops</Link>
+                                )}
+                                {(settings?.features?.feature_ebooks === '1' || settings?.features?.feature_ebooks === 1 || settings?.features?.feature_ebooks === true) && (
+                                    <Link to="/ebooks" className="hover:text-[#FF5A00] transition-colors">E-Books</Link>
+                                )}
+                                {(settings?.features?.feature_blog === '1' || settings?.features?.feature_blog === 1 || settings?.features?.feature_blog === true || settings?.features?.feature_blog === undefined) && (
+                                    <Link to="/blog" className="hover:text-[#FF5A00] transition-colors">AI News / Blog</Link>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Account Column */}
-                    <div className="flex flex-col gap-4">
-                        <span className="text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
-                            / ACCOUNT
-                        </span>
-                        <div className="flex flex-col gap-3 text-[13.5px] font-semibold text-slate-500">
-                            <Link to="/login" className="hover:text-[#FF5A00] transition-colors">Login</Link>
-                            <Link to="/register" className="hover:text-[#FF5A00] transition-colors">Register</Link>
-                            <Link to="/dashboard" className="hover:text-[#FF5A00] transition-colors">Dashboard</Link>
-                            <Link to="/#marketplace" className="hover:text-[#FF5A00] transition-colors">Marketplace</Link>
+                        {/* Account Column */}
+                        <div className="flex flex-col gap-4">
+                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                                / ACCOUNT
+                            </span>
+                            <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
+                                <Link to="/login" className="hover:text-[#FF5A00] transition-colors">Login</Link>
+                                <Link to="/register" className="hover:text-[#FF5A00] transition-colors">Register</Link>
+                                <Link to="/dashboard" className="hover:text-[#FF5A00] transition-colors">Dashboard</Link>
+                                <Link to="/#marketplace" className="hover:text-[#FF5A00] transition-colors">Marketplace</Link>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Legal Column */}
-                    <div className="flex flex-col gap-4">
-                        <span className="text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
-                            / LEGAL
-                        </span>
-                        <div className="flex flex-col gap-3 text-[13.5px] font-semibold text-slate-500">
-                            <Link to="/#privacy" className="hover:text-[#FF5A00] transition-colors">Privacy Policy</Link>
-                            <Link to="/#terms" className="hover:text-[#FF5A00] transition-colors">Terms of Service</Link>
-                            <Link to="/#refund" className="hover:text-[#FF5A00] transition-colors">Refund Policy</Link>
-                            <Link to="/#contact" className="hover:text-[#FF5A00] transition-colors">Contact</Link>
+                        {/* Legal Column */}
+                        <div className="flex flex-col gap-4">
+                            <span className="text-[10px] sm:text-xs font-extrabold text-[#FF5A00] tracking-[0.15em] uppercase select-none">
+                                / LEGAL
+                            </span>
+                            <div className="flex flex-col gap-3 text-xs sm:text-[13.5px] font-semibold text-slate-500">
+                                <Link to="/#privacy" className="hover:text-[#FF5A00] transition-colors">Privacy Policy</Link>
+                                <Link to="/#terms" className="hover:text-[#FF5A00] transition-colors">Terms of Service</Link>
+                                <Link to="/#refund" className="hover:text-[#FF5A00] transition-colors">Refund Policy</Link>
+                                <Link to="/#contact" className="hover:text-[#FF5A00] transition-colors">Contact</Link>
+                            </div>
                         </div>
                     </div>
 
@@ -164,7 +175,7 @@ export default function Footer() {
             </div>
 
             {/* Lower Section */}
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
                 <div className="border-t border-slate-200/80 my-5" />
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold tracking-wider text-slate-450 select-none">

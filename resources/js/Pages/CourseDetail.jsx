@@ -117,15 +117,15 @@ export default function CourseDetail() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
             {/* Header Banner */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12 mb-8 lg:mb-12">
                 {/* Left Info */}
                 <div className="lg:col-span-2 flex flex-col justify-center">
                     <span className="text-xs uppercase tracking-widest text-purple-600 font-bold mb-2">
                         {course.language || 'English'}
                     </span>
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
+                    <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
                         {course.title}
                     </h1>
                     <p className="text-slate-500 text-lg mb-6 font-normal leading-relaxed">
@@ -196,11 +196,11 @@ export default function CourseDetail() {
             </div>
 
             {/* Main Tabs / Info Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
                 <div className="lg:col-span-2 space-y-10">
                     {/* What you'll learn */}
                     {course.what_youll_learn && Array.isArray(course.what_youll_learn) && course.what_youll_learn.length > 0 && (
-                        <div className="bg-white border border-slate-200/80 shadow-sm p-8 rounded-3xl">
+                        <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-2xl sm:rounded-3xl">
                             <h2 className="text-lg font-bold text-slate-900 mb-6">What you'll learn</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {course.what_youll_learn.map((item, idx) => (
@@ -229,19 +229,19 @@ export default function CourseDetail() {
                         <div className="space-y-4">
                             {course.chapters && course.chapters.length > 0 ? (
                                 course.chapters.map((chapter) => (
-                                    <div key={chapter.id} className="bg-white border border-slate-200/70 shadow-sm rounded-3xl overflow-hidden">
-                                        <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                    <div key={chapter.id} className="bg-white border border-slate-200/70 shadow-sm rounded-2xl sm:rounded-3xl overflow-hidden">
+                                        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                             <h3 className="font-bold text-slate-800 text-sm">
                                                 {chapter.title}
                                             </h3>
-                                            <span className="text-xs text-purple-600 font-bold bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                                            <span className="text-xs text-purple-600 font-bold bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100 w-fit">
                                                 {chapter.lessons?.length || 0} Lessons
                                             </span>
                                         </div>
                                         <div className="divide-y divide-slate-100">
                                             {chapter.lessons && chapter.lessons.length > 0 ? (
                                                 chapter.lessons.map((lesson) => (
-                                                    <div key={lesson.id} className="px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/50 transition-all">
+                                                    <div key={lesson.id} className="px-4 sm:px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/50 transition-all">
                                                         <div className="flex items-center gap-3">
                                                             <Play className="h-3.5 w-3.5 text-slate-400" />
                                                             <span className="text-sm text-slate-650 font-normal">{lesson.title}</span>

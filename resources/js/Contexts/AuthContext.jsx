@@ -30,13 +30,13 @@ export const AuthProvider = ({ children }) => {
         refreshUser();
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email, password, remember = false) => {
         // Fetch CSRF cookie before making the request
         try {
             await axios.get('/sanctum/csrf-cookie').catch(() => {});
         } catch (e) {}
 
-        const response = await axios.post('/api/auth/login', { email, password });
+        const response = await axios.post('/api/auth/login', { email, password, remember });
         if (response.data.success) {
             setUser(response.data.user);
         }

@@ -69,14 +69,14 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12 space-y-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-12 md:space-y-20">
             {/* Hero Section */}
-            <div className="text-center relative overflow-hidden py-16 rounded-3xl bg-purple-50/50 border border-purple-100/30">
+            <div className="text-center relative overflow-hidden py-10 md:py-16 px-4 rounded-3xl bg-purple-50/50 border border-purple-100/30">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-100/60 rounded-full blur-3xl -z-10" />
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight">
+                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight">
                     Upgrade Your Skills with <span className="bg-gradient-to-r from-purple-600 to-pink-650 bg-clip-text text-transparent">VibeThink</span>
                 </h1>
-                <p className="text-base text-slate-500 max-w-2xl mx-auto mb-8 font-normal">
+                <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto mb-6 md:mb-8 font-normal px-2">
                     Learn from industry experts and get hands-on experience with modern tech stacks. Discover premium courses tailored for you.
                 </p>
 
@@ -108,13 +108,13 @@ export default function Home() {
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {[1, 2, 3].map((n) => (
                             <div key={n} className="bg-white border border-slate-100 shadow-sm h-80 rounded-2xl animate-pulse" />
                         ))}
                     </div>
                 ) : courses.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {courses.map((course) => (
                             <div key={course.id} className="bg-white border border-slate-200/60 flex flex-col rounded-3xl overflow-hidden transition-all duration-300 group shadow-sm hover:shadow-md hover:-translate-y-0.5">
                                 {/* Thumbnail */}
@@ -203,7 +203,7 @@ export default function Home() {
                         <p className="text-xs text-slate-450 mt-1 font-semibold">আপনার জ্ঞান বৃদ্ধিতে আমাদের রিসেন্ট পাবলিশ হওয়া আর্টিকেলসমূহ পড়ুন।</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {blogs.map((post) => (
                             <div key={post.id} className="bg-white border border-slate-200/60 flex flex-col rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group">
                                 {/* Thumbnail Link */}

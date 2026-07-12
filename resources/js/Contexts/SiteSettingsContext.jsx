@@ -31,6 +31,7 @@ const DEFAULTS = {
         meta_pixel_id: '',
         meta_capi_test_event_code: '',
     },
+    features: {},
 };
 
 export const SiteSettingsProvider = ({ children }) => {
@@ -47,6 +48,7 @@ export const SiteSettingsProvider = ({ children }) => {
                     appearance: { ...prev.appearance, ...(data.settings.appearance || {}) },
                     footer:     { ...prev.footer,     ...(data.settings.footer     || {}) },
                     marketing:  { ...prev.marketing,  ...(data.settings.marketing  || {}) },
+                    features:   data.settings.features || {},
                 }));
             }
         } catch (err) {

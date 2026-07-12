@@ -91,6 +91,27 @@ const MODULES = [
         icon: Ticket,
         color: 'slate',
     },
+    {
+        key: 'feature_workshops',
+        label: 'ওয়ার্কশপ',
+        description: 'লাইভ ওয়ার্কশপ মডিউল — লাইভ ক্লাস ও সেশন বুকিং করার সুযোগ।',
+        icon: Zap,
+        color: 'orange',
+    },
+    {
+        key: 'feature_ebooks',
+        label: 'ই-বুক',
+        description: 'ই-বুক ও রিসোর্স মডিউল — ডিজিটাল বই ও রিসোর্স ডাউনলোডের ব্যবস্থা।',
+        icon: FileText,
+        color: 'emerald',
+    },
+    {
+        key: 'feature_bundles',
+        label: 'কোর্স বান্ডেল',
+        description: 'কোর্স বান্ডেল মডিউল — একাধিক কোর্স কম্বো আকারে সাশ্রয়ী মূল্যে অফার করুন।',
+        icon: Package,
+        color: 'indigo',
+    },
 ];
 
 // Color map for badge backgrounds

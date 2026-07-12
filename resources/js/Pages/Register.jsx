@@ -57,8 +57,8 @@ export default function Register() {
     };
 
     return (
-        <div className="max-w-md w-full mx-auto px-6 py-12 flex flex-col justify-center min-h-[85vh]">
-            <div className="bg-white border border-slate-200/80 shadow-sm p-8 rounded-3xl relative overflow-hidden">
+        <div className="max-w-md w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col justify-center min-h-[85vh]">
+            <div className="bg-white border border-slate-200/80 shadow-sm p-6 sm:p-8 rounded-2xl sm:rounded-3xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-pink-500/5 rounded-full blur-2xl -z-10" />
                 <div className="absolute bottom-0 left-0 w-20 h-20 bg-purple-500/5 rounded-full blur-2xl -z-10" />
 

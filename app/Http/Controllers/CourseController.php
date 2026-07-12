@@ -32,17 +32,37 @@ class CourseController extends Controller
         ]);
     }
 
-    public function publicBlogs()
+    public function publicBlogs(Request $request)
     {
-        $posts = \App\Models\BlogPost::with('author:id,name,avatar', 'category:id,name,slug')
+        $query = \App\Models\BlogPost::with('author:id,name,avatar', 'category:id,name,slug')
             ->where('status', 'published')
-            ->latest()
-            ->take(3)
-            ->get();
+            ->latest();
+
+        if ($request->filled('limit')) {
+            $query->take($request->limit);
+        }
+
+        $posts = $query->get();
 
         return response()->json([
             'success' => true,
             'posts' => $posts
+        ]);
+    }
+
+    public function publicProducts(Request $request)
+    {
+        $query = \App\Models\Product::where('is_active', true);
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $products = $query->orderBy('order')->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'products' => $products
         ]);
     }
 

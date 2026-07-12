@@ -77,9 +77,9 @@ export default function BlogDetail() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
                 {/* Left: Article Details */}
                 <article className="lg:col-span-2 space-y-8">
                     {/* Header */}
@@ -115,7 +115,7 @@ export default function BlogDetail() {
 
                     {/* Featured Image */}
                     {post.featured_image && (
-                        <div className="rounded-3xl overflow-hidden aspect-video bg-slate-100 border border-slate-200/40">
+                        <div className="rounded-2xl sm:rounded-3xl overflow-hidden aspect-video bg-slate-100 border border-slate-200/40">
                             <img
                                 src={post.featured_image.startsWith('http') ? post.featured_image : `/storage/${post.featured_image}`}
                                 alt={post.featured_image_alt || post.title}
@@ -126,7 +126,7 @@ export default function BlogDetail() {
 
                     {/* Excerpt */}
                     {post.excerpt && (
-                        <div className="bg-purple-50/50 border-l-4 border-purple-500 px-5 py-4 rounded-r-2xl">
+                        <div className="bg-purple-50/50 border-l-4 border-purple-500 px-4 sm:px-5 py-3 sm:py-4 rounded-r-xl sm:rounded-r-2xl">
                             <p className="text-slate-600 italic text-xs leading-relaxed font-semibold">{post.excerpt}</p>
                         </div>
                     )}
@@ -186,7 +186,7 @@ export default function BlogDetail() {
                     <div className="sticky top-6 space-y-6">
                         {/* Table of Contents */}
                         {tableOfContents && tableOfContents.length > 0 && (
-                            <div className="bg-white rounded-3xl border border-slate-200/60 p-5 shadow-sm">
+                            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-4 sm:p-5 shadow-sm">
                                 <button
                                     onClick={() => setShowTOC(!showTOC)}
                                     className="flex items-center justify-between w-full font-bold text-slate-800 text-xs border-none bg-transparent cursor-pointer"

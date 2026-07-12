@@ -11,7 +11,7 @@ export default function Navbar() {
     const { user, logout } = useAuth();
     const { settings } = useSiteSettings();
     const siteName = settings?.general?.site_name || 'VibeThink';
-    const navLogo  = settings?.appearance?.site_logo || null;
+    const navLogo = settings?.appearance?.site_logo || null;
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -57,18 +57,22 @@ export default function Navbar() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Track active navigation tab based on location hash
+    // Track active navigation tab based on location path
     useEffect(() => {
-        const hash = location.hash;
         const path = location.pathname;
 
         if (path === '/') {
-            if (hash === '#courses') setActiveTab('কোর্স');
-            else if (hash === '#bundles') setActiveTab('বান্ডেল');
-            else if (hash === '#workshops') setActiveTab('ওয়ার্কশপ');
-            else if (hash === '#ebooks') setActiveTab('ই-বুক');
-            else if (hash === '#blog') setActiveTab('ব্লগ');
-            else setActiveTab('হোম');
+            setActiveTab('হোম');
+        } else if (path.startsWith('/courses')) {
+            setActiveTab('কোর্স');
+        } else if (path.startsWith('/bundles')) {
+            setActiveTab('বান্ডেল');
+        } else if (path.startsWith('/workshops')) {
+            setActiveTab('ওয়ার্কশপ');
+        } else if (path.startsWith('/ebooks')) {
+            setActiveTab('ই-বুক');
+        } else if (path.startsWith('/blog')) {
+            setActiveTab('ব্লগ');
         } else {
             setActiveTab('');
         }
@@ -85,42 +89,50 @@ export default function Navbar() {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+            navigate(`/courses?search=${encodeURIComponent(searchQuery)}`);
         } else {
-            navigate('/');
+            navigate('/courses');
         }
         setMobileMenuOpen(false);
     };
 
+    const isFeatureEnabled = (key, defaultValue = '0') => {
+        const val = settings?.features?.[key];
+        if (val === undefined || val === null) {
+            return defaultValue === '1';
+        }
+        return val === '1' || val === 1 || val === true;
+    };
+
     const navLinks = [
         { name: 'হোম', path: '/' },
-        { name: 'কোর্স', path: '/#courses' },
-        { name: 'বান্ডেল', path: '/#bundles' },
-        { name: 'ওয়ার্কশপ', path: '/#workshops' },
-        { name: 'ই-বুক', path: '/#ebooks' },
-        { name: 'ব্লগ', path: '/#blog' },
+        { name: 'কোর্স', path: '/courses' },
+        ...(isFeatureEnabled('feature_bundles', '0') ? [{ name: 'বান্ডেল', path: '/bundles' }] : []),
+        ...(isFeatureEnabled('feature_workshops', '0') ? [{ name: 'ওয়ার্কশপ', path: '/workshops' }] : []),
+        ...(isFeatureEnabled('feature_ebooks', '0') ? [{ name: 'ই-বুক', path: '/ebooks' }] : []),
+        ...(isFeatureEnabled('feature_blog', '1') ? [{ name: 'ব্লগ', path: '/blog' }] : []),
     ];
 
     return (
         <>
-            <nav className="fixed top-0 left-0 w-full z-50 bg-white border-t-[0px] border-[#4E6178] border-b border-slate-100 shadow-sm transition-all duration-300 py-3.5 px-6">
-                <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <nav className="fixed top-0 left-0 w-full z-50 bg-white border-t-[0px] border-[#4E6178] border-b border-slate-100 shadow-sm transition-all duration-300 py-3 px-4 md:py-3.5 md:px-6">
+                <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 md:gap-4">
                     {/* Left Section: Logo & Search */}
-                    <div className="flex items-center gap-4 flex-1 max-w-xl">
+                    <div className="flex items-center gap-3 md:gap-4 flex-1 max-w-xl">
                         {/* Logo Wrapper */}
                         <Link to="/" className="flex items-center shrink-0">
                             {navLogo ? (
                                 <img
                                     src={navLogo}
                                     alt={siteName}
-                                    className="h-9 max-w-[160px] object-contain"
+                                    className="h-8 md:h-9 max-w-[120px] md:max-w-[160px] object-contain"
                                 />
                             ) : (
                                 <>
-                                    <div className="w-9 h-9 rounded-lg bg-[#FF5A00] flex items-center justify-center font-black text-white text-xl shadow-sm">
+                                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-[#FF5A00] flex items-center justify-center font-black text-white text-lg md:text-xl shadow-sm">
                                         {siteName.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-2xl font-extrabold text-slate-900 tracking-tight ml-2.5">
+                                    <span className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight ml-2">
                                         {siteName}
                                     </span>
                                 </>
@@ -154,9 +166,9 @@ export default function Navbar() {
                                     <Link
                                         key={link.name}
                                         to={link.path}
-                                        className={`relative px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${isActive
-                                                ? 'bg-[#0074D9] text-white shadow-md shadow-blue-500/30 scale-[1.03]'
-                                                : 'text-[#495057] hover:text-[#0074D9]'
+                                        className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${isActive
+                                            ? 'bg-[#0074D9] text-white shadow-md shadow-blue-500/30 scale-[1.03]'
+                                            : 'text-[#495057] hover:text-[#0074D9]'
                                             }`}
                                     >
                                         {link.name}
@@ -168,24 +180,6 @@ export default function Navbar() {
 
                     {/* Right Section: Theme switcher & Auth action */}
                     <div className="hidden md:flex items-center gap-5">
-                        {/* Theme Switch Toggle Switch */}
-                        <div
-                            onClick={toggleTheme}
-                            className={`w-14 h-7.5 rounded-full flex items-center p-0.5 cursor-pointer transition-all duration-300 select-none relative ${isDark ? 'bg-slate-700' : 'bg-[#DCE6F5]'
-                                }`}
-                        >
-                            <div
-                                className={`w-6.5 h-6.5 rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300 transform ${isDark ? 'translate-x-6.5' : 'translate-x-0'
-                                    }`}
-                            >
-                                {isDark ? (
-                                    <Moon className="w-3.5 h-3.5 text-indigo-500 fill-indigo-500" />
-                                ) : (
-                                    <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-spin-slow" />
-                                )}
-                            </div>
-                        </div>
-
                         {/* Auth Status & Navigation Action */}
                         {user ? (
                             <div className="relative" ref={dropdownRef}>
@@ -281,24 +275,6 @@ export default function Navbar() {
 
                     {/* Mobile View Toggles (Hidden on Desktop) */}
                     <div className="flex md:hidden items-center gap-3">
-                        {/* Theme Switch for Mobile */}
-                        <div
-                            onClick={toggleTheme}
-                            className={`w-12 h-6.5 rounded-full flex items-center p-0.5 cursor-pointer transition-colors duration-300 ${isDark ? 'bg-slate-700' : 'bg-[#DCE6F5]'
-                                }`}
-                        >
-                            <div
-                                className={`w-5.5 h-5.5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform duration-300 transform ${isDark ? 'translate-x-5.5' : 'translate-x-0'
-                                    }`}
-                            >
-                                {isDark ? (
-                                    <Moon className="w-3 h-3 text-indigo-500" />
-                                ) : (
-                                    <Sun className="w-3 h-3 text-amber-500" />
-                                )}
-                            </div>
-                        </div>
-
                         {/* Hamburger Menu Toggle */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -309,9 +285,9 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Dropdown Panel */}
+                {/* Mobile Dropdown Panel - Transformed to fixed scrollable overlay */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden mt-4 pt-4 border-t border-slate-100 flex flex-col gap-4 animate-fadeIn">
+                    <div className="fixed inset-x-0 top-[60px] bottom-0 z-40 bg-white flex flex-col gap-4 p-6 overflow-y-auto animate-fadeIn md:hidden">
 
                         {/* Mobile Search Bar */}
                         <form onSubmit={handleSearchSubmit} className="relative w-full">
@@ -340,8 +316,8 @@ export default function Navbar() {
                                         to={link.path}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
-                                                ? 'bg-[#0074D9]/10 text-[#0074D9]'
-                                                : 'text-slate-600 hover:bg-slate-50'
+                                            ? 'bg-[#0074D9]/10 text-[#0074D9]'
+                                            : 'text-slate-600 hover:bg-slate-50'
                                             }`}
                                     >
                                         {link.name}
@@ -397,7 +373,7 @@ export default function Navbar() {
                     </div>
                 )}
             </nav>
-            <div className="h-[76px] w-full" />
+            <div className="h-[60px] md:h-[76px] w-full" />
         </>
     );
 }
