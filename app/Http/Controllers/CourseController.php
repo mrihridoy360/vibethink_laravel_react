@@ -50,6 +50,18 @@ class CourseController extends Controller
         ]);
     }
 
+    public function publicBlogCategories(Request $request)
+    {
+        $categories = \App\Models\BlogCategory::withCount('posts')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories
+        ]);
+    }
+
     public function publicProducts(Request $request)
     {
         $query = \App\Models\Product::where('is_active', true);
