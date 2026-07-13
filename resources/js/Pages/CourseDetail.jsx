@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, FileText, ChevronRight, Award, HelpCircle } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, FileText, ChevronRight, Award, HelpCircle, AlertCircle, Lightbulb } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function CourseDetail() {
@@ -221,6 +221,45 @@ export default function CourseDetail() {
                             {course.description}
                         </div>
                     </div>
+
+                    {/* Problem & Solution */}
+                    {(course.problems && Array.isArray(course.problems) && course.problems.length > 0) || (course.solutions && Array.isArray(course.solutions) && course.solutions.length > 0) ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                            {course.problems && Array.isArray(course.problems) && course.problems.length > 0 && (
+                                <div className="bg-white border border-rose-200/70 shadow-sm p-5 sm:p-7 rounded-2xl sm:rounded-3xl">
+                                    <h3 className="text-base font-bold text-slate-900 mb-5 flex items-center gap-2">
+                                        <AlertCircle className="h-5 w-5 text-rose-500" />
+                                        সমস্যা (Problems)
+                                    </h3>
+                                    <ul className="space-y-3.5">
+                                        {course.problems.map((item, idx) => (
+                                            <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium leading-relaxed">
+                                                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-rose-400 shrink-0" />
+                                                <span>{renderText(item)}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {course.solutions && Array.isArray(course.solutions) && course.solutions.length > 0 && (
+                                <div className="bg-white border border-emerald-200/70 shadow-sm p-5 sm:p-7 rounded-2xl sm:rounded-3xl">
+                                    <h3 className="text-base font-bold text-slate-900 mb-5 flex items-center gap-2">
+                                        <Lightbulb className="h-5 w-5 text-emerald-500" />
+                                        সমাধান (Solutions)
+                                    </h3>
+                                    <ul className="space-y-3.5">
+                                        {course.solutions.map((item, idx) => (
+                                            <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium leading-relaxed">
+                                                <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                                                <span>{renderText(item)}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    ) : null}
 
                     {/* Syllabus / Curriculum */}
                     <div>
