@@ -11,6 +11,7 @@ import {
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
 import FeatureListEditor from './Partials/FeatureListEditor';
+import { DEFAULT_SECTION_TITLES } from '../../Utils/courseSections';
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ toast, onClose }) {
@@ -62,7 +63,7 @@ function ImageUploadBox({ label, hint, preview, onChange, inputId }) {
 }
 
 // ── DetailsTab ─────────────────────────────────────────────────────────────────
-function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThumbnailChange }) {
+function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThumbnailChange, updateSectionTitle }) {
     return (
         <div className="space-y-6">
             {/* Top Grid: Info & Media */}
@@ -182,24 +183,32 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                     items={form.what_youll_learn}
                     onChange={val => setForm(p => ({ ...p, what_youll_learn: val }))}
                     placeholder="যেমন: Advanced React state management শিখবেন"
+                    titleValue={form.section_titles?.what_youll_learn}
+                    onTitleChange={val => updateSectionTitle('what_youll_learn', val)}
                 />
                 <FeatureListEditor
                     label="Requirements (প্রয়োজনীয় রিকোয়ারমেন্টস)"
                     items={form.requirements}
                     onChange={val => setForm(p => ({ ...p, requirements: val }))}
                     placeholder="যেমন: Basic JavaScript ও HTML এর ধারণা"
+                    titleValue={form.section_titles?.requirements}
+                    onTitleChange={val => updateSectionTitle('requirements', val)}
                 />
                 <FeatureListEditor
                     label="Audience (কোর্সটি কাদের জন্য)"
                     items={form.audience}
                     onChange={val => setForm(p => ({ ...p, audience: val }))}
                     placeholder="যেমন: যারা AI টুলস দিয়ে সফটওয়্যার বানাতে চান"
+                    titleValue={form.section_titles?.audience}
+                    onTitleChange={val => updateSectionTitle('audience', val)}
                 />
                 <FeatureListEditor
                     label="This Course Includes (কোর্সের সাথে যা যা থাকছে)"
                     items={form.this_course_includes}
                     onChange={val => setForm(p => ({ ...p, this_course_includes: val }))}
                     placeholder="যেমন: ১০+ ঘন্টার রেকর্ডেড ভিডিও লেকচার"
+                    titleValue={form.section_titles?.this_course_includes}
+                    onTitleChange={val => updateSectionTitle('this_course_includes', val)}
                 />
             </div>
 
@@ -210,6 +219,8 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                     items={form.problems}
                     onChange={val => setForm(p => ({ ...p, problems: val }))}
                     placeholder="যেমন: নিজের কোনো রিয়েল প্রজেক্ট পোর্টফোলিও নেই"
+                    titleValue={form.section_titles?.problem_solution}
+                    onTitleChange={val => updateSectionTitle('problem_solution', val)}
                 />
                 <FeatureListEditor
                     label="Solutions (আমাদের সমাধান)"
@@ -219,11 +230,13 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                 />
             </div>
 
-            {/* FAQ */}
-            <FaqEditor
-                items={form.faq}
-                onChange={val => setForm(p => ({ ...p, faq: val }))}
-            />
+                {/* FAQ */}
+                <FaqEditor
+                    items={form.faq}
+                    onChange={val => setForm(p => ({ ...p, faq: val }))}
+                    titleValue={form.section_titles?.faq}
+                    onTitleChange={val => updateSectionTitle('faq', val)}
+                />
         </div>
     );
 }
@@ -352,9 +365,14 @@ function SEOTab({ form, setForm, seoPreview, onSeoImageChange, errors }) {
 }
 
 // ── FaqEditor ────────────────────────────────────────────────────────────────
-function FaqEditor({ items, onChange }) {
+function FaqEditor({ items, onChange, titleValue, onTitleChange }) {
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
+    const [titleLocal, setTitleLocal] = useState(titleValue || '');
+
+    useEffect(() => {
+        setTitleLocal(titleValue || '');
+    }, [titleValue]);
 
     const addFaq = () => {
         if (!question.trim() || !answer.trim()) return;
@@ -378,8 +396,17 @@ function FaqEditor({ items, onChange }) {
     return (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
             <div>
-                <h3 className="text-base font-bold text-gray-900 mb-0.5">সচরাচর প্রশ্ন ও উত্তর (FAQ)</h3>
-                <p className="text-xs text-gray-400">কোর্স সম্পর্কিত সাধারণ প্রশ্ন ও উত্তর যোগ করুন।</p>
+                <input
+                    type="text"
+                    value={titleLocal}
+                    onChange={e => {
+                        setTitleLocal(e.target.value);
+                        onTitleChange && onTitleChange(e.target.value);
+                    }}
+                    placeholder="সচরাচর প্রশ্ন ও উত্তর (FAQ)"
+                    className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-base font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+                <p className="text-xs text-gray-400 mt-1">কোর্স সম্পর্কিত সাধারণ প্রশ্ন ও উত্তর যোগ করুন।</p>
             </div>
 
             {/* Add form */}
@@ -487,6 +514,7 @@ export default function AdminCourseEdit() {
         problems: [],
         solutions: [],
         faq: [],
+        section_titles: {},
     });
 
     const [thumbnail, setThumbnail]         = useState(null);
@@ -541,6 +569,7 @@ export default function AdminCourseEdit() {
                         problems:          Array.isArray(found.problems) ? found.problems : [],
                         solutions:         Array.isArray(found.solutions) ? found.solutions : [],
                         faq:              Array.isArray(found.faq) ? found.faq : [],
+                        section_titles:   (found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {},
                     });
                     if (found.thumbnail) setThumbnailPreview(found.thumbnail.startsWith('http') ? found.thumbnail : `/storage/${found.thumbnail}`);
                     if (found.seo_image) setSeoPreview(found.seo_image.startsWith('http') ? found.seo_image : `/storage/${found.seo_image}`);
@@ -565,6 +594,18 @@ export default function AdminCourseEdit() {
         if (!file) return;
         setSeoImage(file);
         setSeoPreview(URL.createObjectURL(file));
+    };
+
+    const updateSectionTitle = (key, text) => {
+        setForm(p => {
+            const next = { ...(p.section_titles || {}) };
+            if (text && text.trim() && text !== DEFAULT_SECTION_TITLES[key]) {
+                next[key] = text.trim();
+            } else {
+                delete next[key];
+            }
+            return { ...p, section_titles: next };
+        });
     };
 
     const handleSave = async () => {
@@ -688,6 +729,7 @@ export default function AdminCourseEdit() {
                         errors={errors}
                         thumbnailPreview={thumbnailPreview}
                         onThumbnailChange={handleThumbnailChange}
+                        updateSectionTitle={updateSectionTitle}
                     />
                 )}
                 {activeTab === 'curriculum' && (

@@ -5,6 +5,7 @@ import { useAuth } from '../Contexts/AuthContext';
 import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
+import { getSectionTitle } from '../Utils/courseSections';
 
 export default function CourseDetail() {
     const { slug } = useParams();
@@ -160,18 +161,11 @@ export default function CourseDetail() {
         <div className="w-full">
             {/* Header Section */}
             <div
-                className="relative border-b border-slate-100 bg-white overflow-hidden py-8 md:py-10 select-none"
+                className="relative border-b border-slate-100 overflow-hidden py-8 md:py-10 select-none"
                 style={{
-                    backgroundImage: `
-                        linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px)
-                    `,
-                    backgroundSize: '30px 30px',
-                    backgroundPosition: 'center'
+                    backgroundImage: 'linear-gradient(135deg, rgba(139, 92, 246, 0.14) 0%, rgba(139, 92, 246, 0.06) 35%, #ffffff 75%)'
                 }}
             >
-                {/* Subtle light background radial gradient fade */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,white_90%)] pointer-events-none opacity-50" />
 
                 <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -208,7 +202,7 @@ export default function CourseDetail() {
                         {/* What you'll learn */}
                         {course.what_youll_learn && Array.isArray(course.what_youll_learn) && course.what_youll_learn.length > 0 && (
                             <div>
-                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">আপনি যা <span className="theme-primary-text">শিখবেন</span></h2>
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">{getSectionTitle(course.section_titles, 'what_youll_learn')}</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {course.what_youll_learn.map((item, idx) => (
                                         <div
@@ -235,7 +229,7 @@ export default function CourseDetail() {
                         )}
 
                         {/* Description */}
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">কোর্স <span className="theme-primary-text">বিবরণ</span></h2>
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">{getSectionTitle(course.section_titles, 'description')}</h2>
                         <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-xl sm:rounded-2xl">
                             {course.description && (
                                 <div
@@ -335,7 +329,7 @@ export default function CourseDetail() {
                                 {/* This Course Includes (কোর্সের সাথে যা যা থাকছে) */}
                                 {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
                                     <div className="border-t border-slate-100 pt-4 space-y-3">
-                                        <h4 className="text-base font-bold text-slate-900">এই কোর্সের সাথে যা যা থাকছে:</h4>
+                                        <h4 className="text-base font-bold text-slate-900">{getSectionTitle(course.section_titles, 'this_course_includes')}:</h4>
                                         <ul className="space-y-2">
                                             {course.this_course_includes.map((item, idx) => (
                                                 <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
@@ -350,7 +344,7 @@ export default function CourseDetail() {
                                 {/* Requirements (কিছু প্রয়োজনীয়) */}
                                 {course.requirements && Array.isArray(course.requirements) && course.requirements.length > 0 && (
                                     <div className="border-t border-slate-100 pt-4 space-y-3">
-                                        <h4 className="text-sm font-bold text-slate-900">কিছু প্রয়োজনীয়:</h4>
+                                        <h4 className="text-sm font-bold text-slate-900">{getSectionTitle(course.section_titles, 'requirements')}:</h4>
                                         <ul className="space-y-2">
                                             {course.requirements.map((item, idx) => (
                                                 <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
@@ -388,7 +382,7 @@ export default function CourseDetail() {
                 {/* Audience (কাদের জন্য এই কোর্স) - full width */}
                 {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
                     <div className="mt-12 lg:mt-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">কাদের জন্য এই <span className="theme-primary-text">কোর্স?</span></h2>
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">{getSectionTitle(course.section_titles, 'audience')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {course.audience.map((item, idx) => (
                                 <div
@@ -422,7 +416,7 @@ export default function CourseDetail() {
                             {toBengaliNum(course.chapters?.length || 0)}
                         </span>
                         <h2 className="relative text-3xl sm:text-4xl font-black text-slate-900">
-                            সম্পূর্ণ <span className="theme-primary-text">কারিকুলাম</span>
+                            {getSectionTitle(course.section_titles, 'curriculum')}
                         </h2>
                     </div>
 
@@ -507,7 +501,7 @@ export default function CourseDetail() {
                                     Problem & Solution
                                 </span>
                                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                                    আপনার <span className="text-rose-600">সমস্যা</span> আমাদের <span className="theme-primary-text">সমাধান</span>
+                                    {getSectionTitle(course.section_titles, 'problem_solution')}
                                 </h2>
                             </div>
 
@@ -555,7 +549,7 @@ export default function CourseDetail() {
                 {/* Instructor */}
                 {course.user && (
                     <div className="mt-12 lg:mt-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">আমাদের <span className="theme-primary-text">ইনস্ট্রাক্টর</span></h2>
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">{getSectionTitle(course.section_titles, 'instructor')}</h2>
                         <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-xl sm:rounded-2xl">
                             <div className="flex items-center gap-4 sm:gap-5">
                                 <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-100">
@@ -582,7 +576,7 @@ export default function CourseDetail() {
 
                 {/* Reviews */}
                 <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-xl sm:rounded-2xl mt-12 lg:mt-16">
-                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">কোর্স <span className="theme-primary-text">রিভিউ</span></h2>
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">{getSectionTitle(course.section_titles, 'reviews')}</h2>
 
                     <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8">
                         <div className="flex flex-col items-center sm:items-start">
@@ -662,7 +656,7 @@ export default function CourseDetail() {
                                 FAQ
                             </span>
                             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                                সচরাচর <span className="theme-primary-text">প্রশ্ন ও উত্তর</span>
+                                {getSectionTitle(course.section_titles, 'faq')}
                             </h2>
                         </div>
 

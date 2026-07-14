@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, CheckCircle, Target, BookOpen, Clock, Award, Shield, AlertCircle, HelpCircle, User, Users, CreditCard, Play, Star, MessageSquare } from 'lucide-react';
 
 const ICON_MAP = {
@@ -18,8 +18,13 @@ const ICON_MAP = {
     MessageSquare
 };
 
-export default function FeatureListEditor({ items, onChange, label, placeholder, subPlaceholder = 'অতিরিক্ত বিবরণ (ঐচ্ছিক)' }) {
+export default function FeatureListEditor({ items, onChange, label, placeholder, subPlaceholder = 'অতিরিক্ত বিবরণ (ঐচ্ছিক)', titleValue, onTitleChange }) {
     const list = Array.isArray(items) ? items : [];
+    const [titleLocal, setTitleLocal] = useState(titleValue || '');
+
+    useEffect(() => {
+        setTitleLocal(titleValue || '');
+    }, [titleValue]);
 
     const handleAdd = () => {
         const newItem = { text: '', sub_text: '', icon: 'CheckCircle' };
@@ -43,9 +48,22 @@ export default function FeatureListEditor({ items, onChange, label, placeholder,
 
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-50">
-                <h4 className="text-sm font-bold text-gray-800">{label}</h4>
-                <span className="text-xs text-gray-400 font-semibold">{list.length}টি আইটেম</span>
+            <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-50">
+                {onTitleChange ? (
+                    <input
+                        type="text"
+                        value={titleLocal}
+                        onChange={e => {
+                            setTitleLocal(e.target.value);
+                            onTitleChange && onTitleChange(e.target.value);
+                        }}
+                        placeholder={label}
+                        className="flex-1 min-w-0 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    />
+                ) : (
+                    <h4 className="text-sm font-bold text-gray-800">{label}</h4>
+                )}
+                <span className="text-xs text-gray-400 font-semibold shrink-0">{list.length}টি আইটেম</span>
             </div>
 
             <div className="space-y-3">

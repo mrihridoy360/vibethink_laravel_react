@@ -229,6 +229,7 @@ class AdminController extends Controller
             'problems'          => 'nullable|string',
             'solutions'         => 'nullable|string',
             'faq'               => 'nullable|string',
+            'section_titles'    => 'nullable|string',
         ]);
 
         $data = [
@@ -245,7 +246,7 @@ class AdminController extends Controller
         ];
 
         // Process JSON arrays
-        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq'];
+        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq', 'section_titles'];
         foreach ($jsonFields as $field) {
             if ($request->has($field)) {
                 $decoded = json_decode($request->input($field), true);
@@ -296,6 +297,7 @@ class AdminController extends Controller
             'problems'             => 'nullable|string',
             'solutions'           => 'nullable|string',
             'faq'                 => 'nullable|string',
+            'section_titles'      => 'nullable|string',
         ]);
 
         $data = [
@@ -313,7 +315,7 @@ class AdminController extends Controller
         ];
 
         // Process JSON arrays
-        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq'];
+        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq', 'section_titles'];
         foreach ($jsonFields as $field) {
             if ($request->has($field)) {
                 $decoded = json_decode($request->input($field), true);
