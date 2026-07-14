@@ -166,7 +166,7 @@ export default function Navbar() {
                                     <Link
                                         key={link.name}
                                         to={link.path}
-                                        className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${isActive
+                                        className={`relative px-4 py-1.5 rounded-full text-sm font-bold transition-all duration-300 ${isActive
                                             ? 'theme-primary-bg text-white shadow-md scale-[1.03]'
                                             : 'text-[#495057] theme-primary-text-hover'
                                             }`}
@@ -317,7 +317,7 @@ export default function Navbar() {
                                         key={link.name}
                                         to={link.path}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${isActive
                                             ? 'theme-primary-bg-light theme-primary-text'
                                             : 'text-slate-600 hover:bg-slate-50'
                                             }`}
