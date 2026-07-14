@@ -304,6 +304,42 @@ function SettingsTab({ form, setForm, errors }) {
                     {form.is_published ? 'কোর্সটি প্রকাশিত এবং শিক্ষার্থীদের দেখা যাচ্ছে।' : 'কোর্সটি ড্রাফটে আছে, শিক্ষার্থীরা দেখতে পাচ্ছে না।'}
                 </div>
             </div>
+
+            {/* Guarantee & Access */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+                <div>
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 mb-0.5">
+                        <Shield className="h-4 w-4 text-emerald-600" /> গ্যারান্টি ও অ্যাক্সেস
+                    </h3>
+                    <p className="text-xs text-gray-400">কোর্স ডিটেইলস পেজে দেখানোর জন্য সুবিধাসমূহ।</p>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div>
+                        <p className="text-sm font-semibold text-gray-800">ফুল লাইফটাইম অ্যাক্সেস</p>
+                        <p className="text-xs text-gray-400 mt-0.5">এনাবল করলে শিক্ষার্থীরা লাইফটাইম অ্যাক্সেস পাবে।</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setForm(p => ({ ...p, lifetime_access: !p.lifetime_access }))}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${form.lifetime_access ? 'bg-emerald-600' : 'bg-gray-300'}`}
+                    >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${form.lifetime_access ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" />মানি-ব্যাক গ্যারান্টি (দিন)</label>
+                    <input
+                        type="number" min="0" step="1"
+                        value={form.money_back_days}
+                        onChange={e => setForm(p => ({ ...p, money_back_days: e.target.value }))}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        placeholder="যেমন: ৭ (০ = বন্ধ)"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">০ বা ফাঁকা রাখলে মানি-ব্যাক গ্যারান্টি দেখানো হবে না।</p>
+                </div>
+            </div>
         </div>
     );
 }
@@ -506,6 +542,7 @@ export default function AdminCourseEdit() {
         title: '', slug: '', short_description: '', description: '',
         video_url: '', category_id: '', language: 'Bengali',
         price: '', discount_price: '', is_published: false,
+        money_back_days: '', lifetime_access: false,
         seo_title: '', seo_description: '',
         what_youll_learn: [],
         requirements: [],
@@ -560,6 +597,8 @@ export default function AdminCourseEdit() {
                         price:             found.price != null ? parseFloat(found.price) : '',
                         discount_price:    found.discount_price != null ? parseFloat(found.discount_price) : '',
                         is_published:      !!found.is_published,
+                        money_back_days:   found.money_back_days != null ? parseInt(found.money_back_days, 10) : '',
+                        lifetime_access:   !!found.lifetime_access,
                         seo_title:         found.seo_title || '',
                         seo_description:   found.seo_description || '',
                         what_youll_learn:  Array.isArray(found.what_youll_learn) ? found.what_youll_learn : [],

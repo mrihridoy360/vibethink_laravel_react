@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe, Shield, ShieldCheck } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -306,6 +306,24 @@ export default function CourseDetail() {
                                     <span className="text-sm text-slate-500 font-medium">{course.enrollments_count || 0} Learners Joined</span>
                                 </div>
 
+                                {/* Guarantee & Access (shown only when not enrolled) */}
+                                {!isEnrolled && (
+                                    <div className="space-y-2.5">
+                                        {course.lifetime_access && (
+                                            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
+                                                <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+                                                <span className="text-sm font-bold text-emerald-700">ফুল লাইফটাইম অ্যাক্সেস</span>
+                                            </div>
+                                        )}
+                                        {parseInt(course.money_back_days, 10) > 0 && (
+                                            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-blue-50 border border-blue-100">
+                                                <Shield className="h-4 w-4 text-blue-600 shrink-0" />
+                                                <span className="text-sm font-bold text-blue-700">{toBengaliNum(course.money_back_days)} দিনের মানি-ব্যাক গ্যারান্টি</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* CTA Buttons */}
                                 <div className="space-y-2.5 pt-1">
                                     {isEnrolled ? (
@@ -409,7 +427,7 @@ export default function CourseDetail() {
                 )}
 
                 {/* Syllabus / Curriculum */}
-                <div className="mt-12 lg:mt-16">
+                <div className="mt-12 lg:mt-16 max-w-3xl mx-auto">
                     {/* Header with watermark */}
                     <div className="relative mb-8">
                         <span className="absolute -top-6 -left-1 text-[100px] sm:text-[120px] font-black text-slate-100 leading-none select-none pointer-events-none">
@@ -548,7 +566,7 @@ export default function CourseDetail() {
 
                 {/* Instructor */}
                 {course.user && (
-                    <div className="mt-12 lg:mt-16">
+                    <div className="mt-12 lg:mt-16 max-w-3xl mx-auto">
                         <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">{getSectionTitle(course.section_titles, 'instructor')}</h2>
                         <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-xl sm:rounded-2xl">
                             <div className="flex items-center gap-4 sm:gap-5">

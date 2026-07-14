@@ -33,6 +33,8 @@ class Course extends Model
         'price',
         'discount_price',
         'is_published',
+        'money_back_days',
+        'lifetime_access',
     ];
 
     protected $casts = [
@@ -45,6 +47,8 @@ class Course extends Model
         'faq' => 'array',
         'section_titles' => 'array',
         'is_published' => 'boolean',
+        'lifetime_access' => 'boolean',
+        'money_back_days' => 'integer',
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
     ];

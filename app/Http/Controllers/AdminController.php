@@ -221,6 +221,8 @@ class AdminController extends Controller
             'price'             => 'nullable|numeric|min:0',
             'discount_price'    => 'nullable|numeric|min:0',
             'is_published'      => 'boolean',
+            'money_back_days'   => 'nullable|integer|min:0',
+            'lifetime_access'   => 'boolean',
             'thumbnail'         => 'nullable|image|max:4096',
             'what_youll_learn'  => 'nullable|string',
             'requirements'      => 'nullable|string',
@@ -243,6 +245,8 @@ class AdminController extends Controller
             'price'             => $request->price ?? 0,
             'discount_price'    => $request->discount_price ?? null,
             'is_published'      => $request->boolean('is_published', false),
+            'money_back_days'   => $request->input('money_back_days', 0) ?: 0,
+            'lifetime_access'   => $request->boolean('lifetime_access', false),
         ];
 
         // Process JSON arrays
@@ -286,6 +290,8 @@ class AdminController extends Controller
             'price'                => 'nullable|numeric|min:0',
             'discount_price'       => 'nullable|numeric|min:0',
             'is_published'         => 'boolean',
+            'money_back_days'      => 'nullable|integer|min:0',
+            'lifetime_access'      => 'boolean',
             'thumbnail'            => 'nullable|image|max:4096',
             'seo_title'            => 'nullable|string|max:255',
             'seo_description'      => 'nullable|string',
@@ -310,6 +316,8 @@ class AdminController extends Controller
             'price'             => $request->price ?? 0,
             'discount_price'    => $request->discount_price ?? null,
             'is_published'      => $request->boolean('is_published', false),
+            'money_back_days'   => $request->input('money_back_days', 0) ?: 0,
+            'lifetime_access'   => $request->boolean('lifetime_access', false),
             'seo_title'         => $request->seo_title,
             'seo_description'   => $request->seo_description,
         ];
