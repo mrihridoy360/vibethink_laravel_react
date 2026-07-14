@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe, Shield, ShieldCheck } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe, Shield, ShieldCheck, BadgeCheck } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -584,10 +584,16 @@ export default function CourseDetail() {
                                     )}
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-900">{course.user.name || 'বিশেষজ্ঞ'}</h3>
+                                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-1.5">
+                                        {course.user.name || 'বিশেষজ্ঞ'}
+                                        <BadgeCheck className="h-5 w-5 text-blue-500 shrink-0" />
+                                    </h3>
                                     <p className="text-sm text-slate-500 font-medium mt-0.5">ইনস্ট্রাক্টর</p>
                                 </div>
                             </div>
+                            <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed mt-5">
+                                I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results.
+                            </p>
                         </div>
                     </div>
                 )}
@@ -670,10 +676,10 @@ export default function CourseDetail() {
                 {course.faq && Array.isArray(course.faq) && course.faq.length > 0 && (
                     <div className="mt-12 lg:mt-16">
                         <div className="mb-6 text-center">
-                            <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
+                            <span className="text-xs font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
                                 FAQ
                             </span>
-                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
+                            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
                                 {getSectionTitle(course.section_titles, 'faq')}
                             </h2>
                         </div>
@@ -688,7 +694,7 @@ export default function CourseDetail() {
                                     >
                                         <button
                                             onClick={() => setExpandedFaq(isOpen ? null : index)}
-                                            className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:theme-primary-text text-base transition-colors cursor-pointer border-none bg-transparent"
+                                            className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:theme-primary-text text-lg transition-colors cursor-pointer border-none bg-transparent"
                                         >
                                             <span className="flex items-center gap-3">
                                                 <span className="w-6 h-6 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -699,13 +705,107 @@ export default function CourseDetail() {
                                             <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {isOpen && (
-                                            <div className="px-5 pb-4 pt-1.5 text-sm text-slate-500 font-medium leading-relaxed border-t border-slate-100 pl-14">
+                                            <div className="px-5 pb-4 pt-1.5 text-base text-slate-500 font-medium leading-relaxed border-t border-slate-100 pl-14">
                                                 {faq.answer}
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Call To Action */}
+                {!isEnrolled && (
+                    <div className="mt-12 lg:mt-16">
+                        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8">
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                                <div className="flex flex-col sm:flex-row items-start gap-5">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF5A00] to-orange-600 flex items-center justify-center shrink-0 shadow-lg shadow-orange-200">
+                                        <Award className="h-7 w-7 text-white" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
+                                                আজই এই কোর্সে এনরোল করুন
+                                            </h3>
+                                            <p className="text-sm text-slate-500 font-medium">
+                                                {course.enrollments_count || 0} জন লার্নার ইতিমধ্যে এনরোল করেছেন
+                                            </p>
+                                        </div>
+
+                                        {/* Early Bird Access */}
+                                        {discountPercent > 0 && (
+                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200">
+                                                <span className="relative flex h-2.5 w-2.5">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
+                                                </span>
+                                                <span className="text-xs font-extrabold text-orange-700 tracking-wide uppercase">
+                                                    Early Bird Access Offer চলছে
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Price */}
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-2xl font-extrabold text-slate-900">৳{currentPrice.toLocaleString()}</span>
+                                            {discountPercent > 0 && (
+                                                <>
+                                                    <span className="text-sm text-slate-400 line-through">৳{originalPrice.toLocaleString()}</span>
+                                                    <span className="text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full">
+                                                        {discountPercent}% ছাড়
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* This Course Includes */}
+                                        {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
+                                            <ul className="space-y-2">
+                                                {course.this_course_includes.slice(0, 4).map((item, idx) => (
+                                                    <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium">
+                                                        <CheckCircle className="h-4 w-4 theme-primary-text shrink-0 mt-0.5" />
+                                                        <span>{renderText(item)}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleEnroll}
+                                    disabled={enrolling}
+                                    className="w-full lg:w-auto px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-[#FF5A00] to-orange-600 hover:brightness-110 text-white flex items-center justify-center gap-2 shadow-lg shadow-orange-200 transition-all disabled:opacity-60 cursor-pointer border-none whitespace-nowrap"
+                                >
+                                    {enrolling ? 'এনরোলিং হচ্ছে...' : 'এনরোল করুন'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Money Back Guarantee */}
+                {parseInt(course.money_back_days, 10) > 0 && (
+                    <div className="mt-12 lg:mt-16">
+                        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8">
+                            <div className="flex flex-col sm:flex-row items-start gap-5">
+                                <div className="w-16 h-16 rounded-full border-2 border-orange-200 bg-orange-50 flex items-center justify-center shrink-0">
+                                    <ShieldCheck className="h-8 w-8 text-[#FF5A00]" />
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-extrabold tracking-[0.25em] text-[#FF5A00] uppercase block mb-1">
+                                        ১০০% RISK FREE
+                                    </span>
+                                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
+                                        {toBengaliNum(course.money_back_days)} দিনের মানি-ব্যাক গ্যারান্টি
+                                    </h3>
+                                    <p className="text-sm sm:text-base text-slate-500 font-medium leading-relaxed">
+                                        কোর্স এনরোল করার {toBengaliNum(course.money_back_days)} দিনের মধ্যে যদি আপনি মনে করেন এই কোর্স থেকে কিছুই শিখতে পারেননি, তবে আপনার সম্পূর্ণ টাকা ফেরত পাবেন।
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
