@@ -81,7 +81,7 @@ class CourseController extends Controller
 
     public function show($slug)
     {
-        $course = Course::with(['user:id,name,avatar', 'chapters' => function($q) {
+        $course = Course::with(['user:id,name,avatar', 'category', 'chapters' => function($q) {
             $q->where('is_published', true)->with(['lessons' => function($l) {
                 $l->where('is_published', true)->orderBy('sort_order');
             }])->orderBy('sort_order');
