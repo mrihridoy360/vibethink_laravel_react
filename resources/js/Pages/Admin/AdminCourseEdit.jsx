@@ -6,7 +6,7 @@ import {
     ArrowLeft, BookOpen, LayoutDashboard, Settings, Globe, Save,
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
-    Bell, Trash2, X, ListVideo, Plus
+    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -218,6 +218,12 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                     placeholder="যেমন: কোর্স শেষে ৩টি লাইভ পোর্টফোলিও প্রজেক্ট থাকবে"
                 />
             </div>
+
+            {/* FAQ */}
+            <FaqEditor
+                items={form.faq}
+                onChange={val => setForm(p => ({ ...p, faq: val }))}
+            />
         </div>
     );
 }
@@ -345,6 +351,117 @@ function SEOTab({ form, setForm, seoPreview, onSeoImageChange, errors }) {
     );
 }
 
+// ── FaqEditor ────────────────────────────────────────────────────────────────
+function FaqEditor({ items, onChange }) {
+    const [question, setQuestion] = useState('');
+    const [answer, setAnswer] = useState('');
+
+    const addFaq = () => {
+        if (!question.trim() || !answer.trim()) return;
+        onChange([...items, { question: question.trim(), answer: answer.trim() }]);
+        setQuestion('');
+        setAnswer('');
+    };
+
+    const removeFaq = (idx) => {
+        onChange(items.filter((_, i) => i !== idx));
+    };
+
+    const moveFaq = (idx, dir) => {
+        const target = idx + dir;
+        if (target < 0 || target >= items.length) return;
+        const updated = [...items];
+        [updated[idx], updated[target]] = [updated[target], updated[idx]];
+        onChange(updated);
+    };
+
+    return (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+            <div>
+                <h3 className="text-base font-bold text-gray-900 mb-0.5">সচরাচর প্রশ্ন ও উত্তর (FAQ)</h3>
+                <p className="text-xs text-gray-400">কোর্স সম্পর্কিত সাধারণ প্রশ্ন ও উত্তর যোগ করুন।</p>
+            </div>
+
+            {/* Add form */}
+            <div className="space-y-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">প্রশ্ন</label>
+                    <input
+                        type="text"
+                        value={question}
+                        onChange={e => setQuestion(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        placeholder="যেমন: কোর্সটি কি লাইফটাইম অ্যাক্সেস?"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">উত্তর</label>
+                    <textarea
+                        rows={3}
+                        value={answer}
+                        onChange={e => setAnswer(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                        placeholder="উত্তর লিখুন..."
+                    />
+                </div>
+                <button
+                    type="button"
+                    onClick={addFaq}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all cursor-pointer"
+                >
+                    <Plus className="h-4 w-4" /> FAQ যোগ করুন
+                </button>
+            </div>
+
+            {/* List */}
+            {items.length === 0 ? (
+                <p className="text-sm text-gray-400 italic">এখনো কোনো FAQ যোগ করা হয়নি।</p>
+            ) : (
+                <div className="space-y-3">
+                    {items.map((faq, idx) => (
+                        <div key={idx} className="border border-gray-100 rounded-xl p-4">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-gray-800">প্রশ্ন: {faq.question}</p>
+                                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{faq.answer}</p>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => moveFaq(idx, -1)}
+                                        disabled={idx === 0}
+                                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                        title="উপরে"
+                                    >
+                                        <ChevronUp className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => moveFaq(idx, 1)}
+                                        disabled={idx === items.length - 1}
+                                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                        title="নিচে"
+                                    >
+                                        <ChevronDown className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFaq(idx)}
+                                        className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                                        title="মুছুন"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ── Main AdminCourseEdit ───────────────────────────────────────────────────────
 export default function AdminCourseEdit() {
     const { user, loading, logout } = useAuth();
@@ -369,6 +486,7 @@ export default function AdminCourseEdit() {
         this_course_includes: [],
         problems: [],
         solutions: [],
+        faq: [],
     });
 
     const [thumbnail, setThumbnail]         = useState(null);
@@ -422,6 +540,7 @@ export default function AdminCourseEdit() {
                         this_course_includes: Array.isArray(found.this_course_includes) ? found.this_course_includes : [],
                         problems:          Array.isArray(found.problems) ? found.problems : [],
                         solutions:         Array.isArray(found.solutions) ? found.solutions : [],
+                        faq:              Array.isArray(found.faq) ? found.faq : [],
                     });
                     if (found.thumbnail) setThumbnailPreview(found.thumbnail.startsWith('http') ? found.thumbnail : `/storage/${found.thumbnail}`);
                     if (found.seo_image) setSeoPreview(found.seo_image.startsWith('http') ? found.seo_image : `/storage/${found.seo_image}`);

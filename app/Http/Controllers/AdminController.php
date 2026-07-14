@@ -222,6 +222,13 @@ class AdminController extends Controller
             'discount_price'    => 'nullable|numeric|min:0',
             'is_published'      => 'boolean',
             'thumbnail'         => 'nullable|image|max:4096',
+            'what_youll_learn'  => 'nullable|string',
+            'requirements'      => 'nullable|string',
+            'audience'          => 'nullable|string',
+            'this_course_includes' => 'nullable|string',
+            'problems'          => 'nullable|string',
+            'solutions'         => 'nullable|string',
+            'faq'               => 'nullable|string',
         ]);
 
         $data = [
@@ -236,6 +243,15 @@ class AdminController extends Controller
             'discount_price'    => $request->discount_price ?? null,
             'is_published'      => $request->boolean('is_published', false),
         ];
+
+        // Process JSON arrays
+        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq'];
+        foreach ($jsonFields as $field) {
+            if ($request->has($field)) {
+                $decoded = json_decode($request->input($field), true);
+                $data[$field] = is_array($decoded) ? $decoded : null;
+            }
+        }
 
         if ($request->hasFile('thumbnail')) {
             $cloudinary = new CloudinaryService();
@@ -278,7 +294,8 @@ class AdminController extends Controller
             'audience'             => 'nullable|string',
             'this_course_includes' => 'nullable|string',
             'problems'             => 'nullable|string',
-            'solutions'            => 'nullable|string',
+            'solutions'           => 'nullable|string',
+            'faq'                 => 'nullable|string',
         ]);
 
         $data = [
@@ -296,7 +313,7 @@ class AdminController extends Controller
         ];
 
         // Process JSON arrays
-        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions'];
+        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions', 'faq'];
         foreach ($jsonFields as $field) {
             if ($request->has($field)) {
                 $decoded = json_decode($request->input($field), true);

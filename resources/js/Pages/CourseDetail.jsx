@@ -21,6 +21,7 @@ export default function CourseDetail() {
     const [avgRating, setAvgRating] = useState(0);
     const [totalReviews, setTotalReviews] = useState(0);
     const [distribution, setDistribution] = useState({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
+    const [expandedFaq, setExpandedFaq] = useState(null);
 
     const toBengaliNum = (num) => {
         const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -244,35 +245,6 @@ export default function CourseDetail() {
                             )}
                         </div>
 
-                        {/* Audience (কাদের জন্য এই কোর্স) */}
-                        {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
-                            <div>
-                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">কাদের জন্য এই <span className="theme-primary-text">কোর্স?</span></h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {course.audience.map((item, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="bg-slate-50/50 hover:bg-slate-50 border border-slate-100 hover:theme-primary-border-light p-4 rounded-xl transition-all flex items-start gap-3.5 group shadow-sm hover:shadow-md"
-                                        >
-                                            <div className="w-8 h-8 rounded-xl theme-primary-bg-light flex items-center justify-center shrink-0 transition-colors">
-                                                <CheckCircle className="h-4.5 w-4.5 theme-primary-text" />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-base sm:text-lg text-slate-800 font-bold leading-snug">
-                                                    {renderText(item)}
-                                                </span>
-                                                {typeof item === 'object' && item !== null && item.sub_text && (
-                                                    <span className="text-sm text-slate-500 mt-1">
-                                                        {item.sub_text}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                     </div>
 
                     {/* Right Column - Sticky Info Card (Screenshot Layout) */}
@@ -361,13 +333,13 @@ export default function CourseDetail() {
                                 </div>
 
                                 {/* This Course Includes (কোর্সের সাথে যা যা থাকছে) */}
-                                        {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
-                                            <div className="border-t border-slate-100 pt-4 space-y-3">
-                                                <h4 className="text-base font-bold text-slate-900">এই কোর্সের সাথে যা যা থাকছে:</h4>
-                                                <ul className="space-y-2">
-                                                    {course.this_course_includes.map((item, idx) => (
-                                                        <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
-                                                            <CheckCircle className="h-4 w-4 theme-primary-text shrink-0 mt-0.5" />
+                                {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
+                                    <div className="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 className="text-base font-bold text-slate-900">এই কোর্সের সাথে যা যা থাকছে:</h4>
+                                        <ul className="space-y-2">
+                                            {course.this_course_includes.map((item, idx) => (
+                                                <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
+                                                    <CheckCircle className="h-4 w-4 theme-primary-text shrink-0 mt-0.5" />
                                                     <span>{renderText(item)}</span>
                                                 </li>
                                             ))}
@@ -413,6 +385,35 @@ export default function CourseDetail() {
                     </div>
                 </div>
 
+                {/* Audience (কাদের জন্য এই কোর্স) - full width */}
+                {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
+                    <div className="mt-12 lg:mt-16">
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">কাদের জন্য এই <span className="theme-primary-text">কোর্স?</span></h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {course.audience.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-slate-50/50 hover:bg-slate-50 border border-slate-100 hover:theme-primary-border-light p-4 rounded-xl transition-all flex items-start gap-3.5 group shadow-sm hover:shadow-md"
+                                >
+                                    <div className="w-8 h-8 rounded-xl theme-primary-bg-light flex items-center justify-center shrink-0 transition-colors">
+                                        <CheckCircle className="h-4.5 w-4.5 theme-primary-text" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-base sm:text-lg text-slate-800 font-bold leading-snug">
+                                            {renderText(item)}
+                                        </span>
+                                        {typeof item === 'object' && item !== null && item.sub_text && (
+                                            <span className="text-sm text-slate-500 mt-1">
+                                                {item.sub_text}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Syllabus / Curriculum */}
                 <div className="mt-12 lg:mt-16">
                     {/* Header with watermark */}
@@ -430,8 +431,12 @@ export default function CourseDetail() {
                         <span>{toBengaliNum(course.chapters?.length || 0)} টি মডিউল</span>
                         <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                         <span>{toBengaliNum(totalLessons)} টি লেসন</span>
-                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                        <span>{toBengaliNum(durationHours)} ঘন্টা {toBengaliNum(durationMinutes)} মিনিট</span>
+                        {totalDurationMinutes > 0 && (
+                            <>
+                                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                <span>{toBengaliNum(durationHours)} ঘন্টা {toBengaliNum(durationMinutes)} মিনিট</span>
+                            </>
+                        )}
                     </div>
 
                     {/* Chapter list */}
@@ -648,6 +653,50 @@ export default function CourseDetail() {
                         </div>
                     )}
                 </div>
+
+                {/* Frequently Asked Questions */}
+                {course.faq && Array.isArray(course.faq) && course.faq.length > 0 && (
+                    <div className="mt-12 lg:mt-16">
+                        <div className="mb-6 text-center">
+                            <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
+                                FAQ
+                            </span>
+                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
+                                সচরাচর <span className="theme-primary-text">প্রশ্ন ও উত্তর</span>
+                            </h2>
+                        </div>
+
+                        <div className="max-w-3xl mx-auto space-y-3">
+                            {course.faq.map((faq, index) => {
+                                const isOpen = expandedFaq === index;
+                                return (
+                                    <div
+                                        key={index}
+                                        className="bg-white border border-slate-200/80 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden transition-all duration-200"
+                                    >
+                                        <button
+                                            onClick={() => setExpandedFaq(isOpen ? null : index)}
+                                            className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:theme-primary-text text-base transition-colors cursor-pointer border-none bg-transparent"
+                                        >
+                                            <span className="flex items-center gap-3">
+                                                <span className="w-6 h-6 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center text-[10px] font-bold shrink-0">
+                                                    {index + 1}
+                                                </span>
+                                                {faq.question}
+                                            </span>
+                                            <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {isOpen && (
+                                            <div className="px-5 pb-4 pt-1.5 text-sm text-slate-500 font-medium leading-relaxed border-t border-slate-100 pl-14">
+                                                {faq.answer}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
             </div>
         </div>
