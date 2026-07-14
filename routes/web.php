@@ -22,6 +22,7 @@ Route::prefix('api')->group(function () {
     // Course Routes
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
+    Route::get('/courses/{slug}/reviews', [CourseController::class, 'reviews']);
     Route::get('/blogs', [CourseController::class, 'publicBlogs']);
     Route::get('/blogs/{slug}', [CourseController::class, 'publicBlogShow']);
     Route::get('/blog-categories', [CourseController::class, 'publicBlogCategories']);

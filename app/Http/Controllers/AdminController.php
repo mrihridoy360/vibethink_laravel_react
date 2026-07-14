@@ -216,6 +216,7 @@ class AdminController extends Controller
             'title'             => 'required|string|max:255',
             'category_id'       => 'nullable|integer',
             'short_description' => 'nullable|string',
+            'description'       => 'nullable|string',
             'language'          => 'nullable|string|max:50',
             'price'             => 'nullable|numeric|min:0',
             'discount_price'    => 'nullable|numeric|min:0',
@@ -229,6 +230,7 @@ class AdminController extends Controller
             'slug'              => Str::slug($request->title) . '-' . uniqid(),
             'category_id'       => $request->category_id ?: null,
             'short_description' => $request->short_description,
+            'description'       => $request->description,
             'language'          => $request->language ?? 'Bengali',
             'price'             => $request->price ?? 0,
             'discount_price'    => $request->discount_price ?? null,
@@ -258,15 +260,25 @@ class AdminController extends Controller
         $course = Course::findOrFail($id);
 
         $request->validate([
-            'title'             => 'required|string|max:255',
-            'slug'              => 'nullable|string|max:255|unique:courses,slug,' . $id,
-            'category_id'       => 'nullable|integer',
-            'short_description' => 'nullable|string',
-            'language'          => 'nullable|string|max:50',
-            'price'             => 'nullable|numeric|min:0',
-            'discount_price'    => 'nullable|numeric|min:0',
-            'is_published'      => 'boolean',
-            'thumbnail'         => 'nullable|image|max:4096',
+            'title'                => 'required|string|max:255',
+            'slug'                 => 'nullable|string|max:255|unique:courses,slug,' . $id,
+            'category_id'          => 'nullable|integer',
+            'short_description'    => 'nullable|string',
+            'description'          => 'nullable|string',
+            'language'             => 'nullable|string|max:50',
+            'price'                => 'nullable|numeric|min:0',
+            'discount_price'       => 'nullable|numeric|min:0',
+            'is_published'         => 'boolean',
+            'thumbnail'            => 'nullable|image|max:4096',
+            'seo_title'            => 'nullable|string|max:255',
+            'seo_description'      => 'nullable|string',
+            'seo_image'            => 'nullable|image|max:4096',
+            'what_youll_learn'     => 'nullable|string',
+            'requirements'         => 'nullable|string',
+            'audience'             => 'nullable|string',
+            'this_course_includes' => 'nullable|string',
+            'problems'             => 'nullable|string',
+            'solutions'            => 'nullable|string',
         ]);
 
         $data = [
@@ -274,15 +286,28 @@ class AdminController extends Controller
             'slug'              => $request->slug ?: (Str::slug($request->title) . '-' . $id),
             'category_id'       => $request->category_id ?: null,
             'short_description' => $request->short_description,
+            'description'       => $request->description,
             'language'          => $request->language ?? 'Bengali',
             'price'             => $request->price ?? 0,
             'discount_price'    => $request->discount_price ?? null,
             'is_published'      => $request->boolean('is_published', false),
+            'seo_title'         => $request->seo_title,
+            'seo_description'   => $request->seo_description,
         ];
 
-        if ($request->hasFile('thumbnail')) {
-            $cloudinary = new CloudinaryService();
+        // Process JSON arrays
+        $jsonFields = ['what_youll_learn', 'requirements', 'audience', 'this_course_includes', 'problems', 'solutions'];
+        foreach ($jsonFields as $field) {
+            if ($request->has($field)) {
+                $decoded = json_decode($request->input($field), true);
+                $data[$field] = is_array($decoded) ? $decoded : null;
+            }
+        }
 
+        $cloudinary = new CloudinaryService();
+
+        // Process Thumbnail
+        if ($request->hasFile('thumbnail')) {
             // Delete old Cloudinary thumbnail if exists
             if ($course->thumbnail && $cloudinary->isCloudinaryUrl($course->thumbnail)) {
                 $publicId = $cloudinary->extractPublicId($course->thumbnail);
@@ -292,6 +317,20 @@ class AdminController extends Controller
             $result = $cloudinary->uploadThumbnail($request->file('thumbnail'));
             if ($result) {
                 $data['thumbnail'] = $result['url'];
+            }
+        }
+
+        // Process SEO Image
+        if ($request->hasFile('seo_image')) {
+            // Delete old Cloudinary seo_image if exists
+            if ($course->seo_image && $cloudinary->isCloudinaryUrl($course->seo_image)) {
+                $publicId = $cloudinary->extractPublicId($course->seo_image);
+                if ($publicId) $cloudinary->deleteImage($publicId);
+            }
+
+            $result = $cloudinary->uploadThumbnail($request->file('seo_image'));
+            if ($result) {
+                $data['seo_image'] = $result['url'];
             }
         }
 

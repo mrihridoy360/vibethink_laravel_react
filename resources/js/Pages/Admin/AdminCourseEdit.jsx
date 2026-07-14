@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
+import FeatureListEditor from './Partials/FeatureListEditor';
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ toast, onClose }) {
@@ -63,111 +64,158 @@ function ImageUploadBox({ label, hint, preview, onChange, inputId }) {
 // ── DetailsTab ─────────────────────────────────────────────────────────────────
 function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThumbnailChange }) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left: Course Info */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
-                <div>
-                    <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্সের তথ্য</h3>
-                    <p className="text-xs text-gray-400">কোর্স কার্ডে যা দেখাবে।</p>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">শিরোনাম <span className="text-red-500">*</span></label>
-                    <input
-                        type="text" required
-                        value={form.title}
-                        onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
-                        className={`w-full px-4 py-2.5 rounded-xl border text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${errors.title ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
-                        placeholder="কোর্সের নাম..."
-                    />
-                    {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title[0]}</p>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">স্লাগ (URL)</label>
-                    <input
-                        type="text"
-                        value={form.slug}
-                        onChange={e => setForm(p => ({ ...p, slug: e.target.value }))}
-                        className={`w-full px-4 py-2.5 rounded-xl border text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono ${errors.slug ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
-                        placeholder="course-slug"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">URL-এ ব্যবহৃত হয়। অবশ্যই unique হতে হবে।</p>
-                    {errors.slug && <p className="text-xs text-red-500 mt-1">{errors.slug[0]}</p>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">সংক্ষিপ্ত বিবরণ</label>
-                    <textarea
-                        rows={3}
-                        value={form.short_description}
-                        onChange={e => setForm(p => ({ ...p, short_description: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-                        placeholder="কোর্স সম্পর্কে সংক্ষেপে..."
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">বিস্তারিত বিবরণ</label>
-                    <textarea
-                        rows={5}
-                        value={form.description}
-                        onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-                        placeholder="কোর্সের বিস্তারিত বিবরণ..."
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><ListVideo className="h-3.5 w-3.5" />প্রমোশনাল ভিডিও URL</label>
-                    <input
-                        type="url"
-                        value={form.video_url}
-                        onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                        placeholder="https://youtube.com/watch?v=..."
-                    />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-6">
+            {/* Top Grid: Info & Media */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left: Course Info */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Tag className="h-3.5 w-3.5" />ক্যাটাগরি</label>
-                        <select
-                            value={form.category_id}
-                            onChange={e => setForm(p => ({ ...p, category_id: e.target.value }))}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition-all"
-                        >
-                            <option value="">ক্যাটাগরি নেই</option>
-                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                        </select>
+                        <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্সের তথ্য</h3>
+                        <p className="text-xs text-gray-400">কোর্স কার্ডে যা দেখাবে।</p>
                     </div>
+
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Languages className="h-3.5 w-3.5" />ভাষা</label>
-                        <select
-                            value={form.language}
-                            onChange={e => setForm(p => ({ ...p, language: e.target.value }))}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition-all"
-                        >
-                            <option value="Bengali">বাংলা</option>
-                            <option value="English">English</option>
-                            <option value="Hindi">Hindi</option>
-                        </select>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">শিরোনাম <span className="text-red-500">*</span></label>
+                        <input
+                            type="text" required
+                            value={form.title}
+                            onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
+                            className={`w-full px-4 py-2.5 rounded-xl border text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${errors.title ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+                            placeholder="কোর্সের নাম..."
+                        />
+                        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title[0]}</p>}
                     </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">স্লাগ (URL)</label>
+                        <input
+                            type="text"
+                            value={form.slug}
+                            onChange={e => setForm(p => ({ ...p, slug: e.target.value }))}
+                            className={`w-full px-4 py-2.5 rounded-xl border text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono ${errors.slug ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+                            placeholder="course-slug"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">URL-এ ব্যবহৃত হয়। অবশ্যই unique হতে হবে।</p>
+                        {errors.slug && <p className="text-xs text-red-500 mt-1">{errors.slug[0]}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">সংক্ষিপ্ত বিবরণ</label>
+                        <textarea
+                            rows={3}
+                            value={form.short_description}
+                            onChange={e => setForm(p => ({ ...p, short_description: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                            placeholder="কোর্স সম্পর্কে সংক্ষেপে..."
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">বিস্তারিত বিবরণ</label>
+                        <textarea
+                            rows={5}
+                            value={form.description}
+                            onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                            placeholder="কোর্সের বিস্তারিত বিবরণ..."
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><ListVideo className="h-3.5 w-3.5" />প্রমোশনাল ভিডিও URL</label>
+                        <input
+                            type="url"
+                            value={form.video_url}
+                            onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            placeholder="https://youtube.com/watch?v=..."
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Tag className="h-3.5 w-3.5" />ক্যাটাগরি</label>
+                            <select
+                                value={form.category_id}
+                                onChange={e => setForm(p => ({ ...p, category_id: e.target.value }))}
+                                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition-all"
+                            >
+                                <option value="">ক্যাটাগরি নেই</option>
+                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Languages className="h-3.5 w-3.5" />ভাষা</label>
+                            <select
+                                value={form.language}
+                                onChange={e => setForm(p => ({ ...p, language: e.target.value }))}
+                                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition-all"
+                            >
+                                <option value="Bengali">বাংলা</option>
+                                <option value="English">English</option>
+                                <option value="Hindi">Hindi</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Thumbnail */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্স মিডিয়া</h3>
+                        <p className="text-xs text-gray-400">থাম্বনেইল আপলোড করুন।</p>
+                    </div>
+                    <ImageUploadBox
+                        label="থাম্বনেইল ছবি"
+                        hint="16:9 অনুপাত প্রস্তাবিত। সর্বোচ্চ 4MB"
+                        preview={thumbnailPreview}
+                        onChange={onThumbnailChange}
+                        inputId="thumbnail_input"
+                    />
                 </div>
             </div>
 
-            {/* Right: Thumbnail */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
-                <div>
-                    <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্স মিডিয়া</h3>
-                    <p className="text-xs text-gray-400">থাম্বনেইল আপলোড করুন।</p>
-                </div>
-                <ImageUploadBox
-                    label="থাম্বনেইল ছবি"
-                    hint="16:9 অনুপাত প্রস্তাবিত। সর্বোচ্চ 4MB"
-                    preview={thumbnailPreview}
-                    onChange={onThumbnailChange}
-                    inputId="thumbnail_input"
+            {/* Course Features Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <FeatureListEditor
+                    label="What You'll Learn (কোর্সে যা যা শিখবেন)"
+                    items={form.what_youll_learn}
+                    onChange={val => setForm(p => ({ ...p, what_youll_learn: val }))}
+                    placeholder="যেমন: Advanced React state management শিখবেন"
+                />
+                <FeatureListEditor
+                    label="Requirements (প্রয়োজনীয় রিকোয়ারমেন্টস)"
+                    items={form.requirements}
+                    onChange={val => setForm(p => ({ ...p, requirements: val }))}
+                    placeholder="যেমন: Basic JavaScript ও HTML এর ধারণা"
+                />
+                <FeatureListEditor
+                    label="Audience (কোর্সটি কাদের জন্য)"
+                    items={form.audience}
+                    onChange={val => setForm(p => ({ ...p, audience: val }))}
+                    placeholder="যেমন: যারা AI টুলস দিয়ে সফটওয়্যার বানাতে চান"
+                />
+                <FeatureListEditor
+                    label="This Course Includes (কোর্সের সাথে যা যা থাকছে)"
+                    items={form.this_course_includes}
+                    onChange={val => setForm(p => ({ ...p, this_course_includes: val }))}
+                    placeholder="যেমন: ১০+ ঘন্টার রেকর্ডেড ভিডিও লেকচার"
+                />
+            </div>
+
+            {/* Problems & Solutions Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <FeatureListEditor
+                    label="Problems (শিক্ষার্থীদের সমস্যা)"
+                    items={form.problems}
+                    onChange={val => setForm(p => ({ ...p, problems: val }))}
+                    placeholder="যেমন: নিজের কোনো রিয়েল প্রজেক্ট পোর্টফোলিও নেই"
+                />
+                <FeatureListEditor
+                    label="Solutions (আমাদের সমাধান)"
+                    items={form.solutions}
+                    onChange={val => setForm(p => ({ ...p, solutions: val }))}
+                    placeholder="যেমন: কোর্স শেষে ৩টি লাইভ পোর্টফোলিও প্রজেক্ট থাকবে"
                 />
             </div>
         </div>
@@ -315,6 +363,12 @@ export default function AdminCourseEdit() {
         video_url: '', category_id: '', language: 'Bengali',
         price: '', discount_price: '', is_published: false,
         seo_title: '', seo_description: '',
+        what_youll_learn: [],
+        requirements: [],
+        audience: [],
+        this_course_includes: [],
+        problems: [],
+        solutions: [],
     });
 
     const [thumbnail, setThumbnail]         = useState(null);
@@ -362,6 +416,12 @@ export default function AdminCourseEdit() {
                         is_published:      !!found.is_published,
                         seo_title:         found.seo_title || '',
                         seo_description:   found.seo_description || '',
+                        what_youll_learn:  Array.isArray(found.what_youll_learn) ? found.what_youll_learn : [],
+                        requirements:      Array.isArray(found.requirements) ? found.requirements : [],
+                        audience:          Array.isArray(found.audience) ? found.audience : [],
+                        this_course_includes: Array.isArray(found.this_course_includes) ? found.this_course_includes : [],
+                        problems:          Array.isArray(found.problems) ? found.problems : [],
+                        solutions:         Array.isArray(found.solutions) ? found.solutions : [],
                     });
                     if (found.thumbnail) setThumbnailPreview(found.thumbnail.startsWith('http') ? found.thumbnail : `/storage/${found.thumbnail}`);
                     if (found.seo_image) setSeoPreview(found.seo_image.startsWith('http') ? found.seo_image : `/storage/${found.seo_image}`);
@@ -394,7 +454,11 @@ export default function AdminCourseEdit() {
         try {
             const fd = new FormData();
             Object.entries(form).forEach(([k, v]) => {
-                fd.append(k, v === true ? 1 : v === false ? 0 : (v ?? ''));
+                if (Array.isArray(v) || (typeof v === 'object' && v !== null)) {
+                    fd.append(k, JSON.stringify(v));
+                } else {
+                    fd.append(k, v === true ? 1 : v === false ? 0 : (v ?? ''));
+                }
             });
             if (thumbnail) fd.append('thumbnail', thumbnail);
             if (seoImage) fd.append('seo_image', seoImage);

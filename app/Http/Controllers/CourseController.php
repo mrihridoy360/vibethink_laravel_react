@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
+use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
@@ -84,7 +85,10 @@ class CourseController extends Controller
             $q->where('is_published', true)->with(['lessons' => function($l) {
                 $l->where('is_published', true)->orderBy('sort_order');
             }])->orderBy('sort_order');
-        }])->where('slug', $slug)->firstOrFail();
+        }])
+        ->withCount('enrollments')
+        ->where('slug', $slug)
+        ->firstOrFail();
 
         $enrollment = null;
         $completedLessons = [];
@@ -117,6 +121,42 @@ class CourseController extends Controller
             'is_enrolled' => !is_null($enrollment),
             'enrollment' => $enrollment,
             'completed_lessons' => $completedLessons
+        ]);
+    }
+
+    public function reviews($slug)
+    {
+        $course = Course::where('slug', $slug)->firstOrFail();
+
+        $reviews = Review::where('course_id', $course->id)
+            ->where('is_active', true)
+            ->with('user:id,name,avatar')
+            ->latest()
+            ->get();
+
+        $avgRating = $reviews->avg('rating') ?: 0;
+        $totalReviews = $reviews->count();
+
+        $distribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $distribution[$i] = $reviews->where('rating', $i)->count();
+        }
+
+        return response()->json([
+            'success' => true,
+            'avg_rating' => round($avgRating, 1),
+            'total_reviews' => $totalReviews,
+            'distribution' => $distribution,
+            'reviews' => $reviews->map(fn($r) => [
+                'id' => $r->id,
+                'rating' => $r->rating,
+                'comment' => $r->comment,
+                'created_at' => $r->created_at->format('M d, Y'),
+                'user' => [
+                    'name' => $r->user?->name ?? 'Anonymous',
+                    'avatar' => $r->user?->avatar ?? null,
+                ],
+            ]),
         ]);
     }
 
