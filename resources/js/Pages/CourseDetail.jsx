@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ShoppingCart, ChevronDown, User, Star, MessageSquare, Globe } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Star, MessageSquare, Globe } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 
@@ -155,10 +155,6 @@ export default function CourseDetail() {
     const currentPrice = parseFloat(course.discount_price || course.price) || 0;
     const discountPercent = originalPrice > 0 ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
 
-    const handleAddToCart = () => {
-        alert('শপিংকার্ট বৈশিষ্ট্য শীঘ্রই আসছে!');
-    };
-
     return (
         <div className="w-full">
             {/* Header Section */}
@@ -192,7 +188,7 @@ export default function CourseDetail() {
                             {/* Description */}
                             {course.short_description && (
                                 <div
-                                    className="text-xs md:text-sm text-slate-500 font-medium leading-relaxed max-w-3xl"
+                                    className="text-sm md:text-base text-slate-500 font-medium leading-relaxed max-w-3xl"
                                     dangerouslySetInnerHTML={{ __html: course.short_description }}
                                 />
                             )}
@@ -222,11 +218,11 @@ export default function CourseDetail() {
                                                 <CheckCircle className="h-4.5 w-4.5 theme-primary-text" />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-sm sm:text-base text-slate-800 font-bold leading-snug">
+                                                <span className="text-base sm:text-lg text-slate-800 font-bold leading-snug">
                                                     {renderText(item)}
                                                 </span>
                                                 {typeof item === 'object' && item !== null && item.sub_text && (
-                                                    <span className="text-xs text-slate-500 mt-1">
+                                                    <span className="text-sm text-slate-500 mt-1">
                                                         {item.sub_text}
                                                     </span>
                                                 )}
@@ -242,7 +238,7 @@ export default function CourseDetail() {
                         <div className="bg-white border border-slate-200/80 shadow-sm p-5 sm:p-8 rounded-xl sm:rounded-2xl">
                             {course.description && (
                                 <div
-                                    className="text-slate-600 text-base font-normal leading-relaxed markdown-body"
+                                    className="text-slate-600 text-lg font-normal leading-relaxed markdown-body"
                                     dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(course.description) }}
                                 />
                             )}
@@ -262,11 +258,11 @@ export default function CourseDetail() {
                                                 <CheckCircle className="h-4.5 w-4.5 theme-primary-text" />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-sm sm:text-base text-slate-800 font-bold leading-snug">
+                                                <span className="text-base sm:text-lg text-slate-800 font-bold leading-snug">
                                                     {renderText(item)}
                                                 </span>
                                                 {typeof item === 'object' && item !== null && item.sub_text && (
-                                                    <span className="text-xs text-slate-500 mt-1">
+                                                    <span className="text-sm text-slate-500 mt-1">
                                                         {item.sub_text}
                                                     </span>
                                                 )}
@@ -341,18 +337,11 @@ export default function CourseDetail() {
                                         <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-blue-700">B</div>
                                         <div className="w-7 h-7 rounded-full bg-amber-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-amber-700">C</div>
                                     </div>
-                                    <span className="text-xs text-slate-500 font-medium">{course.enrollments_count || 0} Learners Joined</span>
+                                    <span className="text-sm text-slate-500 font-medium">{course.enrollments_count || 0} Learners Joined</span>
                                 </div>
 
                                 {/* CTA Buttons */}
                                 <div className="space-y-2.5 pt-1">
-                                    <button
-                                        onClick={handleAddToCart}
-                                        className="w-full py-3 rounded-xl font-bold theme-primary-bg hover:brightness-95 text-white flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer border-none animate-pulse hover:animate-none"
-                                    >
-                                        <ShoppingCart className="h-4 w-4" />
-                                        Add To Cart
-                                    </button>
                                     {isEnrolled ? (
                                         <Link
                                             to={`/courses/${course.slug}/learn`}
@@ -374,10 +363,10 @@ export default function CourseDetail() {
                                 {/* This Course Includes (কোর্সের সাথে যা যা থাকছে) */}
                                         {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
                                             <div className="border-t border-slate-100 pt-4 space-y-3">
-                                                <h4 className="text-sm font-bold text-slate-900">এই কোর্সের সাথে যা যা থাকছে:</h4>
+                                                <h4 className="text-base font-bold text-slate-900">এই কোর্সের সাথে যা যা থাকছে:</h4>
                                                 <ul className="space-y-2">
                                                     {course.this_course_includes.map((item, idx) => (
-                                                        <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600 font-medium">
+                                                        <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
                                                             <CheckCircle className="h-4 w-4 theme-primary-text shrink-0 mt-0.5" />
                                                     <span>{renderText(item)}</span>
                                                 </li>
@@ -392,7 +381,7 @@ export default function CourseDetail() {
                                         <h4 className="text-sm font-bold text-slate-900">কিছু প্রয়োজনীয়:</h4>
                                         <ul className="space-y-2">
                                             {course.requirements.map((item, idx) => (
-                                                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600 font-medium">
+                                                <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base text-slate-600 font-medium">
                                                     <ChevronRight className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
                                                     <span>{renderText(item)}</span>
                                                 </li>
@@ -408,14 +397,14 @@ export default function CourseDetail() {
                                             <Globe className="h-4 w-4 theme-primary-text" />
                                         </div>
                                         <div className="text-[9px] font-extrabold theme-primary-text uppercase tracking-wider mb-0.5">ভাষা</div>
-                                        <div className="text-xs font-bold text-slate-900">{course.language || 'Bengali'}</div>
+                                        <div className="text-sm font-bold text-slate-900">{course.language || 'Bengali'}</div>
                                     </div>
                                     <div className="theme-primary-bg-light border theme-primary-border-light rounded-xl p-3 text-center">
                                         <div className="w-8 h-8 mx-auto mb-1.5 bg-white rounded-lg flex items-center justify-center shadow-sm">
                                             <BookOpen className="h-4 w-4 theme-primary-text" />
                                         </div>
                                         <div className="text-[9px] font-extrabold theme-primary-text uppercase tracking-wider mb-0.5">লেসন</div>
-                                        <div className="text-xs font-bold text-slate-900">{course.chapters?.reduce((a, c) => a + (c.lessons?.length || 0), 0) || 0} টি লেসন</div>
+                                        <div className="text-sm font-bold text-slate-900">{toBengaliNum(course.chapters?.reduce((a, c) => a + (c.lessons?.length || 0), 0) || 0)}টি লেসন</div>
                                     </div>
                                 </div>
 
@@ -457,7 +446,7 @@ export default function CourseDetail() {
                                             className="w-full flex items-center justify-between text-left cursor-pointer"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <span className="text-2xl sm:text-3xl font-black text-slate-200">
+                                                <span className="text-4xl sm:text-5xl font-black theme-primary-text opacity-25 leading-none">
                                                     {toBengaliNum(index + 1)}
                                                 </span>
                                                 <div>
@@ -465,7 +454,7 @@ export default function CourseDetail() {
                                                         {chapter.title}
                                                     </h3>
                                                     <p className="text-xs text-slate-400 font-medium mt-0.5">
-                                                        {chapter.lessons?.length || 0} টি লেসন
+                                                        {toBengaliNum(chapter.lessons?.length || 0)}টি লেসন
                                                     </p>
                                                 </div>
                                             </div>
