@@ -181,9 +181,9 @@ export default function Navbar() {
                     {/* Right Section: Theme switcher & Auth action */}
                     <div className="hidden md:flex items-center gap-5">
                         {/* Auth Status & Navigation Action */}
-                            {authLoading ? (
-                                <div className="h-11 w-full rounded-full bg-slate-100 animate-pulse" />
-                            ) : user ? (
+                        {authLoading ? (
+                            <div className="h-11 w-full rounded-full bg-slate-100 animate-pulse" />
+                        ) : user ? (
                             <div className="relative" ref={dropdownRef}>
                                 {/* Profile Dropdown Trigger */}
                                 <button
@@ -330,9 +330,9 @@ export default function Navbar() {
 
                         {/* Mobile Auth Button */}
                         <div className="pt-2 border-t border-slate-100">
-                        {authLoading ? (
-                            <div className="h-9 w-32 rounded-full bg-slate-100 animate-pulse" />
-                        ) : user ? (
+                            {authLoading ? (
+                                <div className="h-9 w-32 rounded-full bg-slate-100 animate-pulse" />
+                            ) : user ? (
                                 <div className="flex flex-col gap-2">
                                     <div className="px-4 py-2 bg-slate-50 rounded-xl mb-1">
                                         <p className="text-xs font-bold text-slate-800">{user.name}</p>
