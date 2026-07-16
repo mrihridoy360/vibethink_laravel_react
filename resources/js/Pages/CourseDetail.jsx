@@ -509,6 +509,66 @@ export default function CourseDetail() {
                     </div>
                 </div>
 
+                {/* Course Value / Why This Course */}
+                <div className="mt-12 lg:mt-16">
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 p-5 sm:p-8 shadow-sm" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 14%, #ffffff) 0%, #ffffff 70%)' }}>
+                        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+                            {/* Left - Text Content */}
+                            <div className="flex-1 space-y-4">
+                                <div className="flex items-center justify-center lg:justify-start">
+                                    <span className="text-7xl sm:text-8xl font-black text-slate-200 leading-none select-none">?</span>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+                                    মনে কি প্রশ্ন জাগছে – &ldquo;এত কিছু মাত্র ৳{currentPrice.toLocaleString()} টাকায় কীভাবে সম্ভব?&rdquo;
+                                </h2>
+                                <div className="space-y-3 text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+                                    <p>
+                                        বাজারের ঔষধে নরমাল কোর্সের দাম ৫ থেকে ১০ হাজার টাকা, সেখানে আমরা এত কম দামে কেন নিচ্ছি –
+                                        এটার কারণ একটাই, <span className="font-bold text-slate-800">সবার জন্য এক্সেসিবল করা</span>। আমরা চাই সিঙ্গেই ডিগ্রি বা মোটা আকের টাকা না থাকা সেভেন্ড দেশের যেকোনো প্রান্ত থেকে একজন যেন মাত্র ১-২ মাসে মডার্ন টেকনোলজিতে নিজের ক্যারিয়ার গড়তে পারে। টাকার জন্য শিখতে পারি নাই – এমন যেন কোনো কারণ না হয়ে দাঁড়ায়।
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Right - Price Card */}
+                            <div className="w-full lg:w-72 shrink-0">
+                                <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4">
+                                    <div className="space-y-1">
+                                        <span className="text-[10px] font-extrabold tracking-[0.2em] text-slate-400 uppercase">Regular Price</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-xl font-black text-slate-400 line-through">৳{originalPrice.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                    <div className="h-px bg-slate-100" />
+                                    <div className="space-y-1">
+                                        <span className="text-[10px] font-extrabold tracking-[0.2em] text-[#FF5A00] uppercase">Offer Price</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-3xl font-black text-slate-900">৳{currentPrice.toLocaleString()}</span>
+                                        </div>
+                                        {discountPercent > 0 && (
+                                            <span className="inline-flex items-center text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full">
+                                                {discountPercent}% ছাড়
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="h-px bg-slate-100" />
+                                    <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                                        অফার শুধুমাত্র নির্দিষ্ট সময়ের জন্য বৈধ। কোর্সের দাম শীঘ্রই বাড়তে পারে।
+                                    </p>
+                                    {!isEnrolled && (
+                                        <button
+                                            onClick={handleEnroll}
+                                            disabled={enrolling}
+                                            className="w-full py-3 rounded-xl font-bold theme-primary-bg hover:brightness-95 text-white flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-60 cursor-pointer border-none"
+                                        >
+                                            {enrolling ? 'এনরোলিং হচ্ছে...' : 'এনরোল করুন'}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Problem & Solution */}
                 <div className="mt-12 lg:mt-16">
                     {(course.problems && Array.isArray(course.problems) && course.problems.length > 0) || (course.solutions && Array.isArray(course.solutions) && course.solutions.length > 0) ? (
