@@ -6,7 +6,7 @@ import {
     ArrowLeft, BookOpen, LayoutDashboard, Settings, Globe, Save,
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
-    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown
+    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -303,6 +303,35 @@ function SettingsTab({ form, setForm, errors }) {
                     {form.is_published ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     {form.is_published ? 'কোর্সটি প্রকাশিত এবং শিক্ষার্থীদের দেখা যাচ্ছে।' : 'কোর্সটি ড্রাফটে আছে, শিক্ষার্থীরা দেখতে পাচ্ছে না।'}
                 </div>
+
+                {/* Coming Soon Toggle */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 pt-4 border-t border-gray-100/50">
+                    <div>
+                        <p className="text-sm font-semibold text-gray-800">কামিং সুন কোর্স</p>
+                        <p className="text-xs text-gray-400 mt-0.5">সক্রিয় করলে কোর্সটি কামিং সুন হিসেবে শো করবে।</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setForm(p => {
+                            const nextTitles = { ...(p.section_titles || {}) };
+                            if (nextTitles.coming_soon) {
+                                delete nextTitles.coming_soon;
+                            } else {
+                                nextTitles.coming_soon = true;
+                            }
+                            return { ...p, section_titles: nextTitles };
+                        })}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${form.section_titles?.coming_soon ? 'bg-orange-500' : 'bg-gray-300'}`}
+                    >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${form.section_titles?.coming_soon ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
+                </div>
+                {form.section_titles?.coming_soon && (
+                    <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                        <Clock className="h-4 w-4 animate-pulse" />
+                        কোর্সটি কামিং সুন হিসেবে সেট করা আছে।
+                    </div>
+                )}
             </div>
 
             {/* Guarantee & Access */}

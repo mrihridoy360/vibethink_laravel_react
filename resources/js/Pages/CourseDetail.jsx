@@ -45,7 +45,12 @@ export default function CourseDetail() {
         try {
             const response = await axios.get(`/api/courses/${slug}`);
             if (response.data.success) {
-                setCourse(response.data.course);
+                const foundCourse = response.data.course;
+                if (foundCourse.section_titles?.coming_soon === true) {
+                    navigate('/courses');
+                    return;
+                }
+                setCourse(foundCourse);
                 setIsEnrolled(response.data.is_enrolled);
                 setCompletedLessons(response.data.completed_lessons || []);
             }

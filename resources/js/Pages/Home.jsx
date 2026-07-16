@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import CourseCard from '../Components/CourseCard';
 import BlogCard from '../Components/BlogCard';
+import ComingSoonModal from '../Components/ComingSoonModal';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     Search, BookOpen, Clock, Tag, ArrowRight, HelpCircle, ChevronDown,
@@ -90,6 +91,7 @@ const whyChooseUsItems = [
 
 export default function Home() {
     const [courses, setCourses] = useState([]);
+    const [comingSoonCourse, setComingSoonCourse] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get('search') || '';
     const [loading, setLoading] = useState(true);
@@ -198,7 +200,7 @@ export default function Home() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {courses.map((course) => (
-                            <CourseCard key={course.id} course={course} />
+                            <CourseCard key={course.id} course={course} onComingSoonClick={setComingSoonCourse} />
                         ))}
                     </div>
                 ) : (
@@ -371,6 +373,12 @@ export default function Home() {
                     </div>
                 </div>
             )}
+
+            <ComingSoonModal
+                isOpen={comingSoonCourse !== null}
+                course={comingSoonCourse}
+                onClose={() => setComingSoonCourse(null)}
+            />
         </div>
     );
 }

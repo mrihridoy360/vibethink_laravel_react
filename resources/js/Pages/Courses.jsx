@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Search, BookOpen, ArrowRight, Eye, ShoppingCart } from 'lucide-react';
+import { Search, BookOpen, ArrowRight, Eye, ShoppingCart, Clock } from 'lucide-react';
+import ComingSoonModal from '../Components/ComingSoonModal';
 
 export default function Courses() {
     const [courses, setCourses] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get('search') || '';
     const [loading, setLoading] = useState(true);
+    const [comingSoonCourse, setComingSoonCourse] = useState(null);
 
     const fetchCourses = async (query = '') => {
         setLoading(true);
@@ -74,9 +76,17 @@ export default function Courses() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {courses.map((course) => (
-                            <div key={course.id} className="bg-white border border-slate-200/80 flex flex-col rounded-[2rem] p-5 transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5">
+                            <div key={course.id} className="bg-white border border-slate-200/80 flex flex-col rounded-[2rem] p-5 transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5 relative">
                                 {/* Thumbnail */}
-                                <div className="relative aspect-[16/10] w-full bg-slate-50 overflow-hidden rounded-2xl mb-4 border border-slate-100 shrink-0">
+                                <div 
+                                    onClick={(e) => {
+                                        if (course.section_titles?.coming_soon) {
+                                            e.preventDefault();
+                                            setComingSoonCourse(course);
+                                        }
+                                    }}
+                                    className={`relative aspect-[16/10] w-full bg-slate-50 overflow-hidden rounded-2xl mb-4 border border-slate-100 shrink-0 ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
+                                >
                                     {course.thumbnail ? (
                                         <img
                                             src={course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`}
@@ -88,11 +98,23 @@ export default function Courses() {
                                             <BookOpen className="h-8 w-8 text-purple-400" />
                                         </div>
                                     )}
+
+                                    {/* Coming Soon Badge Overlay */}
+                                    {course.section_titles?.coming_soon && (
+                                        <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[1px] flex items-start p-3">
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-xl text-[10px] font-black tracking-wide shadow-md animate-pulse">
+                                                <Clock className="w-3 h-3" /> শীঘ্রই আসছে
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Content */}
                                 <div className="flex flex-col flex-grow">
-                                    <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-2 line-clamp-1 theme-primary-text-hover transition-colors">
+                                    <h3 
+                                        onClick={() => course.section_titles?.coming_soon && setComingSoonCourse(course)}
+                                        className={`text-sm sm:text-base font-bold text-slate-800 mb-2 line-clamp-1 theme-primary-text-hover transition-colors ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
+                                    >
                                         {course.title}
                                     </h3>
                                     <p className="text-slate-500 text-xs mb-4 line-clamp-2 font-normal leading-relaxed">
@@ -101,7 +123,11 @@ export default function Courses() {
 
                                     {/* Price */}
                                     <div className="flex items-baseline gap-2 mb-5">
-                                        {parseFloat(course.discount_price) > 0 ? (
+                                        {course.section_titles?.coming_soon ? (
+                                            <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+                                                মূল্য নির্ধারণ করা হয়নি
+                                            </span>
+                                        ) : parseFloat(course.discount_price) > 0 ? (
                                             <>
                                                 <span className="text-lg font-black theme-primary-text text-[#FF5A00]">
                                                     ৳{Math.round(course.discount_price)}
@@ -118,20 +144,32 @@ export default function Courses() {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 mt-auto pt-2">
-                                        <Link
-                                            to={`/courses/${course.slug}`}
-                                            className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100"
-                                        >
-                                            Add to Cart <ShoppingCart className="w-3.5 h-3.5" />
-                                        </Link>
-                                        <Link
-                                            to={`/courses/${course.slug}`}
-                                            className="flex-1 py-3 px-2 theme-primary-bg hover:brightness-95 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"
-                                        >
-                                            View Details <Eye className="w-3.5 h-3.5" />
-                                        </Link>
-                                    </div>
+                                    {course.section_titles?.coming_soon ? (
+                                        <div className="flex items-center gap-2 mt-auto pt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setComingSoonCourse(course)}
+                                                className="w-full py-3 px-4 bg-orange-50 hover:bg-orange-100/80 text-orange-600 font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border border-orange-100/50 cursor-pointer shadow-sm shadow-orange-500/5"
+                                            >
+                                                <Clock className="w-4 h-4 animate-pulse" /> বিস্তারিত জানতে ক্লিক করুন
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 mt-auto pt-2">
+                                            <Link
+                                                to={`/courses/${course.slug}`}
+                                                className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100"
+                                            >
+                                                Add to Cart <ShoppingCart className="w-3.5 h-3.5" />
+                                            </Link>
+                                            <Link
+                                                to={`/courses/${course.slug}`}
+                                                className="flex-1 py-3 px-2 theme-primary-bg hover:brightness-95 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"
+                                            >
+                                                View Details <Eye className="w-3.5 h-3.5" />
+                                            </Link>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -144,6 +182,12 @@ export default function Courses() {
                     </div>
                 )}
             </div>
+
+            <ComingSoonModal
+                isOpen={comingSoonCourse !== null}
+                course={comingSoonCourse}
+                onClose={() => setComingSoonCourse(null)}
+            />
         </div>
     );
 }
