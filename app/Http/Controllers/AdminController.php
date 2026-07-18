@@ -40,6 +40,8 @@ use App\Models\BlogTag;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Services\CloudinaryService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -116,6 +118,81 @@ class AdminController extends Controller
             ? round((($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
             : 0;
 
+        // Fetch visitor stats from settings
+        $analyticsSetting = Setting::where('key', 'visitor_analytics')->first();
+        $analytics = $analyticsSetting ? json_decode($analyticsSetting->value, true) : null;
+        if (!$analytics) {
+            $analytics = [
+                'total_pageviews' => 0,
+                'total_uniques' => 0,
+                'referrers' => [],
+                'countries' => [],
+                'daily' => []
+            ];
+        }
+
+        // Get currently online count and list
+        $online = Cache::get('online_visitors', []);
+        $now = time();
+        $online = array_filter($online, function($v) use ($now) {
+            return $v['last_seen'] >= ($now - 300);
+        });
+        
+        $onlineCount = count($online);
+
+        $onlineList = [];
+        foreach ($online as $ip => $details) {
+            // Anonymize IP address for security & compliance (e.g. 192.168.1.100 -> 192.168.*.*)
+            $maskedIp = preg_replace('/(\d+)\.(\d+)\.(\d+)\.(\d+)/', '$1.$2.*.*', $ip);
+            // If IPv6
+            if (str_contains($ip, ':')) {
+                $parts = explode(':', $ip);
+                $maskedIp = count($parts) > 2 ? $parts[0] . ':' . $parts[1] . ':*:*:*:*' : $ip;
+            }
+
+            $onlineList[] = [
+                'ip'        => $maskedIp,
+                'url'       => $details['url'] ?? '/',
+                'referrer'  => $details['referrer'] ?? 'Direct',
+                'country'   => $details['country'] ?? 'Unknown',
+                'user_name' => $details['user_name'] ?? 'Guest',
+                'last_seen' => $details['last_seen']
+            ];
+        }
+        
+        // Sort by last seen descending
+        usort($onlineList, function($a, $b) {
+            return $b['last_seen'] - $a['last_seen'];
+        });
+
+        // Top Referrers
+        $referrersList = [];
+        if (!empty($analytics['referrers'])) {
+            arsort($analytics['referrers']);
+            foreach (array_slice($analytics['referrers'], 0, 10, true) as $ref => $count) {
+                $referrersList[] = ['name' => $ref, 'count' => $count];
+            }
+        }
+
+        // Top Countries
+        $countriesList = [];
+        if (!empty($analytics['countries'])) {
+            arsort($analytics['countries']);
+            foreach (array_slice($analytics['countries'], 0, 10, true) as $cCode => $count) {
+                $countriesList[] = ['code' => $cCode, 'count' => $count];
+            }
+        }
+
+        $visitorStats = [
+            'total_pageviews' => $analytics['total_pageviews'] ?? 0,
+            'total_uniques'   => $analytics['total_uniques'] ?? 0,
+            'referrers'       => $referrersList,
+            'countries'       => $countriesList,
+            'daily'           => $analytics['daily'] ?? new \stdClass(),
+            'online_count'    => $onlineCount,
+            'online_list'     => $onlineList
+        ];
+
         return response()->json([
             'success' => true,
             'stats'   => [
@@ -132,6 +209,7 @@ class AdminController extends Controller
             'monthly_revenue' => $monthlyRevenue,
             'recent_payments' => $recentPayments,
             'recent_users'    => $recentUsers,
+            'visitor_stats'   => $visitorStats,
         ]);
     }
 
@@ -3026,5 +3104,140 @@ class AdminController extends Controller
             $grouped[$row->group][$row->key] = $row->value;
         }
         return response()->json(['success' => true, 'settings' => $grouped]);
+    }
+
+    public function trackVisit(Request $request)
+    {
+        $ip = $request->ip();
+        $path = $request->input('url', '/');
+        $referrerUrl = $request->input('referrer', '');
+        
+        // Extract domain or default to Direct
+        $referrer = 'Direct';
+        if (!empty($referrerUrl) && filter_var($referrerUrl, FILTER_VALIDATE_URL)) {
+            $host = parse_url($referrerUrl, PHP_URL_HOST);
+            if ($host) {
+                $referrer = preg_replace('/^www\./', '', $host);
+            }
+        } elseif (!empty($referrerUrl) && strlen($referrerUrl) < 100) {
+            $referrer = $referrerUrl;
+        }
+
+        $country = self::getCountryFromIp($ip);
+        $userName = Auth::check() ? Auth::user()->name : 'Guest';
+        $now = time();
+
+        try {
+            // 1. Update Online Visitors Cache
+            $online = Cache::get('online_visitors', []);
+            $online[$ip] = [
+                'last_seen' => $now,
+                'url'       => $path,
+                'referrer'  => $referrer,
+                'country'   => $country,
+                'user_name' => $userName
+            ];
+            // Filter active (last 5 minutes)
+            $online = array_filter($online, function($v) use ($now) {
+                return $v['last_seen'] >= ($now - 300);
+            });
+            Cache::put('online_visitors', $online, 600);
+
+            // 2. Update Persistent Analytics
+            $today = date('Y-m-d');
+            $cacheKey = "visited_today_{$ip}_{$today}";
+            $isUniqueToday = !Cache::has($cacheKey);
+
+            if ($isUniqueToday) {
+                Cache::put($cacheKey, true, 86400); // 24 hours
+            }
+
+            // Fetch settings row
+            $setting = Setting::where('key', 'visitor_analytics')->first();
+            $analytics = $setting ? json_decode($setting->value, true) : null;
+
+            if (!$analytics) {
+                $analytics = [
+                    'total_pageviews' => 0,
+                    'total_uniques'   => 0,
+                    'referrers'       => [],
+                    'countries'       => [],
+                    'daily'           => []
+                ];
+            }
+
+            // Increment pageviews
+            $analytics['total_pageviews']++;
+            if ($isUniqueToday) {
+                $analytics['total_uniques']++;
+            }
+
+            // Referrers
+            if (!isset($analytics['referrers'][$referrer])) {
+                $analytics['referrers'][$referrer] = 0;
+            }
+            $analytics['referrers'][$referrer]++;
+
+            // Countries
+            if (!isset($analytics['countries'][$country])) {
+                $analytics['countries'][$country] = 0;
+            }
+            $analytics['countries'][$country]++;
+
+            // Daily stats
+            if (!isset($analytics['daily'][$today])) {
+                $analytics['daily'][$today] = [
+                    'pageviews' => 0,
+                    'uniques'   => 0
+                ];
+            }
+            $analytics['daily'][$today]['pageviews']++;
+            if ($isUniqueToday) {
+                $analytics['daily'][$today]['uniques']++;
+            }
+
+            // Keep only last 30 days of daily stats to prevent payload bloating
+            if (count($analytics['daily']) > 30) {
+                ksort($analytics['daily']);
+                $analytics['daily'] = array_slice($analytics['daily'], -30, null, true);
+            }
+
+            // Save back to key-value settings table
+            Setting::updateOrCreate(
+                ['key' => 'visitor_analytics'],
+                ['value' => json_encode($analytics), 'group' => 'analytics']
+            );
+
+        } catch (\Exception $e) {
+            // Silence exceptions to keep main application running if DB lock or cache fails
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    private static function getCountryFromIp($ip)
+    {
+        if ($ip === '127.0.0.1' || $ip === '::1' || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) === false) {
+            return 'Localhost';
+        }
+
+        // Cloudflare IP Country Header Check
+        if (!empty($_SERVER['HTTP_CF_IPCOUNTRY'])) {
+            return strtoupper($_SERVER['HTTP_CF_IPCOUNTRY']);
+        }
+
+        // Cache external IP lookup response to prevent performance bottlenecks
+        return Cache::remember("geoip_country_{$ip}", 86400 * 30, function () use ($ip) {
+            try {
+                $response = Http::timeout(2)->get("http://ip-api.com/json/{$ip}?fields=countryCode");
+                if ($response->successful()) {
+                    $data = $response->json();
+                    return $data['countryCode'] ?? 'Unknown';
+                }
+            } catch (\Exception $e) {
+                // Return Unknown on timeout/error
+            }
+            return 'Unknown';
+        });
     }
 }

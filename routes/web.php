@@ -31,6 +31,9 @@ Route::prefix('api')->group(function () {
     // Public Settings (no auth required)
     Route::get('/settings', [AdminController::class, 'publicSettings']);
 
+    // Visitor Tracking (Public, no auth)
+    Route::post('/track-visit', [AdminController::class, 'trackVisit']);
+
     // ZiniPay Webhook (Public, no auth)
     Route::post('/payment/zinipay/webhook', [App\Http\Controllers\ZiniPayController::class, 'webhook'])->name('payment.zinipay.webhook');
 

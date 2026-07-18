@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { AuthProvider } from './Contexts/AuthContext';
 import { SiteSettingsProvider, useSiteSettings } from './Contexts/SiteSettingsContext';
 import Navbar from './Components/Navbar';
@@ -32,6 +33,16 @@ function AppLayout() {
     const { settings, getSetting } = useSiteSettings();
     const metaPixelId = settings?.marketing?.meta_pixel_id;
     const trackingEnabled = settings?.marketing?.meta_tracking_enabled || '1';
+
+    // Track visitor path & referrer in the backend for statistics
+    useEffect(() => {
+        axios.post('/api/track-visit', {
+            url: location.pathname + location.search,
+            referrer: document.referrer
+        }).catch(err => {
+            // Silence silent telemetry errors
+        });
+    }, [location.pathname, location.search]);
 
     // Dynamically initialize Pixel and track PageView on every route change
     useEffect(() => {

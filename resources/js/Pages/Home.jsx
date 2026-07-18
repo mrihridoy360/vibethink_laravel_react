@@ -339,7 +339,7 @@ export default function Home() {
                         <h2 className="text-2xl font-black text-slate-800 flex items-center justify-center gap-2">
                             <HelpCircle className="h-6 w-6 text-indigo-500" /> সচরাচর জিজ্ঞাসিত প্রশ্নাবলী (FAQ)
                         </h2>
-                        <p className="text-xs text-slate-450 font-semibold">কোর্স ও প্ল্যাটফর্ম সম্পর্কে শিক্ষার্থীদের সাধারণ প্রশ্নগুলোর উত্তর নিচে দেখুন।</p>
+                        <p className="text-sm text-slate-550 font-semibold">কোর্স ও প্ল্যাটফর্ম সম্পর্কে শিক্ষার্থীদের সাধারণ প্রশ্নগুলোর উত্তর নিচে দেখুন।</p>
                     </div>
 
                     <div className="max-w-3xl mx-auto space-y-3">
@@ -352,10 +352,10 @@ export default function Home() {
                                 >
                                     <button
                                         onClick={() => setExpandedFaq(isOpen ? null : index)}
-                                        className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:text-indigo-600 text-xs transition-colors cursor-pointer border-none bg-transparent"
+                                        className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:text-indigo-600 text-sm md:text-base transition-colors cursor-pointer border-none bg-transparent"
                                     >
                                         <span className="flex items-center gap-3">
-                                            <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[9px] font-bold shrink-0">
+                                            <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold shrink-0">
                                                 {index + 1}
                                             </span>
                                             {faq.q}
@@ -363,7 +363,7 @@ export default function Home() {
                                         {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0 ml-2" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 ml-2" />}
                                     </button>
                                     {isOpen && (
-                                        <div className="px-5 pb-4 pt-1.5 text-[11.5px] text-slate-500 font-semibold leading-relaxed border-t border-slate-50 pl-13">
+                                        <div className="px-5 pb-4 pt-1.5 text-sm text-slate-500 font-semibold leading-relaxed border-t border-slate-50 pl-14">
                                             {faq.a}
                                         </div>
                                     )}

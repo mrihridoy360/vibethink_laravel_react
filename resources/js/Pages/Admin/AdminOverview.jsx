@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import {
     DollarSign, Users, BookOpen, ShoppingCart,
     TrendingUp, TrendingDown, ArrowUpRight,
-    Clock, CheckCircle2, AlertCircle, Plus
+    Clock, CheckCircle2, AlertCircle, Plus,
+    Activity, Globe, Compass
 } from 'lucide-react';
 
 // ── Mini SVG Line Chart ───────────────────────────────────────
@@ -93,6 +94,159 @@ function RevenueChart({ data }) {
     );
 }
 
+// ── Visitor Stats Line Chart ───────────────────────────────────
+function VisitorStatsChart({ dailyData }) {
+    if (!dailyData || Object.keys(dailyData).length === 0) {
+        return (
+            <div className="flex items-center justify-center h-48 text-gray-300 text-xs">
+                পর্যাপ্ত ডেটা নেই
+            </div>
+        );
+    }
+
+    const W = 800, H = 200, PAD = 40;
+    
+    // Sort dates
+    const sortedDates = Object.keys(dailyData).sort().slice(-15); // Show last 15 days
+    if (sortedDates.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-48 text-gray-300 text-xs">
+                পর্যাপ্ত ডেটা নেই
+            </div>
+        );
+    }
+
+    const pvs = sortedDates.map(date => dailyData[date].pageviews || 0);
+    const uniques = sortedDates.map(date => dailyData[date].uniques || 0);
+    const maxVal = Math.max(...pvs, ...uniques, 10);
+    const minVal = 0;
+    const range = maxVal - minVal || 1;
+
+    // Helper to format dates
+    const formatDate = (dateStr) => {
+        try {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const day = parseInt(parts[2]);
+                const monthNum = parseInt(parts[1]);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                return `${day} ${months[monthNum - 1]}`;
+            }
+        } catch (e) {}
+        return dateStr;
+    };
+
+    // Points for Pageviews
+    const ptsPv = sortedDates.map((date, i) => {
+        const x = PAD + (i / Math.max(sortedDates.length - 1, 1)) * (W - PAD * 2);
+        const y = H - PAD - ((dailyData[date].pageviews - minVal) / range) * (H - PAD * 2);
+        return [x, y];
+    });
+
+    // Points for Uniques
+    const ptsUnq = sortedDates.map((date, i) => {
+        const x = PAD + (i / Math.max(sortedDates.length - 1, 1)) * (W - PAD * 2);
+        const y = H - PAD - ((dailyData[date].uniques - minVal) / range) * (H - PAD * 2);
+        return [x, y];
+    });
+
+    const linePathPv = ptsPv.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ');
+    const linePathUnq = ptsUnq.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ');
+    
+    const areaPathPv = `${linePathPv} L ${ptsPv[ptsPv.length - 1][0]} ${H - PAD} L ${ptsPv[0][0]} ${H - PAD} Z`;
+    const areaPathUnq = `${linePathUnq} L ${ptsUnq[ptsUnq.length - 1][0]} ${H - PAD} L ${ptsUnq[0][0]} ${H - PAD} Z`;
+
+    // Y-axis labels
+    const ySteps = 4;
+    const yLabels = Array.from({ length: ySteps + 1 }, (_, i) => {
+        const val = minVal + (range * i) / ySteps;
+        return { val, y: H - PAD - (i / ySteps) * (H - PAD * 2) };
+    });
+
+    return (
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-48" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.01" />
+                </linearGradient>
+                <linearGradient id="unqGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.01" />
+                </linearGradient>
+            </defs>
+
+            {/* Grid lines */}
+            {yLabels.map(({ y }, i) => (
+                <line key={i} x1={PAD} y1={y} x2={W - PAD} y2={y}
+                    stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4,4" />
+            ))}
+
+            {/* Y labels */}
+            {yLabels.map(({ val, y }, i) => (
+                <text key={i} x={PAD - 6} y={y + 4} textAnchor="end"
+                    fontSize="10" fill="#9ca3af">
+                    {val.toFixed(0)}
+                </text>
+            ))}
+
+            {/* X labels */}
+            {sortedDates.map((date, i) => {
+                const x = PAD + (i / Math.max(sortedDates.length - 1, 1)) * (W - PAD * 2);
+                if (i % 2 !== 0 && i !== sortedDates.length - 1) return null;
+                return (
+                    <text key={i} x={x} y={H - 6} textAnchor="middle"
+                        fontSize="9" fill="#9ca3af">
+                        {formatDate(date)}
+                    </text>
+                );
+            })}
+
+            {/* Area Fills */}
+            <path d={areaPathPv} fill="url(#pvGrad)" />
+            <path d={areaPathUnq} fill="url(#unqGrad)" />
+
+            {/* Line Pageviews */}
+            <path d={linePathPv} fill="none" stroke="#10b981" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" />
+
+            {/* Line Uniques */}
+            <path d={linePathUnq} fill="none" stroke="#f59e0b" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" />
+
+            {/* Points Pageviews */}
+            {ptsPv.map(([x, y], i) => (
+                <circle key={`pv-${i}`} cx={x} cy={y} r="3.5" fill="#10b981" stroke="white" strokeWidth="1.5" />
+            ))}
+
+            {/* Points Uniques */}
+            {ptsUnq.map(([x, y], i) => (
+                <circle key={`unq-${i}`} cx={x} cy={y} r="3.5" fill="#f59e0b" stroke="white" strokeWidth="1.5" />
+            ))}
+        </svg>
+    );
+}
+
+const getCountryName = (code) => {
+    const countries = {
+        'BD': 'Bangladesh 🇧🇩',
+        'US': 'United States 🇺🇸',
+        'GB': 'United Kingdom 🇬🇧',
+        'IN': 'India 🇮🇳',
+        'PK': 'Pakistan 🇵🇰',
+        'CA': 'Canada 🇨🇦',
+        'AU': 'Australia 🇦🇺',
+        'SA': 'Saudi Arabia 🇸🇦',
+        'AE': 'United Arab Emirates 🇦🇪',
+        'MY': 'Malaysia 🇲🇾',
+        'SG': 'Singapore 🇸🇬',
+        'DE': 'Germany 🇩🇪',
+        'FR': 'France 🇫🇷',
+        'Localhost': 'Localhost 💻'
+    };
+    return countries[code] || code || 'Unknown 🌐';
+};
+
 // ── Stat Card ─────────────────────────────────────────────────
 function StatCard({ label, value, sub, growth, icon: Icon, iconBg, iconColor, onClick }) {
     const isPositive = growth >= 0;
@@ -153,6 +307,7 @@ export default function AdminOverview({ onTabChange }) {
     const monthlyRevenue = data?.monthly_revenue || [];
     const recentPayments = data?.recent_payments || [];
     const recentUsers    = data?.recent_users    || [];
+    const visitorStats   = data?.visitor_stats   || { online_count: 0, online_list: [], total_pageviews: 0, total_uniques: 0, referrers: [], countries: [], daily: {} };
 
     const paymentStatusCfg = {
         completed: { label: 'সম্পন্ন', color: 'bg-green-100 text-green-700' },
@@ -184,7 +339,7 @@ export default function AdminOverview({ onTabChange }) {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
                 <StatCard
                     label="মোট রাজস্ব"
                     value={`৳${parseFloat(stats.total_revenue || 0).toLocaleString('bn-BD')}`}
@@ -222,6 +377,22 @@ export default function AdminOverview({ onTabChange }) {
                     iconColor="text-orange-500"
                     onClick={() => onTabChange('enrollments')}
                 />
+                <StatCard
+                    label="অনলাইন ব্যবহারকারী"
+                    value={visitorStats.online_count ?? 0}
+                    sub="বর্তমানে সক্রিয় ভিজিটর"
+                    icon={Activity}
+                    iconBg="bg-rose-50"
+                    iconColor="text-rose-500"
+                />
+                <StatCard
+                    label="মোট ভিজিটর"
+                    value={visitorStats.total_uniques ?? 0}
+                    sub={`মোট পেজভিউ: ${visitorStats.total_pageviews ?? 0}`}
+                    icon={Globe}
+                    iconBg="bg-emerald-50"
+                    iconColor="text-emerald-500"
+                />
             </div>
 
             {/* Revenue Chart */}
@@ -238,6 +409,132 @@ export default function AdminOverview({ onTabChange }) {
                     </span>
                 </div>
                 <RevenueChart data={monthlyRevenue} />
+            </div>
+
+            {/* Visitor Stats Section */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Visitor Chart (Spans 2 columns on xl screens) */}
+                <div className="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                                <Activity className="h-4 w-4 text-emerald-500" /> ভিজিটর ও লাইভ ট্রাফিক স্ট্যাটিসটিক্স
+                            </h3>
+                            <p className="text-xs text-gray-400 mt-0.5">দৈনিক ভিজিটর ও পেজভিউ ট্রেন্ড (গত ১৫ দিন)</p>
+                        </div>
+                        <div className="flex gap-4 text-xs font-semibold">
+                            <span className="flex items-center gap-1.5 text-emerald-600">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> পেজভিউ (Pageviews)
+                            </span>
+                            <span className="flex items-center gap-1.5 text-amber-500">
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> ইউনিক (Uniques)
+                            </span>
+                        </div>
+                    </div>
+                    <VisitorStatsChart dailyData={visitorStats.daily} />
+                </div>
+
+                {/* Country and Referrer lists */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col gap-6">
+                    {/* Top Referrers */}
+                    <div>
+                        <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                            <Compass className="h-4 w-4 text-blue-500" /> টপ রেফারার (Top Referrers)
+                        </h4>
+                        {!visitorStats.referrers || visitorStats.referrers.length === 0 ? (
+                            <p className="text-xs text-gray-400 py-2">কোনো রেফারার তথ্য নেই</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {visitorStats.referrers.slice(0, 5).map((ref, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-xs">
+                                        <span className="text-gray-600 font-medium truncate max-w-[180px]">{ref.name}</span>
+                                        <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-semibold">{ref.count} hits</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Top Countries */}
+                    <div className="border-t border-gray-50 pt-4">
+                        <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                            <Globe className="h-4 w-4 text-purple-500" /> টপ কান্ট্রি (Top Countries)
+                        </h4>
+                        {!visitorStats.countries || visitorStats.countries.length === 0 ? (
+                            <p className="text-xs text-gray-400 py-2">কোনো দেশের তথ্য নেই</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {visitorStats.countries.slice(0, 5).map((c, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-xs">
+                                        <span className="text-gray-600 font-medium">{getCountryName(c.code)}</span>
+                                        <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-semibold">{c.count} hits</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Live Online Users Table */}
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        লাইভ সক্রিয় ব্যবহারকারী ({visitorStats.online_count ?? 0} জন অনলাইন)
+                    </h3>
+                </div>
+                {!visitorStats.online_list || visitorStats.online_list.length === 0 ? (
+                    <div className="py-12 text-center text-sm text-gray-400">বর্তমানে কোনো ভিজিটর সক্রিয় নেই।</div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50/60 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                                    <th className="py-3 px-5">ব্যবহারকারী/IP</th>
+                                    <th className="py-3 px-5">দেশ</th>
+                                    <th className="py-3 px-5">পেজ ইউআরএল (Page Path)</th>
+                                    <th className="py-3 px-5">রেফারার</th>
+                                    <th className="py-3 px-5 text-right">শেষ সক্রিয়তা</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50 text-xs">
+                                {visitorStats.online_list.map((visitor, idx) => {
+                                    const secondsAgo = Math.max(0, Math.floor(Date.now() / 1000 - visitor.last_seen));
+                                    const timeStr = secondsAgo < 60
+                                        ? 'এইমাত্র'
+                                        : `${Math.floor(secondsAgo / 60)} মিনিট আগে`;
+                                    return (
+                                        <tr key={idx} className="hover:bg-slate-50/40 transition-colors">
+                                            <td className="py-3.5 px-5 font-semibold text-gray-800 flex flex-col">
+                                                <span>{visitor.user_name}</span>
+                                                <span className="text-[10px] text-gray-400 font-normal">{visitor.ip}</span>
+                                            </td>
+                                            <td className="py-3.5 px-5 text-gray-600 font-medium">
+                                                {getCountryName(visitor.country)}
+                                            </td>
+                                            <td className="py-3.5 px-5 text-gray-600 max-w-[200px] truncate">
+                                                <span className="px-2 py-1 bg-slate-100 rounded-lg text-[11px] font-mono text-slate-700">
+                                                    {visitor.url}
+                                                </span>
+                                            </td>
+                                            <td className="py-3.5 px-5 text-gray-400 truncate max-w-[150px]">
+                                                {visitor.referrer}
+                                            </td>
+                                            <td className="py-3.5 px-5 text-right font-medium text-gray-600 flex items-center justify-end gap-1.5 mt-0.5">
+                                                <Clock className="h-3.5 w-3.5 text-gray-400" />
+                                                {timeStr}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {/* Bottom Grid: Recent Payments + Recent Users */}
