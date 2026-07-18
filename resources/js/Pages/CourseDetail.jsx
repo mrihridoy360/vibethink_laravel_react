@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -20,6 +20,30 @@ export default function CourseDetail() {
     const [openChapters, setOpenChapters] = useState({});
     const [expandedFaq, setExpandedFaq] = useState(null);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [showStickyRibbon, setShowStickyRibbon] = useState(true);
+    const ribbonRef = useRef(null);
+
+    useEffect(() => {
+        if (isEnrolled) {
+            setShowStickyRibbon(false);
+            return;
+        }
+
+        const handleScroll = () => {
+            if (!ribbonRef.current) return;
+            const rect = ribbonRef.current.getBoundingClientRect();
+            if (rect.top <= window.innerHeight) {
+                setShowStickyRibbon(false);
+            } else {
+                setShowStickyRibbon(true);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isEnrolled]);
 
     const toBengaliNum = (num) => {
         const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -575,7 +599,7 @@ export default function CourseDetail() {
                 </div>
 
                 {/* Course Value / Why This Course */}
-                <div className="my-20 lg:my-28 max-w-3xl mx-auto">
+                <div className="my-20 lg:my-28 max-w-5xl mx-auto">
                     <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 p-5 sm:p-8 shadow-sm" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 14%, #ffffff) 0%, #ffffff 70%)' }}>
                         <div className="space-y-6">
                             {/* Text Content */}
@@ -689,7 +713,7 @@ export default function CourseDetail() {
 
                 {/* Instructor */}
                 {course.user && (
-                    <div className="my-20 lg:my-28 max-w-3xl mx-auto px-4">
+                    <div className="my-20 lg:my-28 max-w-3xl mx-auto px-0 sm:px-4">
                         <div className="relative mb-6">
                             <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
                                 INSTRUCTOR
@@ -748,10 +772,35 @@ export default function CourseDetail() {
                         </div>
                     </div>
                 )}
+            </div> {/* Closes max-w-7xl main container */}
+
+            {/* Special Offer Ribbon - Edge to Edge */}
+            {!isEnrolled && (
+                <div 
+                    ref={ribbonRef}
+                    className="w-full py-4 text-white border-y border-black/10 flex items-center justify-center select-none" 
+                    style={{ backgroundColor: 'var(--primary-color)' }}
+                >
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+                        <span className="text-base sm:text-lg md:text-xl font-bold tracking-wide">
+                            বিশেষ অফার চলছে — দেরি না করে
+                        </span>
+                        <button
+                            onClick={handleEnroll}
+                            className="bg-slate-950 hover:bg-black text-white text-sm sm:text-base font-extrabold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer border-none"
+                        >
+                            এখনই ইনরোল করুন <ArrowRight className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Reopen max-w-7xl container for subsequent elements */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 relative z-20">
 
                 {/* Call To Action */}
                 {!isEnrolled && (
-                    <div className="my-20 lg:my-28 max-w-2xl mx-auto px-4">
+                    <div className="my-20 lg:my-28 max-w-2xl mx-auto px-0 sm:px-4">
                         <div className="text-center mb-8">
                             <h2 className="text-3xl sm:text-4xl font-black leading-tight mb-2" style={{ color: 'color-mix(in srgb, var(--primary-color) 35%, #0f172a 65%)' }}>
                                 Unlock Your Superpower
@@ -976,6 +1025,26 @@ export default function CourseDetail() {
                 )}
 
             </div>
+
+            {/* Sticky Bottom Ribbon */}
+            {!isEnrolled && showStickyRibbon && (
+                <div 
+                    className="fixed bottom-0 left-0 right-0 z-50 py-3 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
+                    style={{ backgroundColor: 'var(--primary-color)' }}
+                >
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center gap-4 sm:gap-6 w-full">
+                        <span className="text-sm sm:text-base font-bold tracking-wide">
+                            বিশেষ অফার চলছে — দেরি না করে
+                        </span>
+                        <button
+                            onClick={handleEnroll}
+                            className="bg-slate-950 hover:bg-black text-white text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border-none shrink-0"
+                        >
+                            এখনই ইনরোল করুন <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

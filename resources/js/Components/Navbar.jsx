@@ -19,6 +19,7 @@ export default function Navbar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [activeTab, setActiveTab] = useState('হোম');
 
     // Theme toggle state (visual switch)
@@ -94,6 +95,7 @@ export default function Navbar() {
             navigate('/courses');
         }
         setMobileMenuOpen(false);
+        setShowMobileSearch(false);
     };
 
     const isFeatureEnabled = (key, defaultValue = '0') => {
@@ -125,14 +127,14 @@ export default function Navbar() {
                                 <img
                                     src={navLogo}
                                     alt={siteName}
-                                    className="h-8 md:h-9 max-w-[120px] md:max-w-[160px] object-contain"
+                                    className="h-10 md:h-9 max-w-[155px] md:max-w-[160px] object-contain"
                                 />
                             ) : (
                                 <>
-                                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg theme-primary-bg flex items-center justify-center font-black text-white text-lg md:text-xl shadow-sm">
+                                    <div className="w-10 h-10 md:w-9 md:h-9 rounded-xl theme-primary-bg flex items-center justify-center font-black text-white text-xl md:text-xl shadow-sm">
                                         {siteName.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight ml-2">
+                                    <span className="text-2xl md:text-2xl font-black text-slate-900 tracking-tight ml-2">
                                         {siteName}
                                     </span>
                                 </>
@@ -277,6 +279,14 @@ export default function Navbar() {
 
                     {/* Mobile View Toggles (Hidden on Desktop) */}
                     <div className="flex md:hidden items-center gap-3">
+                        {/* Search Icon button */}
+                        <button
+                            onClick={() => setShowMobileSearch(!showMobileSearch)}
+                            className="p-1 rounded-lg text-slate-650 hover:bg-slate-50 transition-colors cursor-pointer border-none bg-transparent"
+                        >
+                            <Search className="w-6 h-6" />
+                        </button>
+                        
                         {/* Hamburger Menu Toggle */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -287,26 +297,38 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Dropdown Panel - Transformed to fixed scrollable overlay */}
-                {mobileMenuOpen && (
-                    <div className="fixed inset-x-0 top-[60px] bottom-0 z-40 bg-white flex flex-col gap-4 p-6 overflow-y-auto animate-fadeIn md:hidden">
-
-                        {/* Mobile Search Bar */}
-                        <form onSubmit={handleSearchSubmit} className="relative w-full">
+                {/* Mobile Search Overlay Panel */}
+                {showMobileSearch && (
+                    <div className="absolute inset-x-0 top-0 h-full bg-white z-50 flex items-center px-4 gap-2 animate-fadeIn md:hidden">
+                        <form onSubmit={handleSearchSubmit} className="relative flex-1">
                             <input
                                 type="text"
-                                placeholder="Search.."
+                                placeholder="কোর্স খুঁজুন..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-[#F1F3F5] border-none text-slate-800 text-xs font-semibold pl-5 pr-12 py-3.5 rounded-full focus:outline-none"
+                                className="w-full bg-slate-100 border-none text-slate-800 text-sm font-semibold pl-5 pr-12 py-3.5 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]/20"
+                                autoFocus
                             />
                             <button
                                 type="submit"
-                                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full theme-primary-bg flex items-center justify-center text-white"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8.5 h-8.5 rounded-full theme-primary-bg flex items-center justify-center text-white cursor-pointer border-none"
                             >
                                 <Search className="w-4 h-4" />
                             </button>
                         </form>
+                        <button
+                            onClick={() => setShowMobileSearch(false)}
+                            className="px-3 py-2 text-xs font-black text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer border-none bg-transparent shrink-0"
+                        >
+                            বন্ধ করুন
+                        </button>
+                    </div>
+                )}
+            </nav>
+
+            {/* Mobile Dropdown Panel - Transformed to fixed scrollable overlay */}
+            {mobileMenuOpen && (
+                <div className="fixed inset-x-0 top-[60px] bottom-0 z-40 bg-white flex flex-col gap-4 p-6 overflow-y-auto animate-fadeIn md:hidden">
 
                         {/* Mobile Links */}
                         <div className="flex flex-col gap-1">
@@ -376,7 +398,6 @@ export default function Navbar() {
                         </div>
                     </div>
                 )}
-            </nav>
             <div className="h-[60px] md:h-[76px] w-full" />
         </>
     );
