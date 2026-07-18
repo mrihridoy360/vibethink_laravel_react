@@ -1,15 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Search, BookOpen, ArrowRight, Eye, ShoppingCart, Clock } from 'lucide-react';
 import ComingSoonModal from '../Components/ComingSoonModal';
+import { useAuth } from '../Contexts/AuthContext';
+import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function Courses() {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [courses, setCourses] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get('search') || '';
     const [loading, setLoading] = useState(true);
     const [comingSoonCourse, setComingSoonCourse] = useState(null);
+    const [enrollingId, setEnrollingId] = useState(null);
+
+    const handleEnroll = async (course) => {
+        if (!user) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        setEnrollingId(course.id);
+        try {
+            const price = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
+
+            if (price > 0) {
+                trackPixelEvent('InitiateCheckout', {
+                    content_name: course.title,
+                    content_ids: [course.id],
+                    content_type: 'product',
+                    value: price,
+                    currency: 'BDT'
+                });
+
+                const response = await axios.post(`/api/payment/zinipay/init/${course.id}`);
+                if (response.data.success && response.data.payment_url) {
+                    window.location.href = response.data.payment_url;
+                } else {
+                    alert(response.data.message || 'পেমেন্ট চেকআউট চালু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                    setEnrollingId(null);
+                }
+            } else {
+                const response = await axios.post(`/api/courses/${course.id}/enroll`);
+                if (response.data.success) {
+                    navigate(`/courses/${course.slug}/learn`);
+                }
+            }
+        } catch (error) {
+            if (error.response?.status === 400 && error.response?.data?.message?.includes('already enrolled')) {
+                navigate(`/courses/${course.slug}/learn`);
+            } else {
+                alert(error.response?.data?.message || 'ইনরোলমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            }
+        } finally {
+            setEnrollingId(null);
+        }
+    };
 
     const fetchCourses = async (query = '') => {
         setLoading(true);
@@ -156,12 +205,13 @@ export default function Courses() {
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2 mt-auto pt-2">
-                                            <Link
-                                                to={`/courses/${course.slug}`}
-                                                className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100"
+                                            <button
+                                                onClick={() => handleEnroll(course)}
+                                                disabled={enrollingId === course.id}
+                                                className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100 disabled:opacity-60 cursor-pointer"
                                             >
-                                                Add to Cart <ShoppingCart className="w-3.5 h-3.5" />
-                                            </Link>
+                                                {enrollingId === course.id ? 'Enrolling...' : 'Enroll Now'} <ArrowRight className="w-3.5 h-3.5" />
+                                            </button>
                                             <Link
                                                 to={`/courses/${course.slug}`}
                                                 className="flex-1 py-3 px-2 theme-primary-bg hover:brightness-95 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"

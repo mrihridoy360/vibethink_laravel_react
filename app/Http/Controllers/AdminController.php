@@ -3017,7 +3017,7 @@ class AdminController extends Controller
 
     public function publicSettings()
     {
-        $rows = Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features'])->get();
+        $rows = Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features', 'verification'])->get();
         $grouped = [];
         foreach ($rows as $row) {
             if ($row->group === 'marketing' && $row->key === 'meta_capi_access_token') {

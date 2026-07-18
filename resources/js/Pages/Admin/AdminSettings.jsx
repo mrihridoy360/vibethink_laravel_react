@@ -5,7 +5,7 @@ import {
     Save, Upload, Eye, EyeOff, CheckCircle, XCircle,
     Image, Facebook, Twitter, Instagram, Linkedin,
     Phone, MapPin, Copyright, Link2, ToggleLeft, ToggleRight,
-    Loader2, RefreshCw
+    Loader2, RefreshCw, Shield
 } from 'lucide-react';
 import { useSiteSettings } from '../../Contexts/SiteSettingsContext';
 
@@ -40,7 +40,7 @@ function SettingInput({ label, id, type = 'text', value, onChange, placeholder, 
     );
 }
 
-function SettingTextarea({ label, id, value, onChange, placeholder, rows = 3 }) {
+function SettingTextarea({ label, id, value, onChange, placeholder, rows = 3, hint }) {
     return (
         <div>
             <label htmlFor={id} className="block text-xs font-semibold text-slate-600 mb-1.5">{label}</label>
@@ -52,6 +52,7 @@ function SettingTextarea({ label, id, value, onChange, placeholder, rows = 3 }) 
                 rows={rows}
                 className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400/40 focus:border-orange-400 transition-all resize-none"
             />
+            {hint && <p className="text-xs text-slate-400 mt-1">{hint}</p>}
         </div>
     );
 }
@@ -172,12 +173,13 @@ function SaveBar({ saving, onSave, toast }) {
 
 // ── Tab definitions ─────────────────────────────────────────────
 const TABS = [
-    { key: 'general',    label: 'সাধারণ',   icon: Globe },
-    { key: 'appearance', label: 'চেহারা',   icon: Palette },
-    { key: 'footer',     label: 'ফুটার',    icon: AlignLeft },
-    { key: 'payment',    label: 'পেমেন্ট',  icon: CreditCard },
-    { key: 'email',      label: 'ইমেইল',    icon: Mail },
-    { key: 'marketing',  label: 'মার্কেটিং ও পিক্সেল', icon: Facebook },
+    { key: 'general',      label: 'সাধারণ',   icon: Globe },
+    { key: 'appearance',   label: 'চেহারা',   icon: Palette },
+    { key: 'footer',       label: 'ফুটার',    icon: AlignLeft },
+    { key: 'payment',      label: 'পেমেন্ট',  icon: CreditCard },
+    { key: 'email',        label: 'ইমেইল',    icon: Mail },
+    { key: 'marketing',    label: 'মার্কেটিং ও পিক্সেল', icon: Facebook },
+    { key: 'verification', label: 'ট্যাগ ভেরিফিকেশন', icon: Shield },
 ];
 
 // ── Main component ──────────────────────────────────────────────
@@ -192,13 +194,14 @@ export default function AdminSettings() {
     const [showPassword, setShowPassword] = useState(false);
 
     // Per-group local state
-    const [general, setGeneral]       = useState({});
-    const [appearance, setAppearance] = useState({});
-    const [footer, setFooter]         = useState({});
-    const [payment, setPayment]       = useState({});
-    const [email, setEmail]           = useState({});
-    const [features, setFeatures]     = useState({});
-    const [marketing, setMarketing]   = useState({});
+    const [general, setGeneral]           = useState({});
+    const [appearance, setAppearance]     = useState({});
+    const [footer, setFooter]             = useState({});
+    const [payment, setPayment]           = useState({});
+    const [email, setEmail]               = useState({});
+    const [features, setFeatures]         = useState({});
+    const [marketing, setMarketing]       = useState({});
+    const [verification, setVerification] = useState({});
 
     const showToast = (type, message) => {
         setToast({ type, message });
@@ -219,6 +222,7 @@ export default function AdminSettings() {
                 setEmail(s.email        || {});
                 setFeatures(s.features  || {});
                 setMarketing(s.marketing || {});
+                setVerification(s.verification || {});
             }
         } catch (err) {
             showToast('error', 'সেটিংস লোড করতে সমস্যা হয়েছে।');
@@ -248,13 +252,14 @@ export default function AdminSettings() {
 
     const handleSave = () => {
         const groupMap = {
-            general:    general,
-            appearance: appearance,
-            footer:     footer,
-            payment:    payment,
-            email:      email,
-            features:   features,
-            marketing:  marketing,
+            general:      general,
+            appearance:   appearance,
+            footer:       footer,
+            payment:      payment,
+            email:        email,
+            features:     features,
+            marketing:    marketing,
+            verification: verification,
         };
         saveGroup(activeTab, groupMap[activeTab]);
     };
@@ -286,6 +291,7 @@ export default function AdminSettings() {
     const setE  = (key) => (val) => setEmail((p)       => ({ ...p, [key]: val }));
     const setFt = (key) => (val) => setFeatures((p)    => ({ ...p, [key]: val ? '1' : '0' }));
     const setM  = (key) => (val) => setMarketing((p)   => ({ ...p, [key]: val }));
+    const setV  = (key) => (val) => setVerification((p) => ({ ...p, [key]: val }));
 
     if (loadingData) {
         return (
@@ -736,6 +742,37 @@ export default function AdminSettings() {
                             </div>
                             <p className="text-xs text-slate-400 mt-1">মেটা ইভেন্ট ম্যানেজারের সেটিংস ট্যাব থেকে জেনারেট করা এক্সেস টোকেন এখানে দিন।</p>
                         </div>
+                    </SectionCard>
+                )}
+
+                {/* ── Verification ──────────────────────────── */}
+                {activeTab === 'verification' && (
+                    <SectionCard title="সার্চ কনসোল ও ডোমেইন ভেরিফিকেশন" description="গুগল সার্চ কনসোল, ফেসবুক ডোমেইন ভেরিফিকেশন এবং অন্যান্য মেটা ট্যাগ যুক্ত করুন।">
+                        <SettingInput
+                            label="গুগল সার্চ কনসোল ভেরিফিকেশন কোড (Google Site Verification Code)"
+                            id="google_site_verification"
+                            value={verification.google_site_verification}
+                            onChange={setV('google_site_verification')}
+                            placeholder="যেমন: 45abcDeFgHiJkLmNoPqRsTuVwXyZ"
+                            hint="গুগল সার্চ কনসোলে আপনার সাইট ভেরিফাই করতে meta verification কোডটি দিন।"
+                        />
+                        <SettingInput
+                            label="ফেসবুক ডোমেইন ভেরিফিকেশন কোড (Facebook Domain Verification Code)"
+                            id="facebook_domain_verification"
+                            value={verification.facebook_domain_verification}
+                            onChange={setV('facebook_domain_verification')}
+                            placeholder="যেমন: xzhnqp0kehfdawvbit7rt0ejkj5h2b"
+                            hint="ফেসবুক বিজনেস ম্যানেজার থেকে প্রাপ্ত ডোমেইন ভেরিফিকেশন কোডটি দিন।"
+                        />
+                        <SettingTextarea
+                            label="অন্যান্য কাস্টম মেটা ট্যাগ (Custom Meta Tags / Headers)"
+                            id="custom_meta_tags"
+                            value={verification.custom_meta_tags}
+                            onChange={setV('custom_meta_tags')}
+                            placeholder="<meta name='another-verification' content='value' />"
+                            rows={4}
+                            hint="এখানে যেকোনো কাস্টম মেটা ট্যাগ বা হেড ট্যাগ সরাসরি HTML ফরম্যাটে বসাতে পারেন।"
+                        />
                     </SectionCard>
                 )}
             </div>

@@ -251,16 +251,19 @@ Route::get('/payment/zinipay/callback', [App\Http\Controllers\ZiniPayController:
 // Fallback Route for React SPA
 Route::get('/{any}', function () {
     $meta = [
-        'site_name'        => 'VibeThink LMS',
-        'site_description' => '',
-        'site_favicon'     => null,
-        'site_logo'        => null,
+        'site_name'                    => 'VibeThink LMS',
+        'site_description'             => '',
+        'site_favicon'                 => null,
+        'site_logo'                    => null,
+        'facebook_domain_verification' => null,
+        'google_site_verification'     => null,
+        'custom_meta_tags'             => null,
     ];
 
     $initialSettings = [];
 
     try {
-        $rows = \App\Models\Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features'])->get();
+        $rows = \App\Models\Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features', 'verification'])->get();
         foreach ($rows as $row) {
             if ($row->group === 'marketing' && $row->key === 'meta_capi_access_token') {
                 continue;
@@ -276,6 +279,17 @@ Route::get('/{any}', function () {
             }
             if ($row->group === 'appearance' && $row->key === 'site_logo') {
                 $meta['site_logo'] = $row->value;
+            }
+            if ($row->group === 'verification') {
+                if ($row->key === 'facebook_domain_verification') {
+                    $meta['facebook_domain_verification'] = $row->value;
+                }
+                if ($row->key === 'google_site_verification') {
+                    $meta['google_site_verification'] = $row->value;
+                }
+                if ($row->key === 'custom_meta_tags') {
+                    $meta['custom_meta_tags'] = $row->value;
+                }
             }
             $initialSettings[$row->group][$row->key] = $row->value;
         }

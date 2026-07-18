@@ -1,8 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, ShoppingCart, Eye, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { BookOpen, ShoppingCart, Eye, Clock, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+import { useAuth } from '../Contexts/AuthContext';
+import { trackPixelEvent } from '../Utils/metaPixel';
 
 export default function CourseCard({ course, onComingSoonClick }) {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [enrolling, setEnrolling] = useState(false);
+
     const imageUrl = course.thumbnail
         ? (course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`)
         : null;
@@ -15,6 +23,49 @@ export default function CourseCard({ course, onComingSoonClick }) {
         if (isComingSoon) {
             e.preventDefault();
             onComingSoonClick?.(course);
+        }
+    };
+
+    const handleEnroll = async () => {
+        if (!user) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        setEnrolling(true);
+        try {
+            const price = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
+
+            if (price > 0) {
+                trackPixelEvent('InitiateCheckout', {
+                    content_name: course.title,
+                    content_ids: [course.id],
+                    content_type: 'product',
+                    value: price,
+                    currency: 'BDT'
+                });
+
+                const response = await axios.post(`/api/payment/zinipay/init/${course.id}`);
+                if (response.data.success && response.data.payment_url) {
+                    window.location.href = response.data.payment_url;
+                } else {
+                    alert(response.data.message || 'পেমেন্ট চেকআউট চালু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                    setEnrolling(false);
+                }
+            } else {
+                const response = await axios.post(`/api/courses/${course.id}/enroll`);
+                if (response.data.success) {
+                    navigate(`/courses/${course.slug}/learn`);
+                }
+            }
+        } catch (error) {
+            if (error.response?.status === 400 && error.response?.data?.message?.includes('already enrolled')) {
+                navigate(`/courses/${course.slug}/learn`);
+            } else {
+                alert(error.response?.data?.message || 'ইনরোলমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            }
+        } finally {
+            setEnrolling(false);
         }
     };
 
@@ -97,12 +148,13 @@ export default function CourseCard({ course, onComingSoonClick }) {
                     </div>
                 ) : (
                     <div className="flex items-center gap-2 mt-auto pt-2">
-                        <Link
-                            to={`/courses/${course.slug}`}
-                            className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100"
+                        <button
+                            onClick={handleEnroll}
+                            disabled={enrolling}
+                            className="flex-1 py-3 px-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-100 disabled:opacity-60 cursor-pointer"
                         >
-                            Add to Cart <ShoppingCart className="w-4 h-4" />
-                        </Link>
+                            {enrolling ? 'Enrolling...' : 'Enroll Now'} <ArrowRight className="w-4 h-4" />
+                        </button>
                         <Link
                             to={`/courses/${course.slug}`}
                             className="flex-1 py-3 px-2 theme-primary-bg hover:brightness-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 transition-all"

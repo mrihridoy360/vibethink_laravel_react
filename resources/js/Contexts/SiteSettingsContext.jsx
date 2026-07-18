@@ -31,6 +31,11 @@ const DEFAULTS = {
         meta_pixel_id: '',
         meta_capi_test_event_code: '',
     },
+    verification: {
+        facebook_domain_verification: '',
+        google_site_verification: '',
+        custom_meta_tags: '',
+    },
     features: {},
 };
 
@@ -38,11 +43,12 @@ const DEFAULTS = {
 // client render already shows the real dynamic content instead of DEFAULTS.
 const PRELOADED = (typeof window !== 'undefined' && window.__INITIAL_SITE_SETTINGS__)
     ? {
-        general:    { ...DEFAULTS.general,    ...(window.__INITIAL_SITE_SETTINGS__.general    || {}) },
-        appearance: { ...DEFAULTS.appearance, ...(window.__INITIAL_SITE_SETTINGS__.appearance || {}) },
-        footer:     { ...DEFAULTS.footer,     ...(window.__INITIAL_SITE_SETTINGS__.footer     || {}) },
-        marketing:  { ...DEFAULTS.marketing,  ...(window.__INITIAL_SITE_SETTINGS__.marketing  || {}) },
-        features:   window.__INITIAL_SITE_SETTINGS__.features || {},
+        general:      { ...DEFAULTS.general,      ...(window.__INITIAL_SITE_SETTINGS__.general      || {}) },
+        appearance:   { ...DEFAULTS.appearance,   ...(window.__INITIAL_SITE_SETTINGS__.appearance   || {}) },
+        footer:       { ...DEFAULTS.footer,       ...(window.__INITIAL_SITE_SETTINGS__.footer       || {}) },
+        marketing:    { ...DEFAULTS.marketing,    ...(window.__INITIAL_SITE_SETTINGS__.marketing    || {}) },
+        verification: { ...DEFAULTS.verification, ...(window.__INITIAL_SITE_SETTINGS__.verification || {}) },
+        features:     window.__INITIAL_SITE_SETTINGS__.features || {},
     }
     : null;
 
@@ -56,11 +62,12 @@ export const SiteSettingsProvider = ({ children }) => {
             if (data.success && data.settings) {
                 // Merge with defaults so missing keys fall back gracefully
                 setSettings((prev) => ({
-                    general:    { ...prev.general,    ...(data.settings.general    || {}) },
-                    appearance: { ...prev.appearance, ...(data.settings.appearance || {}) },
-                    footer:     { ...prev.footer,     ...(data.settings.footer     || {}) },
-                    marketing:  { ...prev.marketing,  ...(data.settings.marketing  || {}) },
-                    features:   data.settings.features || {},
+                    general:      { ...prev.general,      ...(data.settings.general      || {}) },
+                    appearance:   { ...prev.appearance,   ...(data.settings.appearance   || {}) },
+                    footer:       { ...prev.footer,       ...(data.settings.footer       || {}) },
+                    marketing:    { ...prev.marketing,    ...(data.settings.marketing    || {}) },
+                    verification: { ...prev.verification, ...(data.settings.verification || {}) },
+                    features:     data.settings.features || {},
                 }));
             }
         } catch (err) {

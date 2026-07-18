@@ -9,6 +9,16 @@
     <title>{{ $meta['site_name'] ?? 'VibeThink LMS' }}</title>
     <meta name="description" content="{{ $meta['site_description'] ?? '' }}">
 
+    @if(!empty($meta['facebook_domain_verification']))
+        <meta name="facebook-domain-verification" content="{{ $meta['facebook_domain_verification'] }}">
+    @endif
+    @if(!empty($meta['google_site_verification']))
+        <meta name="google-site-verification" content="{{ $meta['google_site_verification'] }}">
+    @endif
+    @if(!empty($meta['custom_meta_tags']))
+        {!! $meta['custom_meta_tags'] !!}
+    @endif
+
     @if(!empty($meta['site_favicon']))
         <link rel="icon" href="{{ $meta['site_favicon'] }}">
     @endif
