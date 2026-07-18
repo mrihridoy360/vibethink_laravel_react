@@ -18,6 +18,7 @@ import Dashboard from './Pages/Dashboard';
 import AdminDashboard from './Pages/AdminDashboard';
 import AdminCourseCreate from './Pages/Admin/AdminCourseCreate';
 import AdminCourseEdit from './Pages/Admin/AdminCourseEdit';
+import AdminRoute from './Components/AdminRoute';
 import Blog from './Pages/Blog';
 import BlogDetail from './Pages/BlogDetail';
 import Bundles from './Pages/Bundles';
@@ -113,10 +114,10 @@ function AppLayout() {
                     <Route path="/payment/failed" element={<PaymentFailed />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/dashboard/:tab" element={<Dashboard />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/courses/create" element={<AdminCourseCreate />} />
-                    <Route path="/admin/courses/:id/edit" element={<AdminCourseEdit />} />
-                    <Route path="/admin/:tab" element={<AdminDashboard />} />
+                    <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                    <Route path="/admin/courses/create" element={<AdminRoute><AdminCourseCreate /></AdminRoute>} />
+                    <Route path="/admin/courses/:id/edit" element={<AdminRoute><AdminCourseEdit /></AdminRoute>} />
+                    <Route path="/admin/:tab" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 </Routes>
             </main>
             {!hideLayout && <Footer />}

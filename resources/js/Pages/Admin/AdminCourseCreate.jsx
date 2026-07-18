@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../Contexts/AuthContext';
 import axios from 'axios';
 import {
     ArrowLeft, BookOpen, Tag, Loader2, CheckCircle, AlertCircle
@@ -8,7 +7,6 @@ import {
 import AdminLayout from '../../Components/AdminLayout';
 
 export default function AdminCourseCreate() {
-    const { user, loading } = useAuth();
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
@@ -16,12 +14,6 @@ export default function AdminCourseCreate() {
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
     const [toast, setToast] = useState(null);
-
-    useEffect(() => {
-        if (loading) return;
-        if (!user) { navigate('/login'); return; }
-        if (user.role !== 'admin') { navigate('/dashboard'); return; }
-    }, [user, loading, navigate]);
 
     useEffect(() => {
         axios.get('/api/admin/categories').then(res => {
@@ -48,16 +40,6 @@ export default function AdminCourseCreate() {
             setSaving(false);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-[#f4f6fc]">
-                <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
-
-    if (!user || user.role !== 'admin') return null;
 
     const customHeader = (
         <div className="flex items-center gap-3">

@@ -179,16 +179,7 @@ export default function Footer() {
                 <div className="border-t border-slate-200/80 my-5" />
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold tracking-wider text-slate-450 select-none">
-                    <div>{copyrightText}</div>
-                    <div className="flex gap-4 items-center">
-                        <Link to="/#privacy" className="theme-primary-text-hover transition-colors">PRIVACY</Link>
-                        <span className="text-slate-350">-</span>
-                        <Link to="/#terms" className="theme-primary-text-hover transition-colors">TERMS</Link>
-                        <span className="text-slate-350">-</span>
-                        <Link to="/#refund" className="theme-primary-text-hover transition-colors">REFUND</Link>
-                        <span className="text-slate-350">-</span>
-                        <span>Made for Bangladesh</span>
-                    </div>
+                    <div>© 2026 VibeThink. All Rights Reserved.</div>
                 </div>
             </div>
 

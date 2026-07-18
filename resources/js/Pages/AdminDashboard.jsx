@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../Contexts/AuthContext';
 import { HelpCircle } from 'lucide-react';
 
 // Tab components
@@ -53,7 +52,6 @@ function AdminComingSoon({ menuItem }) {
 
 // ── Main AdminDashboard ───────────────────────────────────────
 export default function AdminDashboard() {
-    const { user, loading } = useAuth();
     const navigate = useNavigate();
     const { tab } = useParams();
     const activeTab = tab || 'dashboard';
@@ -63,19 +61,6 @@ export default function AdminDashboard() {
     };
 
     const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq'];
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-[#f4f6fc]">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-500 font-medium">অ্যাডমিন প্যানেল লোড হচ্ছে...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!user || user.role !== 'admin') return null;
 
     return (
         <AdminLayout activeTab={activeTab}>

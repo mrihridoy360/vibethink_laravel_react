@@ -594,13 +594,6 @@ export default function AdminCourseEdit() {
 
     const showToast = (msg, type = 'success') => setToast({ message: msg, type });
 
-    // Auth guard
-    useEffect(() => {
-        if (loading) return;
-        if (!user) { navigate('/login'); return; }
-        if (user.role !== 'admin') { navigate('/dashboard'); return; }
-    }, [user, loading, navigate]);
-
     // Fetch course + categories
     useEffect(() => {
         if (!user || user.role !== 'admin') return;
@@ -714,7 +707,7 @@ export default function AdminCourseEdit() {
 
     const handleLogout = async () => { await logout(); navigate('/login'); };
 
-    if (loading || pageLoading) {
+    if (pageLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-[#f4f6fc]">
                 <div className="flex flex-col items-center gap-3">
@@ -724,8 +717,6 @@ export default function AdminCourseEdit() {
             </div>
         );
     }
-
-    if (!user || user.role !== 'admin') return null;
 
     const TABS = [
         { key: 'details',    label: 'ল্যান্ডিং পেজ',   icon: LayoutDashboard },
