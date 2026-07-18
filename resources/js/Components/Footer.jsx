@@ -170,8 +170,8 @@ export default function Footer() {
             </div>
 
             {/* Middle: Giant Watermark */}
-            <div className="w-full text-center pointer-events-none select-none overflow-hidden font-black text-[16vw] tracking-[-0.02em] text-[#F3F4F6] dark:text-slate-800/10 leading-none my-6">
-                {footerWatermark}.
+            <div className="w-full text-center pointer-events-none select-none overflow-hidden font-black text-[16vw] tracking-[-0.02em] leading-none my-6">
+                <span className="animate-watermark-gradient">{footerWatermark}.</span>
             </div>
 
             {/* Lower Section */}

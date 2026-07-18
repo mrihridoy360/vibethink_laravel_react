@@ -155,25 +155,35 @@ export default function Home() {
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-12 md:space-y-20">
             {/* Hero Section */}
-            <div className="text-center relative overflow-hidden py-10 md:py-16 px-4 rounded-3xl bg-purple-50/50 border border-purple-100/30">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-100/60 rounded-full blur-3xl -z-10" />
-                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight">
-                    Upgrade Your Skills with <span className="bg-gradient-to-r from-purple-600 to-pink-650 bg-clip-text text-transparent">VibeThink</span>
-                </h1>
-                <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto mb-6 md:mb-8 font-normal px-2">
-                    Learn from industry experts and get hands-on experience with modern tech stacks. Discover premium courses tailored for you.
-                </p>
+            <div className="relative rounded-3xl p-[2px] overflow-hidden snake-border-container shadow-sm border border-slate-100/50">
+                {/* Rotating Snake Border */}
+                <div className="snake-border-glow" />
 
-                {/* Search Bar */}
-                <div className="max-w-md mx-auto relative">
-                    <input
-                        type="text"
-                        placeholder="Search courses..."
-                        value={search}
-                        onChange={(e) => setSearchParams(e.target.value ? { search: e.target.value } : {})}
-                        className="w-full pl-12 pr-4 py-3 rounded-2xl text-sm bg-white border border-slate-200 focus:outline-none focus:border-purple-650 focus:ring-2 focus:ring-purple-600/10 text-slate-800 shadow-sm transition-all"
-                    />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400" />
+                {/* Inner Content Area */}
+                <div 
+                    className="snake-border-content text-center py-10 md:py-16 px-4 rounded-[22px] relative overflow-hidden"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
+                >
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 theme-primary-bg rounded-full blur-3xl -z-10 opacity-10" />
+                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight animate-slide-up-fade">
+                        <span className="animate-gradient-text font-black">VibeThink</span> এর সাথে আপনার স্কিল উন্নত করুন
+                    </h1>
+                    <p className="text-sm md:text-base text-slate-650 max-w-2xl mx-auto mb-6 md:mb-8 font-semibold px-2 animate-slide-up-fade animation-delay-100">
+                        ইন্ডাস্ট্রি বিশেষজ্ঞদের কাছ থেকে শিখুন এবং আধুনিক টেক স্ট্যাকের সাথে বাস্তব অভিজ্ঞতা অর্জন করুন। আপনার জন্য তৈরি করা প্রিমিয়াম কোর্সগুলো এক্সপ্লোর করুন।
+                    </p>
+
+                    {/* Search Bar */}
+                    <div className="max-w-xl mx-auto relative animate-slide-up-fade animation-delay-200">
+                        <input
+                            type="text"
+                            placeholder="কোর্স খুঁজুন..."
+                            value={search}
+                            onChange={(e) => setSearchParams(e.target.value ? { search: e.target.value } : {})}
+                            className="w-full pl-12 pr-4 py-3.5 rounded-2xl text-sm bg-white border border-slate-200 focus:outline-none focus:theme-primary-border focus:ring-2 focus:ring-[var(--primary-color)]/10 text-slate-800 shadow-sm transition-all"
+                            style={{ focusBorderColor: 'var(--primary-color)' }}
+                        />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400" />
+                    </div>
                 </div>
             </div>
 
@@ -182,13 +192,9 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
-                            <BookOpen className="h-6 w-6 text-purple-600" /> Our Courses
+                            <BookOpen className="h-6 w-6 text-purple-600" /> আমাদের কোর্সসমূহ
                         </h2>
-                        <p className="text-xs text-slate-450 mt-1 font-semibold">Explore all published training courses</p>
                     </div>
-                    <span className="text-xs bg-purple-50 border border-purple-100 text-purple-650 px-4 py-1.5 rounded-full font-bold shadow-sm">
-                        {courses.length} Courses Available
-                    </span>
                 </div>
 
                 {loading ? (

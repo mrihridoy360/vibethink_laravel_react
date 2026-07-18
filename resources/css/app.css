@@ -96,3 +96,135 @@ body {
     background-image: linear-gradient(to right, rgba(30, 41, 59, 0.25) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
 }
+
+/* Snake border animation */
+@keyframes border-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.snake-border-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.snake-border-glow {
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    width: 400%;
+    height: 400%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        transparent 40%,
+        var(--primary-color, #FF5A00) 50%,
+        transparent 60%,
+        transparent 100%
+    );
+    animation: border-rotate 4s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.snake-border-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Hero text animations */
+@keyframes slide-up-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up-fade {
+    opacity: 0; /* Keep hidden before animation starts */
+    animation: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animation-delay-100 {
+    animation-delay: 150ms;
+}
+
+.animation-delay-200 {
+    animation-delay: 300ms;
+}
+
+/* Gradient Text Shifter Animation */
+@keyframes gradient-text-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradient-text {
+    background: linear-gradient(
+        270deg,
+        var(--primary-color, #FF5A00),
+        #ec4899,
+        #8b5cf6,
+        var(--primary-color, #FF5A00)
+    );
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradient-text-shift 4s ease infinite;
+}
+
+/* Watermark Breathing Animation */
+@keyframes watermark-breath {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.04);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+}
+
+.animate-watermark {
+    display: inline-block;
+    animation: watermark-breath 10s ease-in-out infinite;
+}
+
+/* Watermark Gradient Animation */
+.animate-watermark-gradient {
+    background: linear-gradient(
+        270deg,
+        var(--primary-color, #FF5A00),
+        #ec4899,
+        #8b5cf6,
+        var(--primary-color, #FF5A00)
+    );
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradient-text-shift 8s ease infinite;
+    opacity: 0.15;
+    display: inline-block;
+}
+
+.dark .animate-watermark-gradient {
+    opacity: 0.25;
+}

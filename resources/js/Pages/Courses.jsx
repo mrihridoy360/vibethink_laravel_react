@@ -81,25 +81,35 @@ export default function Courses() {
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-12">
             {/* Header Banner */}
-            <div className="text-center relative overflow-hidden py-10 md:py-16 px-4 rounded-3xl bg-purple-50/50 border border-purple-100/30">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-purple-100/60 rounded-full blur-3xl -z-10" />
-                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight">
-                    আমাদের সকল <span className="bg-gradient-to-r from-purple-600 to-pink-650 bg-clip-text text-transparent">কোর্সসমূহ</span>
-                </h1>
-                <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto mb-6 md:mb-8 font-normal px-2">
-                    দক্ষতা বৃদ্ধিতে আপনার প্রয়োজনীয় কোর্সটি খুঁজে নিন এবং আজই শেখা শুরু করুন।
-                </p>
+            <div className="relative rounded-3xl p-[2px] overflow-hidden snake-border-container shadow-sm border border-slate-100/50">
+                {/* Rotating Snake Border */}
+                <div className="snake-border-glow" />
 
-                {/* Search Bar */}
-                <div className="max-w-md mx-auto relative">
-                    <input
-                        type="text"
-                        placeholder="কোর্স খুঁজুন..."
-                        value={search}
-                        onChange={(e) => setSearchParams(e.target.value ? { search: e.target.value } : {})}
-                        className="w-full pl-12 pr-4 py-3 rounded-2xl text-sm bg-white border border-slate-200 focus:outline-none focus:border-purple-650 focus:ring-2 focus:ring-purple-600/10 text-slate-800 shadow-sm transition-all"
-                    />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400" />
+                {/* Inner Content Area */}
+                <div 
+                    className="snake-border-content text-center py-10 md:py-16 px-4 rounded-[22px] relative overflow-hidden"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
+                >
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 theme-primary-bg rounded-full blur-3xl -z-10 opacity-10" />
+                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight animate-slide-up-fade">
+                        আমাদের সকল <span className="animate-gradient-text font-black">কোর্সসমূহ</span>
+                    </h1>
+                    <p className="text-sm md:text-base text-slate-650 max-w-2xl mx-auto mb-6 md:mb-8 font-semibold px-2 animate-slide-up-fade animation-delay-100">
+                        দক্ষতা বৃদ্ধিতে আপনার প্রয়োজনীয় কোর্সটি খুঁজে নিন এবং আজই শেখা শুরু করুন।
+                    </p>
+
+                    {/* Search Bar */}
+                    <div className="max-w-xl mx-auto relative animate-slide-up-fade animation-delay-200">
+                        <input
+                            type="text"
+                            placeholder="কোর্স খুঁজুন..."
+                            value={search}
+                            onChange={(e) => setSearchParams(e.target.value ? { search: e.target.value } : {})}
+                            className="w-full pl-12 pr-4 py-3.5 rounded-2xl text-sm bg-white border border-slate-200 focus:outline-none focus:theme-primary-border focus:ring-2 focus:ring-[var(--primary-color)]/10 text-slate-800 shadow-sm transition-all"
+                            style={{ focusBorderColor: 'var(--primary-color)' }}
+                        />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400" />
+                    </div>
                 </div>
             </div>
 
@@ -125,7 +135,7 @@ export default function Courses() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {courses.map((course) => (
-                            <div key={course.id} className="bg-white border border-slate-200/80 flex flex-col rounded-[2rem] p-5 transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5 relative">
+                            <div key={course.id} className="bg-white border border-slate-200/80 flex flex-col rounded-2xl p-5 transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5 relative">
                                 {/* Thumbnail */}
                                 <div 
                                     onClick={(e) => {
@@ -134,7 +144,7 @@ export default function Courses() {
                                             setComingSoonCourse(course);
                                         }
                                     }}
-                                    className={`relative aspect-[16/10] w-full bg-slate-50 overflow-hidden rounded-2xl mb-4 border border-slate-100 shrink-0 ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
+                                    className={`relative aspect-[16/10] w-full bg-slate-50 overflow-hidden rounded-xl mb-4 border border-slate-100 shrink-0 ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
                                 >
                                     {course.thumbnail ? (
                                         <img
@@ -162,11 +172,11 @@ export default function Courses() {
                                 <div className="flex flex-col flex-grow">
                                     <h3 
                                         onClick={() => course.section_titles?.coming_soon && setComingSoonCourse(course)}
-                                        className={`text-sm sm:text-base font-bold text-slate-800 mb-2 line-clamp-1 theme-primary-text-hover transition-colors ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
+                                        className={`text-base sm:text-lg font-bold text-slate-800 mb-2 line-clamp-1 theme-primary-text-hover transition-colors ${course.section_titles?.coming_soon ? 'cursor-pointer' : ''}`}
                                     >
                                         {course.title}
                                     </h3>
-                                    <p className="text-slate-500 text-xs mb-4 line-clamp-2 font-normal leading-relaxed">
+                                    <p className="text-slate-500 text-sm mb-4 line-clamp-2 font-normal leading-relaxed">
                                         {course.short_description || 'No description available for this course.'}
                                     </p>
 
@@ -181,7 +191,7 @@ export default function Courses() {
                                                 <span className="text-lg font-black theme-primary-text text-[#FF5A00]">
                                                     ৳{Math.round(course.discount_price)}
                                                 </span>
-                                                <span className="text-xs text-slate-400 line-through font-semibold">
+                                                <span className="text-sm text-slate-400 line-through font-semibold">
                                                     ৳{Math.round(course.price)}
                                                 </span>
                                             </>
