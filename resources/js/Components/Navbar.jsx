@@ -28,6 +28,7 @@ export default function Navbar() {
     });
 
     const dropdownRef = useRef(null);
+    const mobileDropdownRef = useRef(null);
 
     // Sync search input value with URL changes
     useEffect(() => {
@@ -50,7 +51,9 @@ export default function Navbar() {
     // Close dropdown on click outside
     useEffect(() => {
         function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            const clickedDesktopDropdown = dropdownRef.current && dropdownRef.current.contains(event.target);
+            const clickedMobileDropdown = mobileDropdownRef.current && mobileDropdownRef.current.contains(event.target);
+            if (!clickedDesktopDropdown && !clickedMobileDropdown) {
                 setDropdownOpen(false);
             }
         }
@@ -294,6 +297,88 @@ export default function Navbar() {
                         >
                             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
+
+                        {/* Mobile Profile Trigger (Only visible if user is logged in) */}
+                        {user && (
+                            <div className="relative" ref={mobileDropdownRef}>
+                                <button
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="flex items-center p-0.5 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer shrink-0"
+                                >
+                                    {user.avatar ? (
+                                        <img src={user.avatar} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
+                                    ) : (
+                                        <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
+                                            {user.name.charAt(0)}
+                                        </div>
+                                    )}
+                                </button>
+
+                                {/* Mobile Dropdown Menu Box */}
+                                {dropdownOpen && (
+                                    <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl z-[100] py-2 animate-fadeIn text-slate-800">
+                                        <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                            <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
+                                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                            {user.role === 'admin' && (
+                                                <span className="inline-block mt-1.5 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
+                                                    অ্যাডমিন
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {user.role === 'admin' && (
+                                            <Link
+                                                to="/admin"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <Shield className="h-4 w-4 text-slate-400" />
+                                                এডমিন প্যানেল
+                                            </Link>
+                                        )}
+
+                                        <Link
+                                            to="/dashboard"
+                                            onClick={() => setDropdownOpen(false)}
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                        >
+                                            <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                                            ড্যাশবোর্ড
+                                        </Link>
+
+                                        <Link
+                                            to="/dashboard/enrolled"
+                                            onClick={() => setDropdownOpen(false)}
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                        >
+                                            <BookOpenCheck className="h-4 w-4 text-slate-400" />
+                                            ইনরোলড কোর্সসমূহ
+                                        </Link>
+
+                                        <Link
+                                            to="/dashboard/settings"
+                                            onClick={() => setDropdownOpen(false)}
+                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                        >
+                                            <Settings className="h-4 w-4 text-slate-400" />
+                                            প্রোফাইল সেটিংস
+                                        </Link>
+
+                                        <div className="border-t border-slate-100 my-1.5" />
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            লগআউট
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
