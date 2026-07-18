@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -421,13 +421,16 @@ export default function CourseDetail() {
                     </div>
                 )}
 
-                {/* Audience (কাদের জন্য এই কোর্স) - full width */}
-                {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
-                    <div className="my-20 lg:my-28">
+            </div> {/* Closes max-w-7xl main container */}
+
+            {/* Audience (কাদের জন্য এই কোর্স) - Edge to Edge */}
+            {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
+                <div className="border-y border-slate-200/40 py-16 w-full" style={{ backgroundColor: '#F4F5F7' }}>
+                    <div className="max-w-7xl mx-auto px-4 md:px-6">
                         <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-10 text-center leading-tight">
                             {getSectionTitle(course.section_titles, 'audience')}
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
                             {course.audience.map((item, idx) => (
                                 <div
                                     key={idx}
@@ -461,10 +464,14 @@ export default function CourseDetail() {
                             ))}
                         </div>
                     </div>
-                )}
+                </div>
+            )}
+
+            {/* Reopen max-w-7xl container for subsequent elements */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 relative z-20">
 
                 {/* Syllabus / Curriculum */}
-                <div className="my-20 lg:my-28 max-w-3xl mx-auto">
+                <div className="my-20 lg:my-28 max-w-5xl mx-auto">
                     {/* Header with watermark */}
                     <div className="relative mb-8">
                         <span className="absolute -top-6 -left-1 text-[100px] sm:text-[120px] font-black text-slate-100 leading-none select-none pointer-events-none">
@@ -489,52 +496,73 @@ export default function CourseDetail() {
                     </div>
 
                     {/* Chapter list */}
-                    <div className="space-y-3">
+                    <div className="relative pl-12 sm:pl-16 space-y-6">
+                        {/* Timeline Vertical Line */}
+                        <div className="absolute left-[20px] sm:left-[28px] top-6 bottom-6 w-0.5" style={{ backgroundColor: 'var(--primary-color)', opacity: 0.35 }} />
+
                         {course.chapters && course.chapters.length > 0 ? (
                             course.chapters.map((chapter, index) => {
                                 const isOpen = !!openChapters[chapter.id];
                                 return (
-                                    <div key={chapter.id} className="bg-white border border-slate-200/60 rounded-xl p-5">
-                                        <button
-                                            onClick={() => toggleChapter(chapter.id)}
-                                            className="w-full flex items-center justify-between text-left cursor-pointer"
+                                    <div key={chapter.id} className="relative">
+                                        {/* Timeline Node Circle */}
+                                        <div 
+                                            className="absolute -left-[39px] sm:-left-[49px] top-[32px] sm:top-[30px] w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] rounded-full bg-white border-4 flex items-center justify-center z-10 shadow-sm"
+                                            style={{ borderColor: 'var(--primary-color)' }}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-4xl sm:text-5xl font-black theme-primary-text opacity-25 leading-none">
-                                                    {toBengaliNum(index + 1)}
-                                                </span>
-                                                <div>
-                                                    <h3 className="font-bold text-slate-900 text-base">
-                                                        {chapter.title}
-                                                    </h3>
-                                                    <p className="text-xs text-slate-400 font-medium mt-0.5">
-                                                        {toBengaliNum(chapter.lessons?.length || 0)}টি লেসন
-                                                    </p>
+                                            <div 
+                                                className="w-1.5 h-1.5 rounded-full animate-pulse" 
+                                                style={{ backgroundColor: 'var(--primary-color)' }}
+                                            />
+                                        </div>
+
+                                        {/* Card content wrapper */}
+                                        <div 
+                                            className="border border-slate-200/60 rounded-2xl p-5 hover:shadow-md transition-all relative overflow-hidden"
+                                            style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
+                                        >
+                                            <button
+                                                onClick={() => toggleChapter(chapter.id)}
+                                                className="w-full flex items-center justify-between text-left cursor-pointer border-none bg-transparent p-0"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    {/* Bengali Number */}
+                                                    <span className="text-4xl sm:text-5xl font-black theme-primary-text opacity-35 leading-none shrink-0 min-w-[2.5rem] text-center">
+                                                        {toBengaliNum(index + 1)}
+                                                    </span>
+                                                    <div>
+                                                        <h3 className="font-black text-slate-900 text-lg sm:text-xl leading-snug">
+                                                            {chapter.title}
+                                                        </h3>
+                                                        <p className="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">
+                                                            {toBengaliNum(chapter.lessons?.length || 0)}টি লেসন
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <ChevronDown className={`h-5 w-5 text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                                        </button>
-                                        {isOpen && (
-                                            <div className="mt-4 pt-4 border-t border-slate-100 space-y-0">
-                                                {chapter.lessons && chapter.lessons.length > 0 ? (
-                                                    chapter.lessons.map((lesson) => (
-                                                        <div key={lesson.id} className="flex items-center justify-between py-3 hover:bg-slate-50/50 transition-all">
-                                                            <div className="flex items-center gap-3">
-                                                                <Play className="h-3.5 w-3.5 text-slate-400" />
-                                                                <span className="text-sm text-slate-600 font-normal">{lesson.title}</span>
+                                                <ChevronDown className={`h-5 w-5 text-slate-450 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            {isOpen && (
+                                                <div className="mt-4 pt-4 border-t border-slate-200/60 space-y-0">
+                                                    {chapter.lessons && chapter.lessons.length > 0 ? (
+                                                        chapter.lessons.map((lesson) => (
+                                                            <div key={lesson.id} className="flex items-center justify-between py-3 hover:bg-white/40 rounded-lg px-2 transition-all">
+                                                                <div className="flex items-center gap-3">
+                                                                    <Play className="h-3.5 w-3.5 text-slate-400" />
+                                                                    <span className="text-sm sm:text-base text-slate-650 font-medium">{lesson.title}</span>
+                                                                </div>
+                                                                {lesson.is_preview && (
+                                                                    <span className="text-[10px] text-emerald-600 font-bold px-2 py-0.5 bg-emerald-50 rounded-md border border-emerald-100">
+                                                                        Preview
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                            {lesson.is_preview && (
-                                                                <span className="text-[10px] text-emerald-600 font-bold px-2 py-0.5 bg-emerald-50 rounded-md border border-emerald-100">
-                                                                    Preview
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <div className="text-xs text-slate-400 italic py-2">No lessons in this chapter</div>
-                                                )}
-                                            </div>
-                                        )}
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-xs text-slate-400 italic py-2 px-2">No lessons in this chapter</div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 );
                             })
@@ -582,7 +610,7 @@ export default function CourseDetail() {
                 </div>
 
                 {/* Problem & Solution */}
-                <div className="my-20 lg:my-28">
+                <div className="my-20 lg:my-28 max-w-5xl mx-auto">
                     {(course.problems && Array.isArray(course.problems) && course.problems.length > 0) || (course.solutions && Array.isArray(course.solutions) && course.solutions.length > 0) ? (
                         <div>
                             {/* Header (outside) */}
@@ -821,6 +849,87 @@ export default function CourseDetail() {
                         </div>
                     </div>
                 )}
+
+            </div> {/* Closes max-w-7xl main container */}
+
+            {/* Service Highlights Section (Dedicated Support, Payment, Activation) - Edge to Edge */}
+            <div className="border-y border-slate-200/40 py-16 w-full" style={{ backgroundColor: '#F4F5F7' }}>
+                <div className="max-w-7xl mx-auto px-4 md:px-6">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                            {/* Card 1: Dedicated Support */}
+                            <div 
+                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                style={{ borderColor: 'var(--primary-color)' }}
+                            >
+                                <div className="w-full flex flex-col items-center">
+                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                                        <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
+                                            <Headphones className="h-8 w-8 stroke-[1.8]" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-900 mb-2">ডেডিকেটেড সাপোর্ট</h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">যেকোনো সমস্যায় আমরা আছি আপনার পাশে</p>
+                                </div>
+                                <button 
+                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                    style={{ backgroundColor: 'var(--primary-color)' }}
+                                >
+                                    <Headphones className="h-4.5 w-4.5 fill-white text-white" /> সরাসরি যোগাযোগ
+                                </button>
+                            </div>
+
+                            {/* Card 2: bKash Payment */}
+                            <div 
+                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                style={{ borderColor: 'var(--primary-color)' }}
+                            >
+                                <div className="w-full flex flex-col items-center">
+                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                                        <div className="text-center">
+                                            <span className="text-[#D12053] font-black text-lg tracking-tighter block leading-none">bKash</span>
+                                            <span className="text-[8px] uppercase tracking-wider text-slate-400 font-black block mt-0.5">Payment</span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-900 mb-2">বিকাশ পেমেন্ট</h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">বিকাশ অফিসিয়াল সুরক্ষিত পেমেন্ট গেটওয়ে</p>
+                                </div>
+                                <button 
+                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                    style={{ backgroundColor: 'var(--primary-color)' }}
+                                >
+                                    <Lock className="h-4.5 w-4.5 text-white" /> ১০০% সিকিউর
+                                </button>
+                            </div>
+
+                            {/* Card 3: Instant Activation */}
+                            <div 
+                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                style={{ borderColor: 'var(--primary-color)' }}
+                            >
+                                <div className="w-full flex flex-col items-center">
+                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                                        <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
+                                            <Zap className="h-8 w-8 stroke-[1.8]" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-900 mb-2">ইনস্ট্যান্ট এক্টিভেশন</h3>
+                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">পেমেন্টের সাথে সাথে সার্ভিস চালু</p>
+                                </div>
+                                <button 
+                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                    style={{ backgroundColor: 'var(--primary-color)' }}
+                                >
+                                    <Zap className="h-4.5 w-4.5 fill-white text-white" /> ইনস্ট্যান্ট সেটআপ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Reopen max-w-7xl container for subsequent elements */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12 relative z-20">
 
                 {/* Frequently Asked Questions */}
                 {course.faq && Array.isArray(course.faq) && course.faq.length > 0 && (
