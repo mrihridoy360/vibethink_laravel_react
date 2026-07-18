@@ -35,6 +35,8 @@ const DEFAULTS = {
         facebook_domain_verification: '',
         google_site_verification: '',
         custom_meta_tags: '',
+        sitemap_enabled: '1',
+        sitemap_exclusions: '',
     },
     features: {},
 };

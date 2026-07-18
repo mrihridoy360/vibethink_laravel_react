@@ -179,7 +179,7 @@ const TABS = [
     { key: 'payment',      label: 'পেমেন্ট',  icon: CreditCard },
     { key: 'email',        label: 'ইমেইল',    icon: Mail },
     { key: 'marketing',    label: 'মার্কেটিং ও পিক্সেল', icon: Facebook },
-    { key: 'verification', label: 'ট্যাগ ভেরিফিকেশন', icon: Shield },
+    { key: 'verification', label: 'SEO ও সাইটম্যাপ', icon: Shield },
 ];
 
 // ── Main component ──────────────────────────────────────────────
@@ -747,33 +747,67 @@ export default function AdminSettings() {
 
                 {/* ── Verification ──────────────────────────── */}
                 {activeTab === 'verification' && (
-                    <SectionCard title="সার্চ কনসোল ও ডোমেইন ভেরিফিকেশন" description="গুগল সার্চ কনসোল, ফেসবুক ডোমেইন ভেরিফিকেশন এবং অন্যান্য মেটা ট্যাগ যুক্ত করুন।">
-                        <SettingInput
-                            label="গুগল সার্চ কনসোল ভেরিফিকেশন কোড (Google Site Verification Code)"
-                            id="google_site_verification"
-                            value={verification.google_site_verification}
-                            onChange={setV('google_site_verification')}
-                            placeholder="যেমন: 45abcDeFgHiJkLmNoPqRsTuVwXyZ"
-                            hint="গুগল সার্চ কনসোলে আপনার সাইট ভেরিফাই করতে meta verification কোডটি দিন।"
-                        />
-                        <SettingInput
-                            label="ফেসবুক ডোমেইন ভেরিফিকেশন কোড (Facebook Domain Verification Code)"
-                            id="facebook_domain_verification"
-                            value={verification.facebook_domain_verification}
-                            onChange={setV('facebook_domain_verification')}
-                            placeholder="যেমন: xzhnqp0kehfdawvbit7rt0ejkj5h2b"
-                            hint="ফেসবুক বিজনেস ম্যানেজার থেকে প্রাপ্ত ডোমেইন ভেরিফিকেশন কোডটি দিন।"
-                        />
-                        <SettingTextarea
-                            label="অন্যান্য কাস্টম মেটা ট্যাগ (Custom Meta Tags / Headers)"
-                            id="custom_meta_tags"
-                            value={verification.custom_meta_tags}
-                            onChange={setV('custom_meta_tags')}
-                            placeholder="<meta name='another-verification' content='value' />"
-                            rows={4}
-                            hint="এখানে যেকোনো কাস্টম মেটা ট্যাগ বা হেড ট্যাগ সরাসরি HTML ফরম্যাটে বসাতে পারেন।"
-                        />
-                    </SectionCard>
+                    <>
+                        <SectionCard title="সার্চ কনসোল ও ডোমেইন ভেরিফিকেশন" description="গুগল সার্চ কনসোল, ফেসবুক ডোমেইন ভেরিফিকেশন এবং অন্যান্য মেটা ট্যাগ যুক্ত করুন।">
+                            <SettingInput
+                                label="গুগল সার্চ কনসোল ভেরিফিকেশন কোড (Google Site Verification Code)"
+                                id="google_site_verification"
+                                value={verification.google_site_verification}
+                                onChange={setV('google_site_verification')}
+                                placeholder="যেমন: 45abcDeFgHiJkLmNoPqRsTuVwXyZ"
+                                hint="গুগল সার্চ কনসোলে আপনার সাইট ভেরিফাই করতে meta verification কোডটি দিন।"
+                            />
+                            <SettingInput
+                                label="ফেসবুক ডোমেইন ভেরিফিকেশন কোড (Facebook Domain Verification Code)"
+                                id="facebook_domain_verification"
+                                value={verification.facebook_domain_verification}
+                                onChange={setV('facebook_domain_verification')}
+                                placeholder="যেমন: xzhnqp0kehfdawvbit7rt0ejkj5h2b"
+                                hint="ফেসবুক বিজনেস ম্যানেজার থেকে প্রাপ্ত ডোমেইন ভেরিফিকেশন কোডটি দিন।"
+                            />
+                            <SettingTextarea
+                                label="অন্যান্য কাস্টম মেটা ট্যাগ (Custom Meta Tags / Headers)"
+                                id="custom_meta_tags"
+                                value={verification.custom_meta_tags}
+                                onChange={setV('custom_meta_tags')}
+                                placeholder="<meta name='another-verification' content='value' />"
+                                rows={4}
+                                hint="এখানে যেকোনো কাস্টম মেটা ট্যাগ বা হেড ট্যাগ সরাসরি HTML ফরম্যাটে বসাতে পারেন।"
+                            />
+                        </SectionCard>
+
+                        <SectionCard title="সাইটম্যাপ কনফিগারেশন (Sitemap XML)" description="গুগল বা অন্যান্য সার্চ ইঞ্জিনের ক্রলিং ও ইনডেক্সিং নিয়ন্ত্রণ করুন।">
+                            <FeatureToggle
+                                label="সাইটম্যাপ সক্রিয় করুন"
+                                description="সাইটম্যাপ অন থাকলে সার্চ ইঞ্জিনগুলো স্বয়ংক্রিয়ভাবে আপনার সাইটের কোর্স ও ব্লগ ক্রল করতে পারবে।"
+                                checked={verification.sitemap_enabled === '1'}
+                                onChange={(checked) => setV('sitemap_enabled')(checked ? '1' : '0')}
+                            />
+                            <div className="pt-2">
+                                <SettingTextarea
+                                    label="সাইটম্যাপ থেকে বাদ দেওয়ার জন্য ইউআরএল পাথ (Excluded Paths)"
+                                    id="sitemap_exclusions"
+                                    value={verification.sitemap_exclusions}
+                                    onChange={setV('sitemap_exclusions')}
+                                    placeholder={`যেমন:\n/workshops\n/courses/draft-course-slug\n/blog/hidden-post`}
+                                    rows={4}
+                                    hint="প্রতি লাইনে একটি করে ইউআরএল পাথ বা সম্পূর্ণ ইউআরএল লিখুন। এই ইউআরএলগুলো সার্চ ইঞ্জিন ক্রল করবে না।"
+                                />
+                            </div>
+                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                                <span className="font-semibold">আপনার সাইটম্যাপের লাইভ লিংক:</span>
+                                <a 
+                                    href="/sitemap.xml" 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="flex items-center gap-1.5 text-orange-500 hover:text-orange-600 font-bold hover:underline transition-all"
+                                >
+                                    <Link2 className="w-3.5 h-3.5" />
+                                    view sitemap.xml
+                                </a>
+                            </div>
+                        </SectionCard>
+                    </>
                 )}
             </div>
 

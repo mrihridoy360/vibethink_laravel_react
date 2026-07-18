@@ -251,6 +251,9 @@ Route::prefix('api')->group(function () {
 // ZiniPay redirect callback web route (browser redirect)
 Route::get('/payment/zinipay/callback', [App\Http\Controllers\ZiniPayController::class, 'callback'])->name('payment.zinipay.callback');
 
+// Dynamic XML Sitemap Route
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);
+
 // Fallback Route for React SPA
 Route::get('/{any}', function () {
     $meta = [
