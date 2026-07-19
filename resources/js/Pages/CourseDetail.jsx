@@ -215,13 +215,12 @@ export default function CourseDetail() {
                             <div className="bg-white border border-slate-200/80 shadow-sm rounded-xl sm:rounded-2xl overflow-hidden relative">
                                 <div className="p-5 sm:p-8">
                                     <div
-                                        className={`text-slate-600 text-lg font-normal leading-relaxed markdown-body transition-all duration-500 ease-in-out ${
-                                            !isDescriptionExpanded ? 'max-h-[450px] overflow-hidden' : 'max-h-[none]'
-                                        }`}
+                                        className={`text-slate-600 text-lg font-normal leading-relaxed markdown-body transition-all duration-500 ease-in-out ${!isDescriptionExpanded ? 'max-h-[450px] overflow-hidden' : 'max-h-[none]'
+                                            }`}
                                         dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(course.description) }}
                                     />
                                 </div>
-                                
+
                                 {!isDescriptionExpanded && (
                                     <div className="absolute bottom-14 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none" />
                                 )}
@@ -530,18 +529,18 @@ export default function CourseDetail() {
                                 return (
                                     <div key={chapter.id} className="relative">
                                         {/* Timeline Node Circle */}
-                                        <div 
+                                        <div
                                             className="absolute -left-[39px] sm:-left-[49px] top-[32px] sm:top-[30px] w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] rounded-full bg-white border-4 flex items-center justify-center z-10 shadow-sm"
                                             style={{ borderColor: 'var(--primary-color)' }}
                                         >
-                                            <div 
-                                                className="w-1.5 h-1.5 rounded-full animate-pulse" 
+                                            <div
+                                                className="w-1.5 h-1.5 rounded-full animate-pulse"
                                                 style={{ backgroundColor: 'var(--primary-color)' }}
                                             />
                                         </div>
 
                                         {/* Card content wrapper */}
-                                        <div 
+                                        <div
                                             className="border border-slate-200/60 rounded-2xl p-5 hover:shadow-md transition-all relative overflow-hidden"
                                             style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
                                         >
@@ -652,30 +651,30 @@ export default function CourseDetail() {
                                 {course.problems && Array.isArray(course.problems) && course.problems.length > 0 && (
                                     <div className="relative rounded-3xl p-[2px] overflow-hidden snake-border-container shadow-sm border border-slate-100/50 hover:shadow-md transition-all h-full">
                                         {/* Rotating Snake Border */}
-                                        <div 
-                                            className="snake-border-glow" 
+                                        <div
+                                            className="snake-border-glow"
                                             style={{
                                                 background: 'conic-gradient(from 0deg, transparent 0%, transparent 40%, #ef4444 50%, transparent 60%, transparent 100%)'
                                             }}
                                         />
 
                                         {/* Inner Content Area */}
-                                        <div 
+                                        <div
                                             className="snake-border-content p-6 sm:p-8 rounded-[22px] relative overflow-hidden flex flex-col gap-4 text-left h-full"
                                             style={{ backgroundColor: 'color-mix(in srgb, #ef4444 7%, #ffffff)' }}
                                         >
                                             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-200/60">
-                                                <span className="text-xs sm:text-sm font-extrabold tracking-[0.2em] text-rose-500 uppercase">/ Problem</span>
-                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">আপনার বর্তমান সমস্যা</h3>
+                                                <span className="text-xs sm:text-sm font-extrabold tracking-[0.2em] text-rose-500 uppercase">/ আপনার বর্তমান সমস্যা</span>
+
+                                                <ul className="space-y-4">
+                                                    {course.problems.map((item, idx) => (
+                                                        <li key={idx} className="flex items-start gap-3.5 text-base sm:text-lg text-slate-700 font-semibold leading-relaxed">
+                                                            <span className="mt-2.5 h-2.5 w-2.5 rounded-full bg-rose-500 shrink-0" />
+                                                            <span>{renderText(item)}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
-                                            <ul className="space-y-4">
-                                                {course.problems.map((item, idx) => (
-                                                    <li key={idx} className="flex items-start gap-3.5 text-base sm:text-lg text-slate-700 font-semibold leading-relaxed">
-                                                        <span className="mt-2.5 h-2.5 w-2.5 rounded-full bg-rose-500 shrink-0" />
-                                                        <span>{renderText(item)}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
                                         </div>
                                     </div>
                                 )}
@@ -687,13 +686,13 @@ export default function CourseDetail() {
                                         <div className="snake-border-glow" />
 
                                         {/* Inner Content Area */}
-                                        <div 
+                                        <div
                                             className="snake-border-content p-6 sm:p-8 rounded-[22px] relative overflow-hidden flex flex-col gap-4 text-left h-full"
                                             style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
                                         >
                                             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-200/60">
-                                                <span className="text-xs sm:text-sm font-extrabold tracking-[0.2em] theme-primary-text uppercase">/ Solution</span>
-                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">আপনার জন্য আমাদের সমাধান</h3>
+                                                <span className="text-xs sm:text-sm font-extrabold tracking-[0.2em] theme-primary-text uppercase">/ আপনার জন্য আমাদের সমাধান</span>
+
                                             </div>
                                             <ul className="space-y-4">
                                                 {course.solutions.map((item, idx) => (
@@ -709,342 +708,342 @@ export default function CourseDetail() {
                             </div>
                         </div>
                     ) : null}
-                </div>
+                        </div>
 
                 {/* Instructor */}
-                {course.user && (
-                    <div className="my-20 lg:my-28 max-w-3xl mx-auto px-0 sm:px-4">
-                        <div className="relative mb-6">
-                            <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
-                                INSTRUCTOR
-                            </span>
-                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-                                {getSectionTitle(course.section_titles, 'instructor')}
-                            </h2>
-                        </div>
-                        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-sm transition-all hover:shadow-md" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, #ffffff) 0%, #ffffff 80%)' }}>
-                            {/* Decorative background blob */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 opacity-20 rounded-full blur-3xl pointer-events-none" />
-                            
-                            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
-                                {/* Avatar */}
-                                <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl overflow-hidden bg-white shrink-0 border-4 border-white shadow-md relative group">
-                                    {course.user.avatar ? (
-                                        <img
-                                            src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
-                                            alt={course.user.name}
-                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                            <User className="h-10 w-10 text-white/70" />
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Details */}
-                                <div className="flex-1 text-center md:text-left space-y-4">
-                                    <div className="space-y-1">
-                                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-1.5">
-                                            {course.user.name || 'বিশেষজ্ঞ'}
-                                            <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-50" />
-                                        </h3>
-                                        <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider">কোর্স ইনস্ট্রাক্টর</p>
-                                    </div>
-
-                                    <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed italic border-l-2 border-slate-200 pl-0 md:pl-4">
-                                        "I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."
-                                    </p>
-
-                                    {/* Stats grid */}
-                                    <div className="grid grid-cols-2 gap-3 pt-2">
-                                        <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                            <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">অভিজ্ঞতা</div>
-                                            <div className="text-lg font-black text-slate-800">৬+ বছর</div>
-                                        </div>
-                                        <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                            <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">সম্পন্ন প্রজেক্ট</div>
-                                            <div className="text-lg font-black text-slate-800">৪৫০০+ প্রজেক্ট</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div> {/* Closes max-w-7xl main container */}
-
-            {/* Special Offer Ribbon - Edge to Edge */}
-            {!isEnrolled && (
-                <div 
-                    ref={ribbonRef}
-                    className="w-full py-4 text-white border-y border-black/10 flex items-center justify-center select-none" 
-                    style={{ backgroundColor: 'var(--primary-color)' }}
-                >
-                    <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
-                        <span className="text-base sm:text-lg md:text-xl font-bold tracking-wide">
-                            বিশেষ অফার চলছে — দেরি না করে
-                        </span>
-                        <button
-                            onClick={handleEnroll}
-                            className="bg-slate-950 hover:bg-black text-white text-sm sm:text-base font-extrabold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer border-none"
-                        >
-                            এখনই ইনরোল করুন <ArrowRight className="h-4 w-4" />
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Reopen max-w-7xl container for subsequent elements */}
-            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 relative z-20">
-
-                {/* Call To Action */}
-                {!isEnrolled && (
-                    <div className="my-20 lg:my-28 max-w-2xl mx-auto px-0 sm:px-4">
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl sm:text-4xl font-black leading-tight mb-2" style={{ color: 'color-mix(in srgb, var(--primary-color) 35%, #0f172a 65%)' }}>
-                                Unlock Your Superpower
-                            </h2>
-                            <p className="text-base sm:text-lg text-slate-500 font-semibold leading-relaxed">
-                                মাসে মাসে কোনো ফি নেই। একবার পেমেন্ট করুন, লাইফটাইম এক্সেস নিন।
-                            </p>
-                        </div>
-                        <div className="relative rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xl text-center">
-                            {/* Floating Badge */}
-                            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                                <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black text-white bg-gradient-to-r from-cyan-500 to-indigo-500 shadow-md uppercase tracking-wider whitespace-nowrap">
-                                    <Zap className="h-3.5 w-3.5 fill-white text-white" /> Early Bird Action
+                    {course.user && (
+                        <div className="my-20 lg:my-28 max-w-3xl mx-auto px-0 sm:px-4">
+                            <div className="relative mb-6">
+                                <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
+                                    INSTRUCTOR
                                 </span>
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
+                                    {getSectionTitle(course.section_titles, 'instructor')}
+                                </h2>
                             </div>
+                            <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-sm transition-all hover:shadow-md" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, #ffffff) 0%, #ffffff 80%)' }}>
+                                {/* Decorative background blob */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 opacity-20 rounded-full blur-3xl pointer-events-none" />
 
-                            <div className="space-y-6">
-                                {/* Title and Subtitle */}
-                                <div className="pt-2">
-                                    <h3 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight leading-tight">
-                                        {course.title}
-                                    </h3>
-                                    <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">
-                                        No monthly fees. 100% Free Tools Taught.
-                                    </p>
-                                </div>
-
-                                {/* Price tag */}
-                                <div className="flex items-baseline justify-center gap-3.5 py-2">
-                                    {discountPercent > 0 && (
-                                        <span className="text-2xl sm:text-3xl font-bold text-slate-350 line-through">
-                                            ৳{originalPrice.toLocaleString()}
-                                        </span>
-                                    )}
-                                    <span className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tight">
-                                        ৳{currentPrice.toLocaleString()}
-                                    </span>
-                                </div>
-
-                                {/* Notice Box */}
-                                <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex gap-3 text-left max-w-xl mx-auto">
-                                    <Zap className="h-5 w-5 text-amber-500 shrink-0 mt-0.5 animate-pulse" />
-                                    <p className="text-xs sm:text-sm text-amber-800 font-bold leading-relaxed">
-                                        যেকোনো সময় দাম বাড়তে পারে। <span className="underline">দাম বেড়ে যাওয়ার আগেই</span> আপনার সিটটি নিশ্চিত করুন।
-                                    </p>
-                                </div>
-
-                                {/* Features Checklist */}
-                                {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
-                                    <ul className="space-y-4 py-2 max-w-md mx-auto text-left">
-                                        {course.this_course_includes.map((item, idx) => (
-                                            <li key={idx} className="flex items-center gap-3.5 text-sm sm:text-base text-slate-700 font-bold">
-                                                <div className="w-6 h-6 rounded-full bg-cyan-50 border border-cyan-200 flex items-center justify-center shrink-0">
-                                                    <CheckCircle className="h-4 w-4 text-cyan-600" />
-                                                </div>
-                                                <span className="leading-snug">{renderText(item)}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                {/* Action Button */}
-                                <div>
-                                    <button
-                                        onClick={handleEnroll}
-                                        disabled={enrolling}
-                                        className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:brightness-110 text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-100 transition-all disabled:opacity-60 cursor-pointer border-none text-base sm:text-lg tracking-wide"
-                                    >
-                                        {enrolling ? 'এনরোলিং হচ্ছে...' : 'Start Mission Now'}
-                                    </button>
-                                </div>
-
-                                {/* Bottom Guarantee Box */}
-                                {parseInt(course.money_back_days, 10) > 0 && (
-                                    <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-4 sm:p-5 text-left flex items-start gap-4 max-w-xl mx-auto">
-                                        <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center shrink-0 border border-blue-200">
-                                            <ShieldCheck className="h-6 w-6 text-blue-600" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-base font-extrabold text-blue-900 mb-1">
-                                                {toBengaliNum(course.money_back_days)} দিনের মানি-ব্যাক গ্যারান্টি
-                                            </h4>
-                                            <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                                                কোর্স শুরু করুন নিশ্চিন্তে। {toBengaliNum(course.money_back_days)} দিনের মধ্যে যদি মনে হয় এটা আপনার জন্য নয় — কোনো প্রশ্ন ছাড়াই পুরো টাকা ফেরত।
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Bottom Secure note */}
-                                <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 font-semibold pt-2">
-                                    <Lock className="h-3.5 w-3.5" /> Secure Payment System
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-            </div> {/* Closes max-w-7xl main container */}
-
-            {/* Service Highlights Section (Dedicated Support, Payment, Activation) - Edge to Edge */}
-            <div className="border-y border-slate-200/40 py-16 w-full" style={{ backgroundColor: '#F4F5F7' }}>
-                <div className="max-w-7xl mx-auto px-4 md:px-6">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                            {/* Card 1: Dedicated Support */}
-                            <div 
-                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
-                                style={{ borderColor: 'var(--primary-color)' }}
-                            >
-                                <div className="w-full flex flex-col items-center">
-                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
-                                        <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
-                                            <Headphones className="h-8 w-8 stroke-[1.8]" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-black text-slate-900 mb-2">ডেডিকেটেড সাপোর্ট</h3>
-                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">যেকোনো সমস্যায় আমরা আছি আপনার পাশে</p>
-                                </div>
-                                <button 
-                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
-                                    style={{ backgroundColor: 'var(--primary-color)' }}
-                                >
-                                    <Headphones className="h-4.5 w-4.5 fill-white text-white" /> সরাসরি যোগাযোগ
-                                </button>
-                            </div>
-
-                            {/* Card 2: bKash Payment */}
-                            <div 
-                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
-                                style={{ borderColor: 'var(--primary-color)' }}
-                            >
-                                <div className="w-full flex flex-col items-center">
-                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                                        <div className="text-center">
-                                            <span className="text-[#D12053] font-black text-lg tracking-tighter block leading-none">bKash</span>
-                                            <span className="text-[8px] uppercase tracking-wider text-slate-400 font-black block mt-0.5">Payment</span>
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-black text-slate-900 mb-2">বিকাশ পেমেন্ট</h3>
-                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">বিকাশ অফিসিয়াল সুরক্ষিত পেমেন্ট গেটওয়ে</p>
-                                </div>
-                                <button 
-                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
-                                    style={{ backgroundColor: 'var(--primary-color)' }}
-                                >
-                                    <Lock className="h-4.5 w-4.5 text-white" /> ১০০% সিকিউর
-                                </button>
-                            </div>
-
-                            {/* Card 3: Instant Activation */}
-                            <div 
-                                className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
-                                style={{ borderColor: 'var(--primary-color)' }}
-                            >
-                                <div className="w-full flex flex-col items-center">
-                                    <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
-                                        <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
-                                            <Zap className="h-8 w-8 stroke-[1.8]" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-black text-slate-900 mb-2">ইনস্ট্যান্ট এক্টিভেশন</h3>
-                                    <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">পেমেন্টের সাথে সাথে সার্ভিস চালু</p>
-                                </div>
-                                <button 
-                                    className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
-                                    style={{ backgroundColor: 'var(--primary-color)' }}
-                                >
-                                    <Zap className="h-4.5 w-4.5 fill-white text-white" /> ইনস্ট্যান্ট সেটআপ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Reopen max-w-7xl container for subsequent elements */}
-            <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12 relative z-20">
-
-                {/* Frequently Asked Questions */}
-                {course.faq && Array.isArray(course.faq) && course.faq.length > 0 && (
-                    <div className="my-20 lg:my-28">
-                        <div className="mb-6 text-center">
-                            <span className="text-xs font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
-                                FAQ
-                            </span>
-                            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
-                                {getSectionTitle(course.section_titles, 'faq')}
-                            </h2>
-                        </div>
-
-                        <div className="max-w-3xl mx-auto space-y-3">
-                            {course.faq.map((faq, index) => {
-                                const isOpen = expandedFaq === index;
-                                return (
-                                    <div
-                                        key={index}
-                                        className="bg-white border border-slate-200/80 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden transition-all duration-200"
-                                    >
-                                        <button
-                                            onClick={() => setExpandedFaq(isOpen ? null : index)}
-                                            className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:theme-primary-text text-lg transition-colors cursor-pointer border-none bg-transparent"
-                                        >
-                                            <span className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center text-[10px] font-bold shrink-0">
-                                                    {index + 1}
-                                                </span>
-                                                {faq.question}
-                                            </span>
-                                            <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                                        </button>
-                                        {isOpen && (
-                                            <div className="px-5 pb-4 pt-1.5 text-base text-slate-500 font-medium leading-relaxed border-t border-slate-100 pl-14">
-                                                {faq.answer}
+                                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
+                                    {/* Avatar */}
+                                    <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl overflow-hidden bg-white shrink-0 border-4 border-white shadow-md relative group">
+                                        {course.user.avatar ? (
+                                            <img
+                                                src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
+                                                alt={course.user.name}
+                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                                <User className="h-10 w-10 text-white/70" />
                                             </div>
                                         )}
                                     </div>
-                                );
-                            })}
+
+                                    {/* Details */}
+                                    <div className="flex-1 text-center md:text-left space-y-4">
+                                        <div className="space-y-1">
+                                            <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-1.5">
+                                                {course.user.name || 'বিশেষজ্ঞ'}
+                                                <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-50" />
+                                            </h3>
+                                            <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider">কোর্স ইনস্ট্রাক্টর</p>
+                                        </div>
+
+                                        <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed italic border-l-2 border-slate-200 pl-0 md:pl-4">
+                                            "I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."
+                                        </p>
+
+                                        {/* Stats grid */}
+                                        <div className="grid grid-cols-2 gap-3 pt-2">
+                                            <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
+                                                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">অভিজ্ঞতা</div>
+                                                <div className="text-lg font-black text-slate-800">৬+ বছর</div>
+                                            </div>
+                                            <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
+                                                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">সম্পন্ন প্রজেক্ট</div>
+                                                <div className="text-lg font-black text-slate-800">৪৫০০+ প্রজেক্ট</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div> {/* Closes max-w-7xl main container */}
+
+                {/* Special Offer Ribbon - Edge to Edge */}
+                {!isEnrolled && (
+                    <div
+                        ref={ribbonRef}
+                        className="w-full py-4 text-white border-y border-black/10 flex items-center justify-center select-none"
+                        style={{ backgroundColor: 'var(--primary-color)' }}
+                    >
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+                            <span className="text-base sm:text-lg md:text-xl font-bold tracking-wide">
+                                বিশেষ অফার চলছে — দেরি না করে
+                            </span>
+                            <button
+                                onClick={handleEnroll}
+                                className="bg-slate-950 hover:bg-black text-white text-sm sm:text-base font-extrabold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer border-none"
+                            >
+                                এখনই ইনরোল করুন <ArrowRight className="h-4 w-4" />
+                            </button>
                         </div>
                     </div>
                 )}
 
-            </div>
+                {/* Reopen max-w-7xl container for subsequent elements */}
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 relative z-20">
 
-            {/* Sticky Bottom Ribbon */}
-            {!isEnrolled && showStickyRibbon && (
-                <div 
-                    className="fixed bottom-0 left-0 right-0 z-50 py-3 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
-                    style={{ backgroundColor: 'var(--primary-color)' }}
-                >
-                    <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center gap-4 sm:gap-6 w-full">
-                        <span className="text-sm sm:text-base font-bold tracking-wide">
-                            বিশেষ অফার চলছে — দেরি না করে
-                        </span>
-                        <button
-                            onClick={handleEnroll}
-                            className="bg-slate-950 hover:bg-black text-white text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border-none shrink-0"
-                        >
-                            এখনই ইনরোল করুন <ArrowRight className="h-3.5 w-3.5" />
-                        </button>
+                    {/* Call To Action */}
+                    {!isEnrolled && (
+                        <div className="my-20 lg:my-28 max-w-2xl mx-auto px-0 sm:px-4">
+                            <div className="text-center mb-8">
+                                <h2 className="text-3xl sm:text-4xl font-black leading-tight mb-2" style={{ color: 'color-mix(in srgb, var(--primary-color) 35%, #0f172a 65%)' }}>
+                                    Unlock Your Superpower
+                                </h2>
+                                <p className="text-base sm:text-lg text-slate-500 font-semibold leading-relaxed">
+                                    মাসে মাসে কোনো ফি নেই। একবার পেমেন্ট করুন, লাইফটাইম এক্সেস নিন।
+                                </p>
+                            </div>
+                            <div className="relative rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xl text-center">
+                                {/* Floating Badge */}
+                                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black text-white bg-gradient-to-r from-cyan-500 to-indigo-500 shadow-md uppercase tracking-wider whitespace-nowrap">
+                                        <Zap className="h-3.5 w-3.5 fill-white text-white" /> Early Bird Action
+                                    </span>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {/* Title and Subtitle */}
+                                    <div className="pt-2">
+                                        <h3 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight leading-tight">
+                                            {course.title}
+                                        </h3>
+                                        <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">
+                                            No monthly fees. 100% Free Tools Taught.
+                                        </p>
+                                    </div>
+
+                                    {/* Price tag */}
+                                    <div className="flex items-baseline justify-center gap-3.5 py-2">
+                                        {discountPercent > 0 && (
+                                            <span className="text-2xl sm:text-3xl font-bold text-slate-350 line-through">
+                                                ৳{originalPrice.toLocaleString()}
+                                            </span>
+                                        )}
+                                        <span className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tight">
+                                            ৳{currentPrice.toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                    {/* Notice Box */}
+                                    <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex gap-3 text-left max-w-xl mx-auto">
+                                        <Zap className="h-5 w-5 text-amber-500 shrink-0 mt-0.5 animate-pulse" />
+                                        <p className="text-xs sm:text-sm text-amber-800 font-bold leading-relaxed">
+                                            যেকোনো সময় দাম বাড়তে পারে। <span className="underline">দাম বেড়ে যাওয়ার আগেই</span> আপনার সিটটি নিশ্চিত করুন।
+                                        </p>
+                                    </div>
+
+                                    {/* Features Checklist */}
+                                    {course.this_course_includes && Array.isArray(course.this_course_includes) && course.this_course_includes.length > 0 && (
+                                        <ul className="space-y-4 py-2 max-w-md mx-auto text-left">
+                                            {course.this_course_includes.map((item, idx) => (
+                                                <li key={idx} className="flex items-center gap-3.5 text-sm sm:text-base text-slate-700 font-bold">
+                                                    <div className="w-6 h-6 rounded-full bg-cyan-50 border border-cyan-200 flex items-center justify-center shrink-0">
+                                                        <CheckCircle className="h-4 w-4 text-cyan-600" />
+                                                    </div>
+                                                    <span className="leading-snug">{renderText(item)}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+
+                                    {/* Action Button */}
+                                    <div>
+                                        <button
+                                            onClick={handleEnroll}
+                                            disabled={enrolling}
+                                            className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:brightness-110 text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-100 transition-all disabled:opacity-60 cursor-pointer border-none text-base sm:text-lg tracking-wide"
+                                        >
+                                            {enrolling ? 'এনরোলিং হচ্ছে...' : 'Start Mission Now'}
+                                        </button>
+                                    </div>
+
+                                    {/* Bottom Guarantee Box */}
+                                    {parseInt(course.money_back_days, 10) > 0 && (
+                                        <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-4 sm:p-5 text-left flex items-start gap-4 max-w-xl mx-auto">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center shrink-0 border border-blue-200">
+                                                <ShieldCheck className="h-6 w-6 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-base font-extrabold text-blue-900 mb-1">
+                                                    {toBengaliNum(course.money_back_days)} দিনের মানি-ব্যাক গ্যারান্টি
+                                                </h4>
+                                                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                                                    কোর্স শুরু করুন নিশ্চিন্তে। {toBengaliNum(course.money_back_days)} দিনের মধ্যে যদি মনে হয় এটা আপনার জন্য নয় — কোনো প্রশ্ন ছাড়াই পুরো টাকা ফেরত।
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Bottom Secure note */}
+                                    <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 font-semibold pt-2">
+                                        <Lock className="h-3.5 w-3.5" /> Secure Payment System
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                </div> {/* Closes max-w-7xl main container */}
+
+                {/* Service Highlights Section (Dedicated Support, Payment, Activation) - Edge to Edge */}
+                <div className="border-y border-slate-200/40 py-16 w-full" style={{ backgroundColor: '#F4F5F7' }}>
+                    <div className="max-w-7xl mx-auto px-4 md:px-6">
+                        <div className="max-w-5xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                                {/* Card 1: Dedicated Support */}
+                                <div
+                                    className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                    style={{ borderColor: 'var(--primary-color)' }}
+                                >
+                                    <div className="w-full flex flex-col items-center">
+                                        <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                                            <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
+                                                <Headphones className="h-8 w-8 stroke-[1.8]" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900 mb-2">ডেডিকেটেড সাপোর্ট</h3>
+                                        <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">যেকোনো সমস্যায় আমরা আছি আপনার পাশে</p>
+                                    </div>
+                                    <button
+                                        className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                        style={{ backgroundColor: 'var(--primary-color)' }}
+                                    >
+                                        <Headphones className="h-4.5 w-4.5 fill-white text-white" /> সরাসরি যোগাযোগ
+                                    </button>
+                                </div>
+
+                                {/* Card 2: bKash Payment */}
+                                <div
+                                    className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                    style={{ borderColor: 'var(--primary-color)' }}
+                                >
+                                    <div className="w-full flex flex-col items-center">
+                                        <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                                            <div className="text-center">
+                                                <span className="text-[#D12053] font-black text-lg tracking-tighter block leading-none">bKash</span>
+                                                <span className="text-[8px] uppercase tracking-wider text-slate-400 font-black block mt-0.5">Payment</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900 mb-2">বিকাশ পেমেন্ট</h3>
+                                        <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">বিকাশ অফিসিয়াল সুরক্ষিত পেমেন্ট গেটওয়ে</p>
+                                    </div>
+                                    <button
+                                        className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                        style={{ backgroundColor: 'var(--primary-color)' }}
+                                    >
+                                        <Lock className="h-4.5 w-4.5 text-white" /> ১০০% সিকিউর
+                                    </button>
+                                </div>
+
+                                {/* Card 3: Instant Activation */}
+                                <div
+                                    className="bg-white border-2 rounded-3xl p-6 sm:p-8 text-center flex flex-col items-center justify-between transition-all hover:shadow-lg shadow-sm group animate-fade-in"
+                                    style={{ borderColor: 'var(--primary-color)' }}
+                                >
+                                    <div className="w-full flex flex-col items-center">
+                                        <div className="w-20 h-20 rounded-full border border-slate-200 flex items-center justify-center mb-5 bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                                            <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-850">
+                                                <Zap className="h-8 w-8 stroke-[1.8]" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900 mb-2">ইনস্ট্যান্ট এক্টিভেশন</h3>
+                                        <p className="text-xs sm:text-sm text-slate-500 font-bold mb-6">পেমেন্টের সাথে সাথে সার্ভিস চালু</p>
+                                    </div>
+                                    <button
+                                        className="w-full py-3 rounded-xl text-white font-black text-sm sm:text-base flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-95 border-none shadow-sm"
+                                        style={{ backgroundColor: 'var(--primary-color)' }}
+                                    >
+                                        <Zap className="h-4.5 w-4.5 fill-white text-white" /> ইনস্ট্যান্ট সেটআপ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            )}
-        </div>
-    );
+
+                {/* Reopen max-w-7xl container for subsequent elements */}
+                <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12 relative z-20">
+
+                    {/* Frequently Asked Questions */}
+                    {course.faq && Array.isArray(course.faq) && course.faq.length > 0 && (
+                        <div className="my-20 lg:my-28">
+                            <div className="mb-6 text-center">
+                                <span className="text-xs font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
+                                    FAQ
+                                </span>
+                                <h2 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
+                                    {getSectionTitle(course.section_titles, 'faq')}
+                                </h2>
+                            </div>
+
+                            <div className="max-w-3xl mx-auto space-y-3">
+                                {course.faq.map((faq, index) => {
+                                    const isOpen = expandedFaq === index;
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="bg-white border border-slate-200/80 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden transition-all duration-200"
+                                        >
+                                            <button
+                                                onClick={() => setExpandedFaq(isOpen ? null : index)}
+                                                className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-slate-700 hover:theme-primary-text text-lg transition-colors cursor-pointer border-none bg-transparent"
+                                            >
+                                                <span className="flex items-center gap-3">
+                                                    <span className="w-6 h-6 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center text-[10px] font-bold shrink-0">
+                                                        {index + 1}
+                                                    </span>
+                                                    {faq.question}
+                                                </span>
+                                                <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            {isOpen && (
+                                                <div className="px-5 pb-4 pt-1.5 text-base text-slate-500 font-medium leading-relaxed border-t border-slate-100 pl-14">
+                                                    {faq.answer}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Sticky Bottom Ribbon */}
+                {!isEnrolled && showStickyRibbon && (
+                    <div
+                        className="fixed bottom-0 left-0 right-0 z-50 py-3 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
+                        style={{ backgroundColor: 'var(--primary-color)' }}
+                    >
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center gap-4 sm:gap-6 w-full">
+                            <span className="text-sm sm:text-base font-bold tracking-wide">
+                                বিশেষ অফার চলছে — দেরি না করে
+                            </span>
+                            <button
+                                onClick={handleEnroll}
+                                className="bg-slate-950 hover:bg-black text-white text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border-none shrink-0"
+                            >
+                                এখনই ইনরোল করুন <ArrowRight className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+            );
 }
