@@ -6,7 +6,7 @@ import {
     ArrowLeft, BookOpen, LayoutDashboard, Settings, Globe, Save,
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
-    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock
+    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -368,6 +368,106 @@ function SettingsTab({ form, setForm, errors }) {
                     />
                     <p className="text-xs text-gray-400 mt-1">০ বা ফাঁকা রাখলে মানি-ব্যাক গ্যারান্টি দেখানো হবে না।</p>
                 </div>
+            </div>
+
+            {/* Fake Learner & Countdown Settings */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5 lg:col-span-2">
+                <div>
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 mb-0.5">
+                        <Users className="h-4 w-4 text-blue-600" /> ফেক কাউন্ট ও কাউন্টডাউন টাইমার
+                    </h3>
+                    <p className="text-xs text-gray-400">শিক্ষার্থীদের আকর্ষণের জন্য ফেক লার্নার কাউন্ট এবং কাউন্টডাউন টাইমার কনফিগার করুন।</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Fake Learner Count */}
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">ফেক লার্নার সংখ্যা (Fake Learner Count)</label>
+                            <input
+                                type="number" min="0" step="1"
+                                value={form.section_titles?.fake_learner_count || ''}
+                                onChange={e => setForm(p => {
+                                    const nextTitles = { ...(p.section_titles || {}) };
+                                    nextTitles.fake_learner_count = e.target.value ? parseInt(e.target.value) : 0;
+                                    return { ...p, section_titles: nextTitles };
+                                })}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="যেমন: ৩৫০"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">এই সংখ্যাটির সাথে কোর্সের প্রকৃত ইনরোলমেন্ট সংখ্যা যোগ হয়ে কোর্স ডিটেইলস পেইজে দেখাবে।</p>
+                        </div>
+                    </div>
+
+                    {/* Countdown Settings */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-800">কাউন্টডাউন টাইমার সক্রিয় করুন</p>
+                                <p className="text-xs text-gray-400 mt-0.5">সক্রিয় করলে কোর্সে একটি কাউন্টডাউন টাইমার ব্যানার দেখাবে।</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setForm(p => {
+                                    const nextTitles = { ...(p.section_titles || {}) };
+                                    nextTitles.countdown_enabled = !nextTitles.countdown_enabled;
+                                    return { ...p, section_titles: nextTitles };
+                                })}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${form.section_titles?.countdown_enabled ? 'bg-orange-500' : 'bg-gray-300'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${form.section_titles?.countdown_enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {form.section_titles?.countdown_enabled && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">কাউন্টডাউন সময়সীমা (ঘন্টায়)</label>
+                            <input
+                                type="number" min="1" step="0.5"
+                                value={form.section_titles?.countdown_hours || ''}
+                                onChange={e => setForm(p => {
+                                    const nextTitles = { ...(p.section_titles || {}) };
+                                    nextTitles.countdown_hours = e.target.value ? parseFloat(e.target.value) : 24;
+                                    return { ...p, section_titles: nextTitles };
+                                })}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="যেমন: ২৪ বা ৩"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">সময় শেষ হয়ে গেলে টাইমারটি পুনরায় রিস্টার্ট হবে।</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">টাইটেল (Title)</label>
+                            <input
+                                type="text"
+                                value={form.section_titles?.countdown_title || ''}
+                                onChange={e => setForm(p => {
+                                    const nextTitles = { ...(p.section_titles || {}) };
+                                    nextTitles.countdown_title = e.target.value;
+                                    return { ...p, section_titles: nextTitles };
+                                })}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="লাইফ টাইম সাপোর্ট এর সাথে"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">সাবটাইটেল (Subtitle)</label>
+                            <input
+                                type="text"
+                                value={form.section_titles?.countdown_subtitle || ''}
+                                onChange={e => setForm(p => {
+                                    const nextTitles = { ...(p.section_titles || {}) };
+                                    nextTitles.countdown_subtitle = e.target.value;
+                                    return { ...p, section_titles: nextTitles };
+                                })}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="ইনস্ট্যান্ট আর্নিং এর জগতে এখনি জয়েন করুন 💸"
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -23,6 +23,53 @@ export default function CourseDetail() {
     const [showStickyRibbon, setShowStickyRibbon] = useState(true);
     const ribbonRef = useRef(null);
 
+    const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+
+    useEffect(() => {
+        if (!course?.section_titles?.countdown_enabled) return;
+
+        const durationHours = parseFloat(course.section_titles?.countdown_hours) || 24;
+        const durationMs = durationHours * 60 * 60 * 1000;
+        const storageKey = `course_countdown_target_${course.id}`;
+
+        const getOrCreateTargetTime = () => {
+            let targetStr = localStorage.getItem(storageKey);
+            let target = targetStr ? parseInt(targetStr, 10) : 0;
+            const now = Date.now();
+
+            if (!target || target <= now) {
+                target = now + durationMs;
+                localStorage.setItem(storageKey, target.toString());
+            }
+            return target;
+        };
+
+        let targetTime = getOrCreateTargetTime();
+
+        const updateTimer = () => {
+            const now = Date.now();
+            let diff = targetTime - now;
+
+            if (diff <= 0) {
+                // Restart timer
+                targetTime = now + durationMs;
+                localStorage.setItem(storageKey, targetTime.toString());
+                diff = durationMs;
+            }
+
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            setTimeLeft({ hours: hrs, minutes: mins, seconds: secs });
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+
+        return () => clearInterval(interval);
+    }, [course]);
+
     useEffect(() => {
         if (isEnrolled) {
             setShowStickyRibbon(false);
@@ -167,6 +214,9 @@ export default function CourseDetail() {
     const currentPrice = parseFloat(course.discount_price || course.price) || 0;
     const discountPercent = originalPrice > 0 ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
 
+    const fakeLearnersBase = parseInt(course.section_titles?.fake_learner_count, 10) || 0;
+    const totalLearners = fakeLearnersBase + (course.enrollments_count || 0);
+
     return (
         <div className="w-full">
             {/* Header Section */}
@@ -300,7 +350,9 @@ export default function CourseDetail() {
                                         <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-blue-700">B</div>
                                         <div className="w-7 h-7 rounded-full bg-amber-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-amber-700">C</div>
                                     </div>
-                                    <span className="text-sm text-slate-500 font-medium">{course.enrollments_count || 0} Learners Joined</span>
+                                    <span className="text-sm text-slate-500 font-bold" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {toBengaliNum(totalLearners.toLocaleString())} জন শিক্ষার্থী যুক্ত হয়েছেন
+                                    </span>
                                 </div>
 
                                 {/* Guarantee & Access (shown only when not enrolled) */}
@@ -380,6 +432,67 @@ export default function CourseDetail() {
                         </div>
                     </div>
                 </div>
+
+                {/* Countdown Timer Section */}
+                {course.section_titles?.countdown_enabled && (
+                    <div 
+                        className="my-12 py-5 px-6 sm:py-6 sm:px-8 rounded-3xl text-white shadow-2xl shadow-[var(--primary-color)]/15 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 overflow-hidden relative select-none border border-white/10"
+                        style={{ backgroundColor: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}
+                    >
+                        {/* Glow decorative rings */}
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+                        
+                        {/* Text Info */}
+                        <div className="text-center lg:text-left space-y-2 lg:max-w-lg shrink-0">
+                            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+                                {course.section_titles?.countdown_title || 'লাইফ টাইম সাপোর্ট এর সাথে'}
+                            </h3>
+                            <p className="text-sm sm:text-base lg:text-lg font-medium opacity-95">
+                                {course.section_titles?.countdown_subtitle || 'ইনস্ট্যান্ট আর্নিং এর জগতে এখনি জয়েন করুন 💸'}
+                            </p>
+                        </div>
+
+                        {/* Countdown Units */}
+                        <div className="flex flex-col items-center gap-2.5">
+                            <span className="text-[13px] font-extrabold text-white/90 tracking-wide bg-white/10 px-3 py-1 rounded-full border border-white/5">
+                                অফার শেষ হতে আর মাত্র বাকি আছে
+                            </span>
+                            <div className="flex items-center gap-4 sm:gap-5 justify-center">
+                                <div className="bg-white/95 text-slate-900 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4.5 flex flex-col items-center justify-center min-w-[75px] sm:min-w-[85px] shadow-lg border border-white/20 transition-transform hover:scale-[1.03] duration-300">
+                                    <span className="text-3xl sm:text-4xl font-black leading-none" style={{ color: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {toBengaliNum(String(timeLeft.hours).padStart(2, '0'))}
+                                    </span>
+                                    <span className="text-xs sm:text-sm font-bold text-slate-500 mt-2">ঘণ্টা</span>
+                                </div>
+                                <div className="bg-white/95 text-slate-900 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4.5 flex flex-col items-center justify-center min-w-[75px] sm:min-w-[85px] shadow-lg border border-white/20 transition-transform hover:scale-[1.03] duration-300">
+                                    <span className="text-3xl sm:text-4xl font-black leading-none" style={{ color: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {toBengaliNum(String(timeLeft.minutes).padStart(2, '0'))}
+                                    </span>
+                                    <span className="text-xs sm:text-sm font-bold text-slate-500 mt-2">মিনিট</span>
+                                </div>
+                                <div className="bg-white/95 text-slate-900 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4.5 flex flex-col items-center justify-center min-w-[75px] sm:min-w-[85px] shadow-lg border border-white/20 transition-transform hover:scale-[1.03] duration-300">
+                                    <span className="text-3xl sm:text-4xl font-black leading-none" style={{ color: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {toBengaliNum(String(timeLeft.seconds).padStart(2, '0'))}
+                                    </span>
+                                    <span className="text-xs sm:text-sm font-bold text-slate-500 mt-2">সেকেন্ড</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Pricing */}
+                        <div className="text-center lg:text-right flex flex-col items-center lg:items-end justify-center shrink-0">
+                            {discountPercent > 0 && (
+                                <span className="text-lg sm:text-xl font-bold text-white/80 line-through leading-none mb-1">
+                                    ৳{toBengaliNum(originalPrice.toLocaleString())} টাকা
+                                </span>
+                            )}
+                            <span className="text-4xl sm:text-5xl font-black text-white leading-none drop-shadow-md">
+                                ৳{toBengaliNum(currentPrice.toLocaleString())} টাকা
+                            </span>
+                        </div>
+                    </div>
+                )}
 
                 {/* What you'll learn (এখানে আপনি শিখতে পারবেন) - full width */}
                 {course.what_youll_learn && Array.isArray(course.what_youll_learn) && course.what_youll_learn.length > 0 && (
