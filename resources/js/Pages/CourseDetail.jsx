@@ -690,7 +690,7 @@ export default function CourseDetail() {
                                             style={{ backgroundColor: 'color-mix(in srgb, var(--primary-color) 7%, #ffffff)' }}
                                         >
                                             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-200/60">
-                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">আপনার জন্য আমাদের সমাধান</h3>
+                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-800">/ আপনার জন্য আমাদের সমাধান</h3>
                                             </div>
                                             <ul className="space-y-4">
                                                 {course.solutions.map((item, idx) => (
