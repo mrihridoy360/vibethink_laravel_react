@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
@@ -71,7 +71,20 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
     const { user, loading, logout } = useAuth();
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
     const { settings } = useSiteSettings();
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const siteLogo = settings?.appearance?.site_logo || null;
     const siteFavicon = settings?.appearance?.site_favicon || null;
@@ -227,25 +240,75 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                                 <Bell className="h-5 w-5" />
                                 <span className="absolute top-1 right-1 h-1.5 w-1.5 bg-red-500 rounded-full" />
                             </button>
-                            <Link to="/" className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors">
-                                <Home className="h-5 w-5" />
-                            </Link>
                             <Link to="/dashboard" className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors" title="Student Dashboard">
                                 <Users className="h-5 w-5" />
                             </Link>
-                            <button className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors">
-                                <Moon className="h-5 w-5" />
-                            </button>
                         </div>
 
-                        <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-400">{user?.email}</p>
-                            </div>
-                            <div className="h-10 w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-orange-500/20">
-                                {user?.name?.slice(0, 2)?.toUpperCase()}
-                            </div>
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="flex items-center gap-2 pl-4 border-l border-gray-100 hover:opacity-90 active:scale-[0.98] transition-all focus:outline-none cursor-pointer text-left bg-transparent border-none"
+                            >
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-bold text-gray-900">{user?.name}</p>
+                                    <p className="text-xs text-gray-400">{user?.email}</p>
+                                </div>
+                                <div className="h-10 w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-orange-500/20">
+                                    {user?.name?.slice(0, 2)?.toUpperCase()}
+                                </div>
+                                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {dropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-gray-700">
+                                    <div className="px-4 py-2 border-b border-gray-50 mb-1">
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                        <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{user?.name}</p>
+                                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                        <span className="inline-block mt-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[10px] font-bold">
+                                            অ্যাডমিন
+                                        </span>
+                                    </div>
+
+                                    <Link
+                                        to="/"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <Home className="h-4 w-4 text-gray-400" />
+                                        হোম পেজ
+                                    </Link>
+
+                                    <Link
+                                        to="/dashboard"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-750 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <LayoutDashboard className="h-4 w-4 text-gray-400" />
+                                        শিক্ষার্থী ড্যাশবোর্ড
+                                    </Link>
+
+                                    <Link
+                                        to="/dashboard/settings"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-750 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <Settings className="h-4 w-4 text-gray-400" />
+                                        প্রোফাইল সেটিংস
+                                    </Link>
+
+                                    <div className="border-t border-gray-100 my-1.5" />
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        লগআউট
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </header>
