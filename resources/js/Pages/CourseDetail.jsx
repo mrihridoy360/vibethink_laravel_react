@@ -599,35 +599,44 @@ export default function CourseDetail() {
 
                 {/* Course Value / Why This Course */}
                 <div className="my-20 lg:my-28 max-w-5xl mx-auto">
-                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 p-5 sm:p-8 shadow-sm" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 14%, #ffffff) 0%, #ffffff 70%)' }}>
-                        <div className="space-y-6">
-                            {/* Text Content */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-start">
-                                    <span className="text-6xl sm:text-7xl font-black theme-primary-text opacity-50 leading-none select-none">?</span>
-                                </div>
-                                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-                                    মনে কি প্রশ্ন জাগছে – &ldquo;এত কিছু মাত্র ৳{currentPrice.toLocaleString()} টাকায় কীভাবে সম্ভব?&rdquo;
-                                </h2>
-                                <div className="space-y-3 text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
-                                    <p>
-                                        সাধারণত বাজারে অন্যান্য কোর্সের মূল্য ৫ থেকে ১০ হাজার টাকা হয়ে থাকে, সেখানে আমরা এত কম মূল্যে এই কোর্সটি দিচ্ছি—যার একমাত্র লক্ষ্য হলো <span className="font-bold text-slate-800">সবার জন্য কোয়ালিটি লার্নিং অ্যাক্সেসিবল করা</span>। আমরা চাই দামি কোনো ডিগ্রি বা মোটা অংকের টাকা না থাকলেও দেশের যেকোনো প্রান্ত থেকে যে কেউ যেন মাত্র ১-২ মাসে মডার্ন টেকনোলজি শিখে নিজের ক্যারিয়ার গড়তে পারে। "টাকার অভাবে শিখতে পারিনি"—এমন অজুহাত বা সীমাবদ্ধতা যেন কারো স্বপ্ন পূরণে বাধা হয়ে না দাঁড়ায়।
-                                    </p>
-                                </div>
-                            </div>
+                    <div className="relative rounded-3xl p-[2px] overflow-hidden snake-border-container shadow-sm border border-slate-100/50 hover:shadow-md transition-all">
+                        {/* Rotating Snake Border */}
+                        <div className="snake-border-glow" />
 
-                            {/* Action Button */}
-                            {!isEnrolled && (
-                                <div className="pt-2">
-                                    <button
-                                        onClick={handleEnroll}
-                                        disabled={enrolling}
-                                        className="w-full py-3.5 rounded-xl font-bold theme-primary-bg hover:brightness-95 text-white flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-60 cursor-pointer border-none"
-                                    >
-                                        {enrolling ? 'এনরোলিং হচ্ছে...' : 'এনরোল করুন'}
-                                    </button>
+                        {/* Inner Content Area */}
+                        <div 
+                            className="snake-border-content p-6 sm:p-8 rounded-[22px] relative overflow-hidden"
+                            style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 14%, #ffffff) 0%, #ffffff 70%)' }}
+                        >
+                            <div className="space-y-6">
+                                {/* Text Content */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-start">
+                                        <span className="text-6xl sm:text-7xl font-black theme-primary-text opacity-50 leading-none select-none">?</span>
+                                    </div>
+                                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+                                        মনে কি প্রশ্ন জাগছে – &ldquo;এত কিছু মাত্র ৳{currentPrice.toLocaleString()} টাকায় কীভাবে সম্ভব?&rdquo;
+                                    </h2>
+                                    <div className="space-y-3 text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+                                        <p>
+                                            সাধারণত বাজারে অন্যান্য কোর্সের মূল্য ৫ থেকে ১০ হাজার টাকা হয়ে থাকে, সেখানে আমরা এত কম মূল্যে এই কোর্সটি দিচ্ছি—যার একমাত্র লক্ষ্য হলো <span className="font-bold text-slate-800">সবার জন্য কোয়ালিটি লার্নিং অ্যাক্সেসিবল করা</span>। আমরা চাই দামি কোনো ডিগ্রি বা মোটা অংকের টাকা না থাকলেও দেশের যেকোনো প্রান্ত থেকে যে কেউ যেন মাত্র ১-২ মাসে মডার্ন টেকনোলজি শিখে নিজের ক্যারিয়ার গড়তে পারে। "টাকার অভাবে শিখতে পারিনি"—এমন অজুহাত বা সীমাবদ্ধতা যেন কারো স্বপ্ন পূরণে বাধা হয়ে না দাঁড়ায়।
+                                        </p>
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* Action Button */}
+                                {!isEnrolled && (
+                                    <div className="pt-2">
+                                        <button
+                                            onClick={handleEnroll}
+                                            disabled={enrolling}
+                                            className="w-full py-3.5 rounded-xl font-bold theme-primary-bg hover:brightness-95 text-white flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-60 cursor-pointer border-none"
+                                        >
+                                            {enrolling ? 'এনরোলিং হচ্ছে...' : 'এনরোল করুন'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
