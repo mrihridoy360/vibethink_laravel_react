@@ -171,7 +171,7 @@ class ZiniPayController extends Controller
             $processed = $this->processCompletedPayment($response);
 
             if ($processed['success']) {
-                return redirect('/payment/success?slug=' . $processed['course_slug'] . '&trx=' . $processed['trx_id']);
+                return redirect('/payment/success?slug=' . $processed['course_slug'] . '&trx=' . $processed['trx_id'] . '&amount=' . ($processed['amount'] ?? ''));
             } else {
                 return redirect('/payment/failed?error=' . urlencode($processed['message']));
             }
@@ -252,7 +252,8 @@ class ZiniPayController extends Controller
             return [
                 'success' => true,
                 'course_slug' => $course->slug,
-                'trx_id' => $payment->transaction_id
+                'trx_id' => $payment->transaction_id,
+                'amount' => $payment->amount
             ];
         }
 
@@ -273,6 +274,7 @@ class ZiniPayController extends Controller
                 app(\App\Services\MetaCapiService::class)->sendEvent(
                     'Purchase',
                     [
+                        'id' => $user->id,
                         'email' => $user->email,
                         'phone' => $user->phone,
                         'first_name' => $firstName,
@@ -286,7 +288,7 @@ class ZiniPayController extends Controller
                         'content_type' => 'product'
                     ],
                     $payment->transaction_id,
-                    url("/payment/success?slug={$course->slug}&trx={$payment->transaction_id}")
+                    url("/payment/success?slug={$course->slug}&trx={$payment->transaction_id}&amount={$payment->amount}")
                 );
             }
         } catch (\Exception $e) {
@@ -326,7 +328,8 @@ class ZiniPayController extends Controller
         return [
             'success' => true,
             'course_slug' => $course->slug,
-            'trx_id' => $payment->transaction_id
+            'trx_id' => $payment->transaction_id,
+            'amount' => $payment->amount
         ];
     }
 }

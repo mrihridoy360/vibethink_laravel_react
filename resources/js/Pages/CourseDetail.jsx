@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight } from 'lucide-react';
+import { useSiteSettings } from '../Contexts/SiteSettingsContext';
+import { Play, BookOpen, CheckCircle, ChevronRight, ChevronLeft, Star, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight, Facebook, Phone, MapPin, MessageSquare, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -22,6 +23,32 @@ export default function CourseDetail() {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showStickyRibbon, setShowStickyRibbon] = useState(true);
     const ribbonRef = useRef(null);
+
+    const { settings } = useSiteSettings();
+    const footer = settings?.footer || {};
+    const hotline = footer.contact_phone || '+880 01933-554982';
+    const address = footer.contact_address || '১ম তলা, এ-১, ডমিন্যান্ট বিল্ডিংস, হাউজ ৩০/৩২, রোড ৫, সেক্টর ১, ব্লক ই, আফতাবনগর, ঢাকা';
+
+    const cleanPhone = hotline.replace(/[^\d]/g, '');
+    const whatsappNumber = cleanPhone.startsWith('88') ? cleanPhone : `88${cleanPhone}`;
+    const whatsappLink = `https://wa.me/${whatsappNumber}`;
+
+    const socialLinks = [];
+    if (footer.social_facebook) socialLinks.push({ name: 'Facebook', href: footer.social_facebook, icon: Facebook });
+    if (footer.social_twitter) socialLinks.push({ name: 'Twitter', href: footer.social_twitter, icon: Twitter });
+    if (footer.social_instagram) socialLinks.push({ name: 'Instagram', href: footer.social_instagram, icon: Instagram });
+    if (footer.social_linkedin) socialLinks.push({ name: 'LinkedIn', href: footer.social_linkedin, icon: Linkedin });
+
+    const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+
 
     const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
@@ -1096,7 +1123,224 @@ export default function CourseDetail() {
                 </div>
             </div>
 
-            {/* Reopen max-w-7xl container for subsequent elements */}
+            {/* Testimonials Ticker Section - Full Width */}
+            {course.section_titles?.testimonials && Array.isArray(course.section_titles.testimonials) && course.section_titles.testimonials.length > 0 && (() => {
+                const testimonials = course.section_titles.testimonials;
+                
+                // Duplicate testimonials to ensure we have enough items for seamless scrolling
+                const doubledTestimonials = [...testimonials];
+                while (doubledTestimonials.length < 8) {
+                    doubledTestimonials.push(...testimonials);
+                }
+                const marqueeList = [...doubledTestimonials, ...doubledTestimonials];
+
+                return (
+                    <div className="w-full overflow-hidden py-16 bg-[#f4f6fc]/30 border-y border-slate-100 relative select-none">
+                        <div className="mb-10 text-center max-w-7xl mx-auto px-4 md:px-6">
+                            <span className="text-xs font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
+                                SUCCESS STORIES
+                            </span>
+                            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight">
+                                আমাদের শিক্ষার্থীদের সফলতার গল্প
+                            </h2>
+                        </div>
+
+                        {/* Fade overlay on left and right */}
+                        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-36 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-36 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+
+                        {/* Scrolling Container */}
+                        <div className="w-full flex overflow-hidden">
+                            <div className="animate-marquee flex gap-6 py-4">
+                                {marqueeList.map((item, idx) => (
+                                    <div 
+                                        key={idx}
+                                        className="relative rounded-3xl p-6 sm:p-7 shadow-sm border border-cyan-100 hover:shadow-md transition-all flex flex-col justify-between bg-gradient-to-b from-white to-cyan-50/10 min-h-[220px] w-[300px] sm:w-[360px] shrink-0"
+                                    >
+                                        {/* Source Badge Illustration */}
+                                        <div className={`absolute top-5 right-5 w-11 h-11 rounded-2xl flex items-center justify-center border transition-all ${item.source === 'facebook' ? 'bg-blue-50 border-blue-100/50' : 'bg-cyan-50 border-cyan-100/50'}`}>
+                                            {item.source === 'facebook' ? (
+                                                <Facebook className="w-5 h-5 text-blue-600 fill-blue-600" />
+                                            ) : (
+                                                <Globe className="w-5 h-5 text-cyan-500" />
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            {/* Header info */}
+                                            <div className="flex items-center gap-3.5 mb-4">
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.name} 
+                                                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                                                />
+                                                <div>
+                                                    <h4 className="text-base font-extrabold text-slate-800" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                                        {item.name}
+                                                    </h4>
+                                                    {/* Stars */}
+                                                    <div className="flex items-center gap-0.5 mt-1">
+                                                        {[...Array(item.rating || 5)].map((_, i) => (
+                                                            <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Feedback Comment */}
+                                            <p className="text-sm sm:text-base text-slate-650 font-medium leading-relaxed mb-6 text-left" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                                {item.comment}
+                                            </p>
+                                        </div>
+
+                                        {/* Footer Designation (Replacing Date) */}
+                                        {item.designation && (
+                                            <div className="text-xs sm:text-sm font-bold text-cyan-600/90 text-left mt-auto" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                                {item.designation}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Call To Action Button */}
+                        {!isEnrolled && (
+                            <div className="mt-12 flex justify-center">
+                                <button
+                                    onClick={handleEnroll}
+                                    className="px-8 py-4 rounded-2xl text-white font-extrabold text-base sm:text-lg flex items-center gap-2 cursor-pointer transition-all hover:brightness-95 border-none shadow-lg shadow-[var(--primary-color)]/25 hover:scale-[1.02] duration-300 active:scale-[0.98]"
+                                    style={{ backgroundColor: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}
+                                >
+                                    এখনই ইনরোল করুন <ArrowRight className="h-5 w-5" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
+
+            {/* Contact/Support Section */}
+            <div className="max-w-6xl mx-auto px-4 md:px-6 my-20 lg:my-28 select-none animate-fade-in">
+                <div 
+                    className="relative rounded-[32px] p-8 md:p-12 overflow-hidden shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-center"
+                    style={{ 
+                        backgroundColor: 'var(--primary-color)',
+                        backgroundImage: 'linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 80%, black) 100%)'
+                    }}
+                >
+                    {/* Grid background overlay */}
+                    <div 
+                        className="absolute inset-0 opacity-15 pointer-events-none" 
+                        style={{
+                            backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
+                            backgroundSize: '24px 24px'
+                        }}
+                    />
+
+                    {/* Left Column: Text & CTA */}
+                    <div className="w-full lg:w-1/2 space-y-6 relative z-10 text-left">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/12 backdrop-blur-sm border border-white/10 text-white text-xs font-bold">
+                            <Phone className="w-3.5 h-3.5" />
+                            সাপোর্ট টিম
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-white leading-tight" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                            যেকোনো প্রয়োজনে যোগাযোগ করুন
+                        </h2>
+                        <p className="text-white/85 text-sm sm:text-base font-medium leading-relaxed" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                            প্ল্যাটফর্ম, কোর্স বা পেমেন্ট সংক্রান্ত বিস্তারিত জানতে আমাদের সাপোর্ট টিমের সাথে সরাসরি কথা বলতে পারেন।
+                        </p>
+                        <div>
+                            <a 
+                                href={whatsappLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white hover:bg-slate-50 text-[var(--primary-color)] text-sm sm:text-base font-extrabold rounded-2xl transition-all shadow-lg shadow-black/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
+                                style={{ color: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}
+                            >
+                                <MessageSquare className="h-5 w-5 fill-[var(--primary-color)] text-[var(--primary-color)]" />
+                                হোয়াটসঅ্যাপে মেসেজ
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Dynamic Cards */}
+                    <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 text-left">
+                        {/* Hotline Card */}
+                        <div className="bg-white/10 backdrop-blur-md border border-white/12 rounded-3xl p-6 flex flex-col justify-between min-h-[120px] transition-all hover:bg-white/15">
+                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white mb-4">
+                                <Phone className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <span className="text-[10px] font-extrabold tracking-wider text-white/70 uppercase block mb-1">
+                                    হটলাইন
+                                </span>
+                                <a 
+                                    href={`tel:${hotline}`}
+                                    className="text-sm sm:text-base font-extrabold text-white hover:underline"
+                                >
+                                    {hotline}
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Social Media Card */}
+                        <div className="bg-white/10 backdrop-blur-md border border-white/12 rounded-3xl p-6 flex flex-col justify-between min-h-[120px] transition-all hover:bg-white/15">
+                            <div className="flex gap-2 mb-4">
+                                {socialLinks.map((s, idx) => {
+                                    const Icon = s.icon;
+                                    return (
+                                        <a 
+                                            key={idx}
+                                            href={s.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all hover:scale-105"
+                                        >
+                                            <Icon className="w-5 h-5" />
+                                        </a>
+                                    );
+                                })}
+                            </div>
+                            <div>
+                                <span className="text-[10px] font-extrabold tracking-wider text-white/70 uppercase block mb-1">
+                                    সোশ্যাল মিডিয়া
+                                </span>
+                                <div className="flex gap-3 text-xs sm:text-sm font-bold text-white">
+                                    {socialLinks.map((s, idx) => (
+                                        <a 
+                                            key={idx}
+                                            href={s.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:underline"
+                                        >
+                                            {s.name}
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Address Card (Full width of the grid) */}
+                        <div className="sm:col-span-2 bg-white/10 backdrop-blur-md border border-white/12 rounded-3xl p-6 flex gap-4 items-start transition-all hover:bg-white/15">
+                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0">
+                                <MapPin className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <span className="text-[10px] font-extrabold tracking-wider text-white/70 uppercase block mb-1">
+                                    অফিস ঠিকানা
+                                </span>
+                                <p className="text-xs sm:text-sm font-extrabold text-white leading-relaxed" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                    {address}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Reopen container for subsequent elements */}
             <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12 relative z-20">
 
                 {/* Frequently Asked Questions */}
@@ -1111,7 +1355,7 @@ export default function CourseDetail() {
                             </h2>
                         </div>
 
-                        <div className="max-w-3xl mx-auto space-y-3">
+                        <div className="max-w-5xl mx-auto space-y-3">
                             {course.faq.map((faq, index) => {
                                 const isOpen = expandedFaq === index;
                                 return (

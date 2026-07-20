@@ -8,6 +8,8 @@ export default function PaymentSuccess() {
     const [searchParams] = useSearchParams();
     const courseSlug = searchParams.get('slug') || '';
     const trxId = searchParams.get('trx') || 'N/A';
+    const amountParam = searchParams.get('amount');
+    const parsedAmount = amountParam ? parseFloat(amountParam) : null;
 
     useEffect(() => {
         if (courseSlug && trxId !== 'N/A') {
@@ -15,7 +17,9 @@ export default function PaymentSuccess() {
                 .then(response => {
                     if (response.data.success) {
                         const course = response.data.course;
-                        const value = parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0;
+                        const value = (parsedAmount !== null && !isNaN(parsedAmount))
+                            ? parsedAmount
+                            : (parseFloat(course.discount_price > 0 ? course.discount_price : course.price) || 0);
                         trackPixelEvent('Purchase', {
                             content_name: course.title,
                             content_ids: [course.id],
@@ -27,7 +31,7 @@ export default function PaymentSuccess() {
                 })
                 .catch(err => console.error('Error tracking purchase event:', err));
         }
-    }, [courseSlug, trxId]);
+    }, [courseSlug, trxId, parsedAmount]);
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">

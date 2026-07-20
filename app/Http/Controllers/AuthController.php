@@ -48,6 +48,7 @@ class AuthController extends Controller
             app(\App\Services\MetaCapiService::class)->sendEvent(
                 'CompleteRegistration',
                 [
+                    'id' => $user->id,
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'first_name' => $firstName,

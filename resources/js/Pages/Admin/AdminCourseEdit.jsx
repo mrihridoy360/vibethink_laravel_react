@@ -6,7 +6,7 @@ import {
     ArrowLeft, BookOpen, LayoutDashboard, Settings, Globe, Save,
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
-    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users
+    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users, MessageSquare, Pencil
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -230,13 +230,369 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                 />
             </div>
 
-                {/* FAQ */}
-                <FaqEditor
-                    items={form.faq}
-                    onChange={val => setForm(p => ({ ...p, faq: val }))}
-                    titleValue={form.section_titles?.faq}
-                    onTitleChange={val => updateSectionTitle('faq', val)}
-                />
+            {/* FAQ */}
+            <FaqEditor
+                items={form.faq}
+                onChange={val => setForm(p => ({ ...p, faq: val }))}
+                titleValue={form.section_titles?.faq}
+                onTitleChange={val => updateSectionTitle('faq', val)}
+            />
+        </div>
+    );
+}
+
+// ── TestimonialsTab ───────────────────────────────────────────────────────────
+function TestimonialsTab({ form, setForm }) {
+    const [name, setName] = useState('');
+    const [designation, setDesignation] = useState('');
+    const [comment, setComment] = useState('');
+    const [rating, setRating] = useState(5);
+    const [source, setSource] = useState('website');
+    const [image, setImage] = useState('');
+    const [imagePreview, setImagePreview] = useState('');
+    const [editingIndex, setEditingIndex] = useState(null);
+    const fileInputRef = useRef();
+
+    const testimonials = form.section_titles?.testimonials || [];
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 150;
+                const MAX_HEIGHT = 150;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                setImage(dataUrl);
+                setImagePreview(dataUrl);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const startEdit = (index) => {
+        const item = testimonials[index];
+        setName(item.name || '');
+        setDesignation(item.designation || '');
+        setComment(item.comment || '');
+        setRating(item.rating || 5);
+        setSource(item.source || 'website');
+        setImage(item.image || '');
+        setImagePreview(item.image || '');
+        setEditingIndex(index);
+    };
+
+    const cancelEdit = () => {
+        setName('');
+        setDesignation('');
+        setComment('');
+        setRating(5);
+        setSource('website');
+        setImage('');
+        setImagePreview('');
+        setEditingIndex(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const addTestimonial = () => {
+        if (!name.trim() || !designation.trim() || !comment.trim() || !image) {
+            alert('অনুগ্রহ করে নাম, পদবি, ছবি এবং মন্তব্য প্রদান করুন।');
+            return;
+        }
+
+        const newTestimonial = {
+            name: name.trim(),
+            designation: designation.trim(),
+            comment: comment.trim(),
+            image,
+            rating: parseInt(rating, 10) || 5,
+            source: source || 'website'
+        };
+
+        let updatedList;
+        if (editingIndex !== null) {
+            updatedList = [...testimonials];
+            updatedList[editingIndex] = newTestimonial;
+        } else {
+            updatedList = [...testimonials, newTestimonial];
+        }
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                testimonials: updatedList
+            }
+        }));
+
+        cancelEdit();
+    };
+
+    const removeTestimonial = (index) => {
+        if (editingIndex === index) {
+            cancelEdit();
+        } else if (editingIndex !== null && index < editingIndex) {
+            setEditingIndex(editingIndex - 1);
+        }
+        const updatedList = testimonials.filter((_, i) => i !== index);
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                testimonials: updatedList
+            }
+        }));
+    };
+
+    const moveTestimonial = (index, direction) => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === testimonials.length - 1) return;
+
+        const updatedList = [...testimonials];
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+
+        const temp = updatedList[index];
+        updatedList[index] = updatedList[swapIndex];
+        updatedList[swapIndex] = temp;
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                testimonials: updatedList
+            }
+        }));
+
+        if (editingIndex === index) {
+            setEditingIndex(swapIndex);
+        } else if (editingIndex === swapIndex) {
+            setEditingIndex(index);
+        }
+    };
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Col: Add Form */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5 lg:col-span-1 self-start">
+                <div>
+                    <h3 className="text-base font-bold text-gray-900 mb-0.5">
+                        {editingIndex !== null ? 'টেস্টিমোনিয়াল সংশোধন করুন' : 'নতুন টেস্টিমোনিয়াল যুক্ত করুন'}
+                    </h3>
+                    <p className="text-xs text-gray-400">
+                        {editingIndex !== null ? 'টেস্টিমোনিয়াল এডিট করে আপডেট করুন।' : 'শিক্ষার্থীদের রিভিউ বা ফিডব্যাক দিন।'}
+                    </p>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">শিক্ষার্থীর নাম</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            placeholder="যেমন: আরিয়ান হোসাইন"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">পদবি / বিবরণ</label>
+                        <input
+                            type="text"
+                            value={designation}
+                            onChange={e => setDesignation(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            placeholder="যেমন: ওয়েব ডেভেলপার, গুগল"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">মন্তব্য / ফিডব্যাক</label>
+                        <textarea
+                            value={comment}
+                            rows="3"
+                            onChange={e => setComment(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            placeholder="কোর্স সম্পর্কে শিক্ষার্থীর মতামত লিখুন..."
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">স্টার রেটিং</label>
+                            <select
+                                value={rating}
+                                onChange={e => setRating(parseInt(e.target.value, 10))}
+                                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            >
+                                <option value={5}>৫ স্টার</option>
+                                <option value={4}>৪ স্টার</option>
+                                <option value={3}>৩ স্টার</option>
+                                <option value={2}>২ স্টার</option>
+                                <option value={1}>১ স্টার</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">রিভিউ এর উৎস</label>
+                            <select
+                                value={source}
+                                onChange={e => setSource(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            >
+                                <option value="website">ওয়েবসাইট</option>
+                                <option value="facebook">ফেইসবুক</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">ছবি</label>
+                        <div className="flex items-center gap-3">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="Preview" className="w-16 h-16 rounded-full object-cover border border-gray-205 shadow-sm" />
+                            ) : (
+                                <div className="w-16 h-16 rounded-full bg-gray-105 flex items-center justify-center text-gray-400 border border-gray-200">
+                                    <ImageIcon className="h-6 w-6" />
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current.click()}
+                                className="px-4 py-2 border border-gray-200 hover:bg-gray-55 text-gray-700 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                            >
+                                ছবি নির্বাচন করুন
+                            </button>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </div>
+                    </div>
+
+                    {editingIndex !== null ? (
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={addTestimonial}
+                                className="flex-1 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                                <CheckCircle className="h-4 w-4" /> আপডেট করুন
+                            </button>
+                            <button
+                                type="button"
+                                onClick={cancelEdit}
+                                className="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all cursor-pointer"
+                            >
+                                বাতিল
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={addTestimonial}
+                            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                            <Plus className="h-4 w-4" /> যুক্ত করুন
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Right Col: List of Testimonials */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5 lg:col-span-2">
+                <div>
+                    <h3 className="text-base font-bold text-gray-900 mb-0.5">যুক্ত করা টেস্টিমোনিয়ালসমূহ</h3>
+                    <p className="text-xs text-gray-400">যুক্ত করা রিভিউগুলো নিচে সাজানো আছে।</p>
+                </div>
+
+                {testimonials.length === 0 ? (
+                    <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2">
+                        <MessageSquare className="h-10 w-10 text-gray-300" />
+                        <span className="text-sm font-semibold">কোনো টেস্টিমোনিয়াল যুক্ত করা হয়নি</span>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {testimonials.map((item, index) => (
+                            <div key={index} className="flex items-center gap-4 p-4 border border-gray-100 rounded-2xl hover:bg-gray-50/50 transition-all">
+                                <img src={item.image} alt={item.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-bold text-gray-900 truncate">{item.name}</h4>
+                                    <p className="text-xs text-gray-550 truncate flex items-center gap-1.5 mt-0.5">
+                                        <span>{item.designation}</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="flex items-center text-amber-500 font-bold">{item.rating || 5}★</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                                            {item.source === 'facebook' ? 'Facebook' : 'Website'}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        disabled={index === 0}
+                                        onClick={() => moveTestimonial(index, 'up')}
+                                        className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
+                                    >
+                                        <ChevronUp className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={index === testimonials.length - 1}
+                                        onClick={() => moveTestimonial(index, 'down')}
+                                        className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
+                                    >
+                                        <ChevronDown className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => startEdit(index)}
+                                        className={`p-1.5 rounded-lg transition-all cursor-pointer ${editingIndex === index ? 'bg-blue-50 text-blue-600' : 'hover:bg-blue-50 text-gray-500 hover:text-blue-600'}`}
+                                        title="এডিট করুন"
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeTestimonial(index)}
+                                        className="p-1.5 hover:bg-red-50 text-red-500 hover:text-red-700 rounded-lg transition-all cursor-pointer"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
@@ -663,8 +1019,8 @@ export default function AdminCourseEdit() {
 
     const activeTab = searchParams.get('tab') || 'details';
 
-    const [course, setCourse]           = useState(null);
-    const [categories, setCategories]   = useState([]);
+    const [course, setCourse] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [pageLoading, setPageLoading] = useState(true);
 
     const [form, setForm] = useState({
@@ -683,14 +1039,14 @@ export default function AdminCourseEdit() {
         section_titles: {},
     });
 
-    const [thumbnail, setThumbnail]         = useState(null);
+    const [thumbnail, setThumbnail] = useState(null);
     const [thumbnailPreview, setThumbnailPreview] = useState(null);
-    const [seoImage, setSeoImage]           = useState(null);
-    const [seoPreview, setSeoPreview]       = useState(null);
+    const [seoImage, setSeoImage] = useState(null);
+    const [seoPreview, setSeoPreview] = useState(null);
 
-    const [saving, setSaving]   = useState(false);
-    const [errors, setErrors]   = useState({});
-    const [toast, setToast]     = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [toast, setToast] = useState(null);
 
     const showToast = (msg, type = 'success') => setToast({ message: msg, type });
 
@@ -709,28 +1065,28 @@ export default function AdminCourseEdit() {
                     const found = courseRes.data.course;
                     setCourse(found);
                     setForm({
-                        title:             found.title || '',
-                        slug:              found.slug || '',
+                        title: found.title || '',
+                        slug: found.slug || '',
                         short_description: found.short_description || '',
-                        description:       found.description || '',
-                        video_url:         found.video_url || '',
-                        category_id:       found.category_id || '',
-                        language:          found.language || 'Bengali',
-                        price:             found.price != null ? parseFloat(found.price) : '',
-                        discount_price:    found.discount_price != null ? parseFloat(found.discount_price) : '',
-                        is_published:      !!found.is_published,
-                        money_back_days:   found.money_back_days != null ? parseInt(found.money_back_days, 10) : '',
-                        lifetime_access:   !!found.lifetime_access,
-                        seo_title:         found.seo_title || '',
-                        seo_description:   found.seo_description || '',
-                        what_youll_learn:  Array.isArray(found.what_youll_learn) ? found.what_youll_learn : [],
-                        requirements:      Array.isArray(found.requirements) ? found.requirements : [],
-                        audience:          Array.isArray(found.audience) ? found.audience : [],
+                        description: found.description || '',
+                        video_url: found.video_url || '',
+                        category_id: found.category_id || '',
+                        language: found.language || 'Bengali',
+                        price: found.price != null ? parseFloat(found.price) : '',
+                        discount_price: found.discount_price != null ? parseFloat(found.discount_price) : '',
+                        is_published: !!found.is_published,
+                        money_back_days: found.money_back_days != null ? parseInt(found.money_back_days, 10) : '',
+                        lifetime_access: !!found.lifetime_access,
+                        seo_title: found.seo_title || '',
+                        seo_description: found.seo_description || '',
+                        what_youll_learn: Array.isArray(found.what_youll_learn) ? found.what_youll_learn : [],
+                        requirements: Array.isArray(found.requirements) ? found.requirements : [],
+                        audience: Array.isArray(found.audience) ? found.audience : [],
                         this_course_includes: Array.isArray(found.this_course_includes) ? found.this_course_includes : [],
-                        problems:          Array.isArray(found.problems) ? found.problems : [],
-                        solutions:         Array.isArray(found.solutions) ? found.solutions : [],
-                        faq:              Array.isArray(found.faq) ? found.faq : [],
-                        section_titles:   (found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {},
+                        problems: Array.isArray(found.problems) ? found.problems : [],
+                        solutions: Array.isArray(found.solutions) ? found.solutions : [],
+                        faq: Array.isArray(found.faq) ? found.faq : [],
+                        section_titles: (found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {},
                     });
                     if (found.thumbnail) setThumbnailPreview(found.thumbnail.startsWith('http') ? found.thumbnail : `/storage/${found.thumbnail}`);
                     if (found.seo_image) setSeoPreview(found.seo_image.startsWith('http') ? found.seo_image : `/storage/${found.seo_image}`);
@@ -819,10 +1175,11 @@ export default function AdminCourseEdit() {
     }
 
     const TABS = [
-        { key: 'details',    label: 'ল্যান্ডিং পেজ',   icon: LayoutDashboard },
-        { key: 'curriculum', label: 'কারিকুলাম',        icon: ListVideo },
-        { key: 'settings',   label: 'সেটিংস ও মূল্য',  icon: Settings },
-        { key: 'seo',        label: 'SEO',              icon: Globe },
+        { key: 'details', label: 'ল্যান্ডিং পেজ', icon: LayoutDashboard },
+        { key: 'curriculum', label: 'কারিকুলাম', icon: ListVideo },
+        { key: 'settings', label: 'সেটিংস ও মূল্য', icon: Settings },
+        { key: 'testimonials', label: 'টেস্টিমোনিয়াল', icon: MessageSquare },
+        { key: 'seo', label: 'SEO', icon: Globe },
     ];
 
     const customHeader = (
@@ -902,6 +1259,9 @@ export default function AdminCourseEdit() {
                 )}
                 {activeTab === 'settings' && (
                     <SettingsTab form={form} setForm={setForm} errors={errors} />
+                )}
+                {activeTab === 'testimonials' && (
+                    <TestimonialsTab form={form} setForm={setForm} />
                 )}
                 {activeTab === 'seo' && (
                     <SEOTab

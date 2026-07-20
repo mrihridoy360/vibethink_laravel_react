@@ -56,6 +56,18 @@ class MetaCapiService
             $hashedUserData['ln'] = [hash('sha256', strtolower(trim($userData['last_name'])))];
         }
 
+        if (!empty($userData['id'])) {
+            $hashedUserData['external_id'] = hash('sha256', (string)$userData['id']);
+        }
+
+        // Add Facebook fbp & fbc cookies if available
+        if ($fbp = request()->cookie('_fbp')) {
+            $hashedUserData['fbp'] = $fbp;
+        }
+        if ($fbc = request()->cookie('_fbc')) {
+            $hashedUserData['fbc'] = $fbc;
+        }
+
         // Add client metadata
         $hashedUserData['client_ip_address'] = request()->ip();
         $hashedUserData['client_user_agent'] = request()->userAgent();
