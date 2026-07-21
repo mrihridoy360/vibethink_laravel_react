@@ -13,6 +13,7 @@ use App\Models\ReferralUser;
 use App\Models\ReferralCommission;
 use App\Models\SupportGroup;
 use App\Models\Enrollment;
+use App\Services\CloudinaryService;
 
 class UserController extends Controller
 {
@@ -43,6 +44,49 @@ class UserController extends Controller
             'success' => true,
             'message' => 'প্রোফাইল সফলভাবে আপডেট হয়েছে।',
             'user'    => $user->fresh(),
+        ]);
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|max:1024', // Max 1 MB
+        ], [
+            'avatar.max' => 'ছবির সাইজ ১ মেগাবাইটের বেশি হওয়া যাবে না।',
+            'avatar.image' => 'আপলোড করা ফাইলটি অবশ্যই একটি ছবি হতে হবে।',
+        ]);
+
+        $user = Auth::user();
+        $cloudinary = new CloudinaryService();
+
+        // Delete old avatar from Cloudinary if it exists and is a Cloudinary URL
+        if ($user->avatar && $cloudinary->isCloudinaryUrl($user->avatar)) {
+            $publicId = $cloudinary->extractPublicId($user->avatar);
+            if ($publicId) {
+                $cloudinary->deleteImage($publicId);
+            }
+        }
+
+        $result = $cloudinary->uploadImage($request->file('avatar'), 'avatars', [
+            'transformation' => 'w_150,h_150,c_fill,q_50',
+            'format' => 'webp'
+        ]);
+
+        if (!$result || !isset($result['url'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cloudinary-তে ছবি আপলোড করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            ], 500);
+        }
+
+        $user->update([
+            'avatar' => $result['url'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে।',
+            'user' => $user->fresh(),
         ]);
     }
 

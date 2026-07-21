@@ -115,12 +115,24 @@ class CourseController extends Controller
             }
         }
 
+        $recentStudents = Enrollment::where('course_id', $course->id)
+            ->with('user:id,name,avatar')
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(function ($enrollment) {
+                return $enrollment->user;
+            })
+            ->filter()
+            ->values();
+
         return response()->json([
             'success' => true,
             'course' => $course,
             'is_enrolled' => !is_null($enrollment),
             'enrollment' => $enrollment,
-            'completed_lessons' => $completedLessons
+            'completed_lessons' => $completedLessons,
+            'recent_students' => $recentStudents
         ]);
     }
 

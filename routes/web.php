@@ -52,6 +52,7 @@ Route::prefix('api')->group(function () {
         Route::get('/profile', [UserController::class, 'profile']);
         Route::put('/profile', [UserController::class, 'updateProfile']);
         Route::put('/profile/password', [UserController::class, 'updatePassword']);
+        Route::post('/profile/avatar', [UserController::class, 'updateAvatar']);
 
         // Certificates
         Route::get('/certificates', [UserController::class, 'certificates']);

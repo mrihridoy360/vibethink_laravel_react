@@ -24,6 +24,7 @@ export default function CourseDetail() {
     });
     const [isEnrolled, setIsEnrolled] = useState(false);
     const [completedLessons, setCompletedLessons] = useState([]);
+    const [recentStudents, setRecentStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [enrolling, setEnrolling] = useState(false);
     const [openChapters, setOpenChapters] = useState({});
@@ -156,6 +157,7 @@ export default function CourseDetail() {
                 setCourse(foundCourse);
                 setIsEnrolled(response.data.is_enrolled);
                 setCompletedLessons(response.data.completed_lessons || []);
+                setRecentStudents(response.data.recent_students || []);
             }
         } catch (error) {
             console.error('Error fetching course detail', error);
@@ -251,6 +253,28 @@ export default function CourseDetail() {
 
     const fakeLearnersBase = parseInt(course.section_titles?.fake_learner_count, 10) || 0;
     const totalLearners = fakeLearnersBase + (course.enrollments_count || 0);
+
+    const getInitials = (name) => {
+        if (!name) return '?';
+        return name.trim().charAt(0).toUpperCase();
+    };
+
+    const defaultPlaceholders = [
+        { name: 'A', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+        { name: 'B', bg: 'bg-blue-100', text: 'text-blue-700' },
+        { name: 'C', bg: 'bg-amber-100', text: 'text-amber-700' }
+    ];
+
+    const displayStudents = [...recentStudents];
+    while (displayStudents.length < 3) {
+        const idx = displayStudents.length;
+        displayStudents.push({
+            isPlaceholder: true,
+            name: defaultPlaceholders[idx].name,
+            bg: defaultPlaceholders[idx].bg,
+            text: defaultPlaceholders[idx].text
+        });
+    }
 
     return (
         <div className="w-full">
@@ -381,9 +405,50 @@ export default function CourseDetail() {
                                 {/* Learners */}
                                 <div className="flex items-center gap-2.5">
                                     <div className="flex -space-x-2">
-                                        <div className="w-7 h-7 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-emerald-700">A</div>
-                                        <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-blue-700">B</div>
-                                        <div className="w-7 h-7 rounded-full bg-amber-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-amber-700">C</div>
+                                        {displayStudents.map((student, idx) => {
+                                            if (student.isPlaceholder) {
+                                                return (
+                                                    <div
+                                                        key={`placeholder-${idx}`}
+                                                        className={`w-7 h-7 rounded-full ${student.bg} border-2 border-white flex items-center justify-center text-[10px] font-bold ${student.text}`}
+                                                    >
+                                                        {student.name}
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (student.avatar) {
+                                                const avatarUrl = student.avatar.startsWith('http')
+                                                    ? student.avatar
+                                                    : `/storage/${student.avatar}`;
+                                                return (
+                                                    <img
+                                                        key={student.id || idx}
+                                                        src={avatarUrl}
+                                                        alt={student.name}
+                                                        className="w-7 h-7 rounded-full border-2 border-white object-cover"
+                                                    />
+                                                );
+                                            }
+
+                                            const bgColors = [
+                                                'bg-emerald-100 text-emerald-700',
+                                                'bg-blue-100 text-blue-700',
+                                                'bg-amber-100 text-amber-700',
+                                                'bg-purple-100 text-purple-700',
+                                                'bg-rose-100 text-rose-700'
+                                            ];
+                                            const colorClass = bgColors[student.id % bgColors.length] || bgColors[0];
+
+                                            return (
+                                                <div
+                                                    key={student.id || idx}
+                                                    className={`w-7 h-7 rounded-full ${colorClass} border-2 border-white flex items-center justify-center text-[10px] font-bold`}
+                                                >
+                                                    {getInitials(student.name)}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                     <span className="text-sm text-slate-500 font-bold" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
                                         {toBengaliNum(totalLearners.toLocaleString())} জন শিক্ষার্থী যুক্ত হয়েছেন

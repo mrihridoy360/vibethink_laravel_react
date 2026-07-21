@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { User, Lock, Camera, Save, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../Contexts/AuthContext';
@@ -14,6 +14,50 @@ export default function Settings() {
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileSuccess, setProfileSuccess] = useState('');
     const [profileError, setProfileError] = useState('');
+
+    // Avatar upload
+    const fileInputRef = useRef(null);
+    const [avatarLoading, setAvatarLoading] = useState(false);
+    const [avatarError, setAvatarError] = useState('');
+    const [avatarSuccess, setAvatarSuccess] = useState('');
+
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setAvatarError('');
+        setAvatarSuccess('');
+
+        // Limit to 1 MB (1024 * 1024 bytes)
+        const maxSize = 1 * 1024 * 1024;
+        if (file.size > maxSize) {
+            setAvatarError('ছবির সাইজ ১ মেগাবাইট (1 MB) এর বেশি হওয়া যাবে না।');
+            e.target.value = '';
+            return;
+        }
+
+        setAvatarLoading(true);
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            const res = await axios.post('/api/profile/avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (res.data.success) {
+                setAvatarSuccess(res.data.message);
+                await refreshUser();
+                setTimeout(() => setAvatarSuccess(''), 3000);
+            }
+        } catch (err) {
+            setAvatarError(err.response?.data?.message || 'ছবি আপলোড করতে ব্যর্থ হয়েছে।');
+        } finally {
+            setAvatarLoading(false);
+            e.target.value = '';
+        }
+    };
 
     // Password form
     const [passForm, setPassForm] = useState({
@@ -82,17 +126,49 @@ export default function Settings() {
 
             {/* Avatar Section */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                {avatarSuccess && (
+                    <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> {avatarSuccess}
+                    </div>
+                )}
+                {avatarError && (
+                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
+                        {avatarError}
+                    </div>
+                )}
                 <div className="flex items-center gap-5">
                     <div className="relative">
-                        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl font-extrabold shadow-lg shadow-blue-500/25">
-                            {user?.name?.charAt(0)?.toUpperCase()}
-                        </div>
+                        {user?.avatar ? (
+                            <img
+                                src={user.avatar.startsWith('http') ? user.avatar : `/storage/${user.avatar}`}
+                                alt={user?.name}
+                                className="h-16 w-16 rounded-full object-cover border border-gray-250 shadow-md"
+                            />
+                        ) : (
+                            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl font-extrabold shadow-lg shadow-blue-500/25">
+                                {user?.name?.charAt(0)?.toUpperCase()}
+                            </div>
+                        )}
+                        {avatarLoading && (
+                            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            </div>
+                        )}
                         <button
-                            className="absolute bottom-0 right-0 p-1 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-colors"
-                            title="ছবি পরিবর্তন (শীঘ্রই)"
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute bottom-0 right-0 p-1 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition-colors cursor-pointer"
+                            title="ছবি পরিবর্তন"
                         >
                             <Camera className="h-2.5 w-2.5" />
                         </button>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            onChange={handleAvatarChange}
+                            className="hidden"
+                        />
                     </div>
                     <div>
                         <p className="text-sm font-bold text-gray-900">{user?.name}</p>
