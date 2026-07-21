@@ -22,6 +22,7 @@ Route::prefix('api')->group(function () {
     // Course Routes
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
+    Route::post('/courses/{id}/interest', [CourseController::class, 'expressInterest']);
     Route::get('/courses/{slug}/reviews', [CourseController::class, 'reviews']);
     Route::get('/blogs', [CourseController::class, 'publicBlogs']);
     Route::get('/blogs/{slug}', [CourseController::class, 'publicBlogShow']);
@@ -87,6 +88,11 @@ Route::prefix('api')->group(function () {
             Route::get('/stats',                           [AdminController::class, 'stats']);
             Route::get('/system-info',                     [AdminController::class, 'systemInfo']);
             Route::get('/courses',                         [AdminController::class, 'courses']);
+            
+            // ── Course Leads ──────────────────────────────────────
+            Route::get('/leads',                           [AdminController::class, 'getLeads']);
+            Route::delete('/leads/{id}',                   [AdminController::class, 'destroyLead']);
+            Route::post('/leads/notify/{id}',              [AdminController::class, 'notifyLead']);
             Route::get('/courses/{id}',                    [AdminController::class, 'showCourse']);
             Route::post('/courses',                        [AdminController::class, 'storeCourse']);
             Route::match(['post', 'put'], '/courses/{id}/update', [AdminController::class, 'updateCourse']);

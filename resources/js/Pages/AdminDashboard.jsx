@@ -5,6 +5,7 @@ import { HelpCircle } from 'lucide-react';
 // Tab components
 import AdminOverview from './Admin/AdminOverview';
 import AdminCourses from './Admin/AdminCourses';
+import AdminLeads from './Admin/AdminLeads';
 import AdminUsers from './Admin/AdminUsers';
 import AdminEnrollments from './Admin/AdminEnrollments';
 import AdminPayments from './Admin/AdminPayments';
@@ -60,12 +61,13 @@ export default function AdminDashboard() {
         navigate(key === 'dashboard' ? '/admin' : `/admin/${key}`);
     };
 
-    const activeTabs = ['dashboard', 'courses', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq'];
+    const activeTabs = ['dashboard', 'courses', 'leads', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq'];
 
     return (
         <AdminLayout activeTab={activeTab}>
             {activeTab === 'dashboard' && <AdminOverview onTabChange={handleTabChange} />}
             {activeTab === 'courses' && <AdminCourses />}
+            {activeTab === 'leads' && <AdminLeads />}
             {activeTab === 'users' && <AdminUsers />}
             {activeTab === 'enrollments' && <AdminEnrollments />}
             {activeTab === 'payments' && <AdminPayments />}

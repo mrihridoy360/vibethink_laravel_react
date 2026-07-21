@@ -859,59 +859,52 @@ export default function CourseDetail() {
 
                 {/* Instructor */}
                 {course.user && (
-                    <div className="my-20 lg:my-28 max-w-3xl mx-auto px-0 sm:px-4">
-                        <div className="relative mb-6">
-                            <span className="text-[10px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mb-2 block">
-                                INSTRUCTOR
-                            </span>
-                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-                                {getSectionTitle(course.section_titles, 'instructor')}
-                            </h2>
-                        </div>
-                        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-sm transition-all hover:shadow-md" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, #ffffff) 0%, #ffffff 80%)' }}>
+                    <div className="my-20 lg:my-28 max-w-5xl mx-auto px-0 sm:px-4">
+                        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 shadow-sm transition-all hover:shadow-md flex flex-col md:flex-row bg-white" style={{ backgroundImage: 'linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, #ffffff) 0%, #ffffff 80%)' }}>
                             {/* Decorative background blob */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 opacity-20 rounded-full blur-3xl pointer-events-none" />
 
-                            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
-                                {/* Avatar */}
-                                <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl overflow-hidden bg-white shrink-0 border-4 border-white shadow-md relative group">
-                                    {course.user.avatar ? (
-                                        <img
-                                            src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
-                                            alt={course.user.name}
-                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                            <User className="h-10 w-10 text-white/70" />
-                                        </div>
-                                    )}
+                            {/* Avatar - cover full left side */}
+                            <div className="w-full md:w-80 shrink-0 relative min-h-[300px] md:min-h-full">
+                                {course.user.avatar ? (
+                                    <img
+                                        src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
+                                        alt={course.user.name}
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                        <User className="h-20 w-20 text-white/70" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Details */}
+                            <div className="flex-1 p-6 sm:p-10 text-center md:text-left space-y-4 flex flex-col justify-center relative z-10">
+                                <div className="space-y-1">
+                                    <span className="inline-block px-3 py-1 bg-purple-50 border border-purple-100 text-purple-600 rounded-full text-[10px] font-black tracking-wider uppercase font-mono mb-2" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        Meet Your Mentor
+                                    </span>
+                                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-1.5" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {course.user.name || 'বিশেষজ্ঞ'}
+                                        <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-50" />
+                                    </h3>
+                                    <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>কোর্স ইনস্ট্রাক্টর</p>
                                 </div>
 
-                                {/* Details */}
-                                <div className="flex-1 text-center md:text-left space-y-4">
-                                    <div className="space-y-1">
-                                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-1.5">
-                                            {course.user.name || 'বিশেষজ্ঞ'}
-                                            <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-50" />
-                                        </h3>
-                                        <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider">কোর্স ইনস্ট্রাক্টর</p>
+                                <p className="text-sm sm:text-base text-slate-650 font-medium leading-relaxed italic border-l-2 border-slate-200 pl-0 md:pl-4">
+                                    "I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."
+                                </p>
+
+                                {/* Stats grid */}
+                                <div className="grid grid-cols-2 gap-3 pt-2" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                    <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
+                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">অভিজ্ঞতা</div>
+                                        <div className="text-lg font-black text-slate-800">৬+ বছর</div>
                                     </div>
-
-                                    <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed italic border-l-2 border-slate-200 pl-0 md:pl-4">
-                                        "I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."
-                                    </p>
-
-                                    {/* Stats grid */}
-                                    <div className="grid grid-cols-2 gap-3 pt-2">
-                                        <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                            <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">অভিজ্ঞতা</div>
-                                            <div className="text-lg font-black text-slate-800">৬+ বছর</div>
-                                        </div>
-                                        <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                            <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">সম্পন্ন প্রজেক্ট</div>
-                                            <div className="text-lg font-black text-slate-800">৪৫০০+ প্রজেক্ট</div>
-                                        </div>
+                                    <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
+                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">সম্পন্ন প্রজেক্ট</div>
+                                        <div className="text-lg font-black text-slate-800">৪৫০০+ প্রজেক্ট</div>
                                     </div>
                                 </div>
                             </div>

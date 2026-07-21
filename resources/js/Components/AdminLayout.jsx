@@ -14,6 +14,7 @@ import {
 const MAIN_MENU = [
     { key: 'dashboard', label: 'ড্যাশবোর্ড', icon: LayoutDashboard, active: true, path: '/admin' },
     { key: 'courses', label: 'কোর্সসমূহ', icon: BookOpen, active: true, path: '/admin/courses' },
+    { key: 'leads', label: 'কোর্স লিডস', icon: Users, active: true, path: '/admin/leads' },
     { key: 'assignments', label: 'এসাইনমেন্ট', icon: FileText, active: true, path: '/admin/assignments' },
     { key: 'categories', label: 'ক্যাটাগরি', icon: Tag, active: true, path: '/admin/categories' },
     { key: 'users', label: 'ব্যবহারকারী', icon: Users, active: true, path: '/admin/users' },
@@ -46,6 +47,7 @@ const BOTTOM_MENU = [
 const PAGE_TITLES = {
     dashboard: 'ড্যাশবোর্ড',
     courses: 'কোর্সসমূহ',
+    leads: 'কোর্স লিডস',
     assignments: 'এসাইনমেন্ট',
     categories: 'ক্যাটাগরি',
     users: 'ব্যবহারকারী',

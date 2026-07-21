@@ -279,6 +279,10 @@ class AdminController extends Controller
         $course = Course::findOrFail($id);
         $course->update(['is_published' => !$course->is_published]);
 
+        if ($course->is_published) {
+            $this->notifyCourseLeads($course);
+        }
+
         return response()->json([
             'success'      => true,
             'is_published' => $course->is_published,
@@ -439,7 +443,12 @@ class AdminController extends Controller
             }
         }
 
+        $oldIsPublished = $course->is_published;
         $course->update($data);
+
+        if (!$oldIsPublished && $course->is_published) {
+            $this->notifyCourseLeads($course);
+        }
 
         return response()->json([
             'success' => true,
@@ -3239,5 +3248,141 @@ class AdminController extends Controller
             }
             return 'Unknown';
         });
+    }
+
+    public function getLeads()
+    {
+        $this->ensureAdmin();
+
+        $leads = \App\Models\CourseLead::with('course:id,title,slug')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'leads'   => $leads,
+        ]);
+    }
+
+    public function destroyLead($id)
+    {
+        $this->ensureAdmin();
+
+        $lead = \App\Models\CourseLead::findOrFail($id);
+        $lead->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'লিডটি সফলভাবে মুছে ফেলা হয়েছে।',
+        ]);
+    }
+
+    public function notifyLead($id)
+    {
+        $this->ensureAdmin();
+
+        $lead = \App\Models\CourseLead::findOrFail($id);
+        $course = $lead->course;
+
+        if (!$course) {
+            return response()->json(['success' => false, 'message' => 'কোর্সটি খুঁজে পাওয়া যায়নি।'], 404);
+        }
+
+        try {
+            $toEmail = $lead->email;
+            $toName = $lead->name;
+
+            \Illuminate\Support\Facades\Mail::html(
+                "<div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>
+                    <div style='background-color: #7c3aed; color: #ffffff; padding: 24px; text-align: center;'>
+                        <h2 style='margin: 0; font-size: 24px;'>আমাদের নতুন কোর্স এখন লাইভ!</h2>
+                    </div>
+                    <div style='padding: 24px;'>
+                        <p>প্রিয় <strong>{$toName}</strong>,</p>
+                        <p>আপনি যে কোর্সটিতে আগ্রহ প্রকাশ করেছিলেন, তা এখন আমাদের প্ল্যাটফর্মে লাইভ ও সবার জন্য উন্মুক্ত করা হয়েছে।</p>
+                        <div style='background-color: #f3f4f6; border-left: 4px solid #7c3aed; padding: 16px; margin: 20px 0; border-radius: 4px;'>
+                            <h3 style='margin: 0 0 8px 0; color: #1f2937;'>{$course->title}</h3>
+                            <p style='margin: 0; font-size: 14px; color: #4b5563;'>{$course->short_description}</p>
+                        </div>
+                        <p>কোর্সে ভর্তি হতে বা বিস্তারিত দেখতে নিচের লিঙ্কে ক্লিক করুন:</p>
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='" . url("/courses/{$course->slug}") . "' style='background-color: #7c3aed; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);'>কোর্সে ভর্তি হোন</a>
+                        </div>
+                        <p>ধন্যবাদ,<br><strong>VibeThink LMS টিম</strong></p>
+                    </div>
+                    <div style='background-color: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #eee; font-size: 12px; color: #6b7280;'>
+                        &copy; " . date('Y') . " VibeThink. All rights reserved.
+                    </div>
+                </div>",
+                function ($message) use ($toEmail, $toName, $course) {
+                    $message->to($toEmail, $toName)
+                        ->subject("🎉 আমাদের নতুন কোর্স '{$course->title}' এখন লাইভ!");
+                }
+            );
+
+            $lead->update([
+                'notified' => true,
+                'notified_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'ইউজারকে নোটিফিকেশন পাঠানো হয়েছে।',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'মেল পাঠাতে ব্যর্থ হয়েছে: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function notifyCourseLeads($course)
+    {
+        $leads = \App\Models\CourseLead::where('course_id', $course->id)
+            ->where('notified', false)
+            ->get();
+
+        foreach ($leads as $lead) {
+            try {
+                $toEmail = $lead->email;
+                $toName = $lead->name;
+
+                \Illuminate\Support\Facades\Mail::html(
+                    "<div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>
+                        <div style='background-color: #7c3aed; color: #ffffff; padding: 24px; text-align: center;'>
+                            <h2 style='margin: 0; font-size: 24px;'>আমাদের নতুন কোর্স এখন লাইভ!</h2>
+                        </div>
+                        <div style='padding: 24px;'>
+                            <p>প্রিয় <strong>{$toName}</strong>,</p>
+                            <p>আপনি যে কোর্সটিতে আগ্রহ প্রকাশ করেছিলেন, তা এখন আমাদের প্ল্যাটফর্মে লাইভ ও সবার জন্য উন্মুক্ত করা হয়েছে।</p>
+                            <div style='background-color: #f3f4f6; border-left: 4px solid #7c3aed; padding: 16px; margin: 20px 0; border-radius: 4px;'>
+                                <h3 style='margin: 0 0 8px 0; color: #1f2937;'>{$course->title}</h3>
+                                <p style='margin: 0; font-size: 14px; color: #4b5563;'>{$course->short_description}</p>
+                            </div>
+                            <p>কোর্সে ভর্তি হতে বা বিস্তারিত দেখতে নিচের লিঙ্কে ক্লিক করুন:</p>
+                            <div style='text-align: center; margin: 30px 0;'>
+                                <a href='" . url("/courses/{$course->slug}") . "' style='background-color: #7c3aed; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);'>কোর্সে ভর্তি হোন</a>
+                            </div>
+                            <p>ধন্যবাদ,<br><strong>VibeThink LMS টিম</strong></p>
+                        </div>
+                        <div style='background-color: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #eee; font-size: 12px; color: #6b7280;'>
+                            &copy; " . date('Y') . " VibeThink. All rights reserved.
+                        </div>
+                    </div>",
+                    function ($message) use ($toEmail, $toName, $course) {
+                        $message->to($toEmail, $toName)
+                            ->subject("🎉 আমাদের নতুন কোর্স '{$course->title}' এখন লাইভ!");
+                    }
+                );
+
+                $lead->update([
+                    'notified' => true,
+                    'notified_at' => now(),
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to notify lead: " . $lead->email . " - " . $e->getMessage());
+            }
+        }
     }
 }

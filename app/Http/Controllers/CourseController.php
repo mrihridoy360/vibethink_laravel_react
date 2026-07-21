@@ -398,4 +398,45 @@ class CourseController extends Controller
         }
         return $toc;
     }
+
+    public function expressInterest(Request $request, $id)
+    {
+        $course = Course::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+        ], [
+            'name.required' => 'নাম প্রদান করা আবশ্যক।',
+            'email.required' => 'ইমেইল প্রদান করা আবশ্যক।',
+            'email.email' => 'সঠিক ইমেইল ঠিকানা প্রদান করুন।',
+        ]);
+
+        $name = $request->name;
+        $email = $request->email;
+
+        // Check if interest already exists
+        $existing = \App\Models\CourseLead::where('course_id', $course->id)
+            ->where('email', $email)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'আপনি ইতিমধ্যে এই কোর্সে আপনার আগ্রহ প্রকাশ করেছেন।'
+            ], 400);
+        }
+
+        \App\Models\CourseLead::create([
+            'course_id' => $course->id,
+            'name' => $name,
+            'email' => $email,
+            'notified' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ধন্যবাদ! কোর্সটি লাইভ হলে আপনাকে ইমেইলের মাধ্যমে জানানো হবে।'
+        ]);
+    }
 }

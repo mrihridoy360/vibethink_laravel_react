@@ -143,7 +143,7 @@ export default function CourseCard({ course, onComingSoonClick }) {
                             onClick={handleComingSoonClick}
                             className="w-full py-3 px-4 bg-orange-50 hover:bg-orange-100/80 text-orange-600 font-extrabold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all border border-orange-100/50 cursor-pointer shadow-sm shadow-orange-500/5"
                         >
-                            <Clock className="w-4 h-4 animate-pulse" /> বিস্তারিত জানতে ক্লিক করুন
+                            <Clock className="w-4 h-4 animate-pulse" /> আগ্রহ প্রকাশ করতে ক্লিক করুন
                         </button>
                     </div>
                 ) : (
