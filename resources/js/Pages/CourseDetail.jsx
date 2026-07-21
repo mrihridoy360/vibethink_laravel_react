@@ -1376,18 +1376,19 @@ export default function CourseDetail() {
             {/* Sticky Bottom Ribbon */}
             {!isEnrolled && showStickyRibbon && (
                 <div
-                    className="fixed bottom-0 left-0 right-0 z-50 py-3 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
+                    className="fixed bottom-0 left-0 right-0 z-50 py-4 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
                     style={{ backgroundColor: 'var(--primary-color)' }}
                 >
                     <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center gap-4 sm:gap-6 w-full">
-                        <span className="text-sm sm:text-base font-bold tracking-wide">
+                        <span className="text-base sm:text-lg md:text-xl font-extrabold tracking-wide" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
                             বিশেষ অফার চলছে — দেরি না করে
                         </span>
                         <button
                             onClick={handleEnroll}
-                            className="bg-slate-950 hover:bg-black text-white text-xs sm:text-sm font-extrabold px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border-none shrink-0"
+                            className="bg-white hover:bg-slate-50 text-sm sm:text-base md:text-lg font-extrabold px-6 py-3 rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer border-none shrink-0 duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                            style={{ color: 'var(--primary-color)', fontFamily: "'Hind Siliguri', sans-serif" }}
                         >
-                            এখনই ইনরোল করুন <ArrowRight className="h-3.5 w-3.5" />
+                            এখনই ইনরোল করুন <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                         </button>
                     </div>
                 </div>
