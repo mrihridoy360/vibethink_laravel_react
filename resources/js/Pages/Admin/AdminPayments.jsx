@@ -57,7 +57,7 @@ export default function AdminPayments() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
                     <DollarSign className="h-5 w-5 text-green-500 mx-auto mb-1.5" />
                     <p className="text-lg font-extrabold text-gray-900">৳{parseFloat(summary.completed || 0).toLocaleString()}</p>

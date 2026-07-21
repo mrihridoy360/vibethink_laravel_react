@@ -3270,6 +3270,197 @@ class AdminController extends Controller
         });
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Visitor Analytics — Advanced Filtered Dashboard
+    // ─────────────────────────────────────────────────────────────
+
+    public function visitorAnalytics(Request $request)
+    {
+        $this->ensureAdmin();
+
+        // ── Filters from query params ──────────────────────────────
+        $dateFrom    = $request->input('date_from');   // e.g. 2025-07-01
+        $dateTo      = $request->input('date_to');     // e.g. 2025-07-21
+        $referrer    = $request->input('referrer');    // filter by referrer name
+        $country     = $request->input('country');     // filter by country code
+        $range       = $request->input('range', '30'); // preset: 7, 15, 30, 90, 'custom'
+
+        // Resolve date range
+        if ($range !== 'custom' || !$dateFrom || !$dateTo) {
+            $days = (int) $range ?: 30;
+            $dateTo   = date('Y-m-d');
+            $dateFrom = date('Y-m-d', strtotime("-{$days} days"));
+        }
+
+        $dateFromTs = strtotime($dateFrom);
+        $dateToTs   = strtotime($dateTo) + 86399; // end of day
+
+        // ── Load persistent analytics ──────────────────────────────
+        $analyticsSetting = Setting::where('key', 'visitor_analytics')->first();
+        $analytics = $analyticsSetting ? json_decode($analyticsSetting->value, true) : null;
+        if (!$analytics) {
+            $analytics = [
+                'total_pageviews' => 0,
+                'total_uniques'   => 0,
+                'referrers'       => [],
+                'countries'       => [],
+                'daily'           => []
+            ];
+        }
+
+        // ── Filter daily data by date range ───────────────────────
+        $allDaily    = $analytics['daily'] ?? [];
+        $filteredDays = [];
+        foreach ($allDaily as $date => $vals) {
+            $ts = strtotime($date);
+            if ($ts >= $dateFromTs && $ts <= $dateToTs) {
+                $filteredDays[$date] = $vals;
+            }
+        }
+        ksort($filteredDays);
+
+        // ── Summary stats for the filtered range ───────────────────
+        $rangePageviews = array_sum(array_column($filteredDays, 'pageviews'));
+        $rangeUniques   = array_sum(array_column($filteredDays, 'uniques'));
+
+        // ── Bounce-rate estimate (uniques / pageviews) ─────────────
+        $bounceRate = ($rangePageviews > 0)
+            ? round((($rangePageviews - $rangeUniques) / $rangePageviews) * 100, 1)
+            : 0;
+
+        // ── Avg pages per session ──────────────────────────────────
+        $avgPagesPerSession = ($rangeUniques > 0)
+            ? round($rangePageviews / $rangeUniques, 2)
+            : 0;
+
+        // ── Growth compared to previous period ────────────────────
+        $periodDays   = max(1, (int) round(($dateToTs - $dateFromTs) / 86400));
+        $prevDateFrom = date('Y-m-d', strtotime($dateFrom) - ($periodDays * 86400));
+        $prevDateTo   = date('Y-m-d', strtotime($dateFrom) - 1);
+        $prevFromTs   = strtotime($prevDateFrom);
+        $prevToTs     = strtotime($prevDateTo) + 86399;
+
+        $prevDays = [];
+        foreach ($allDaily as $date => $vals) {
+            $ts = strtotime($date);
+            if ($ts >= $prevFromTs && $ts <= $prevToTs) {
+                $prevDays[$date] = $vals;
+            }
+        }
+        $prevPageviews = array_sum(array_column($prevDays, 'pageviews'));
+        $prevUniques   = array_sum(array_column($prevDays, 'uniques'));
+
+        $pvGrowth  = $prevPageviews > 0 ? round((($rangePageviews - $prevPageviews) / $prevPageviews) * 100, 1) : 0;
+        $unqGrowth = $prevUniques   > 0 ? round((($rangeUniques   - $prevUniques)   / $prevUniques)   * 100, 1) : 0;
+
+        // ── Top Referrers (filtered by country if set) ─────────────
+        $referrersRaw = $analytics['referrers'] ?? [];
+        arsort($referrersRaw);
+        $referrersList = [];
+        foreach (array_slice($referrersRaw, 0, 20, true) as $ref => $count) {
+            if ($referrer && stripos($ref, $referrer) === false) continue;
+            $referrersList[] = ['name' => $ref, 'count' => $count];
+        }
+
+        // ── Top Countries ──────────────────────────────────────────
+        $countriesRaw = $analytics['countries'] ?? [];
+        arsort($countriesRaw);
+        $countriesList = [];
+        $totalCountryHits = array_sum($countriesRaw);
+        foreach (array_slice($countriesRaw, 0, 20, true) as $code => $count) {
+            if ($country && strtoupper($country) !== strtoupper($code)) continue;
+            $countriesList[] = [
+                'code'    => $code,
+                'count'   => $count,
+                'percent' => $totalCountryHits > 0 ? round(($count / $totalCountryHits) * 100, 1) : 0
+            ];
+        }
+
+        // ── Live Online Users ──────────────────────────────────────
+        $online  = Cache::get('online_visitors', []);
+        $nowTs   = time();
+        $online  = array_filter($online, fn($v) => $v['last_seen'] >= ($nowTs - 300));
+
+        $onlineList = [];
+        foreach ($online as $ip => $details) {
+            // Apply country filter for live list
+            if ($country && strtoupper($details['country'] ?? '') !== strtoupper($country)) {
+                continue;
+            }
+            // Apply referrer filter for live list
+            if ($referrer && stripos($details['referrer'] ?? '', $referrer) === false) {
+                continue;
+            }
+            $maskedIp = preg_replace('/(\d+)\.(\d+)\.(\d+)\.(\d+)/', '$1.$2.*.*', $ip);
+            if (str_contains($ip, ':')) {
+                $parts = explode(':', $ip);
+                $maskedIp = count($parts) > 2 ? $parts[0] . ':' . $parts[1] . ':*:*:*:*' : $ip;
+            }
+            $secondsAgo = max(0, $nowTs - ($details['last_seen'] ?? $nowTs));
+            $onlineList[] = [
+                'ip'          => $maskedIp,
+                'url'         => $details['url'] ?? '/',
+                'referrer'    => $details['referrer'] ?? 'Direct',
+                'country'     => $details['country'] ?? 'Unknown',
+                'user_name'   => $details['user_name'] ?? 'Guest',
+                'last_seen'   => $details['last_seen'] ?? $nowTs,
+                'seconds_ago' => $secondsAgo,
+            ];
+        }
+        usort($onlineList, fn($a, $b) => $b['last_seen'] - $a['last_seen']);
+
+        // ── Top Pages visited (from online cache URL histogram) ────
+        $pageHits = [];
+        $allOnline = Cache::get('online_visitors', []);
+        foreach ($allOnline as $ip => $details) {
+            $url = $details['url'] ?? '/';
+            $pageHits[$url] = ($pageHits[$url] ?? 0) + 1;
+        }
+        arsort($pageHits);
+        $topPages = [];
+        foreach (array_slice($pageHits, 0, 10, true) as $url => $hits) {
+            $topPages[] = ['url' => $url, 'hits' => $hits];
+        }
+
+        // ── Available filter options (distinct referrers & countries) ──
+        $availableReferrers = [];
+        foreach (array_keys($referrersRaw) as $r) {
+            $availableReferrers[] = $r;
+        }
+        $availableCountries = array_keys($countriesRaw);
+
+        return response()->json([
+            'success' => true,
+            'filters' => [
+                'date_from' => $dateFrom,
+                'date_to'   => $dateTo,
+                'range'     => $range,
+                'referrer'  => $referrer,
+                'country'   => $country,
+            ],
+            'summary' => [
+                'total_pageviews'      => $analytics['total_pageviews'] ?? 0,
+                'total_uniques'        => $analytics['total_uniques'] ?? 0,
+                'range_pageviews'      => $rangePageviews,
+                'range_uniques'        => $rangeUniques,
+                'pv_growth'            => $pvGrowth,
+                'unq_growth'           => $unqGrowth,
+                'bounce_rate'          => $bounceRate,
+                'avg_pages_per_session'=> $avgPagesPerSession,
+                'online_count'         => count($online),
+                'prev_pageviews'       => $prevPageviews,
+                'prev_uniques'         => $prevUniques,
+            ],
+            'daily'              => $filteredDays,
+            'referrers'          => $referrersList,
+            'countries'          => $countriesList,
+            'online_list'        => $onlineList,
+            'top_pages'          => $topPages,
+            'available_referrers'=> array_values(array_unique($availableReferrers)),
+            'available_countries'=> array_values(array_unique($availableCountries)),
+        ]);
+    }
+
     public function getLeads()
     {
         $this->ensureAdmin();

@@ -295,7 +295,7 @@ export default function AdminOverview({ onTabChange }) {
         return (
             <div className="space-y-6">
                 <div className="h-28 bg-gray-100 rounded-2xl animate-pulse" />
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[1, 2, 3, 4].map(n => <div key={n} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}
                 </div>
                 <div className="h-72 bg-gray-100 rounded-2xl animate-pulse" />
@@ -319,20 +319,20 @@ export default function AdminOverview({ onTabChange }) {
     return (
         <div className="space-y-6">
             {/* Welcome card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between relative overflow-hidden">
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-50/50 rounded-full -translate-y-16 translate-x-16 -z-0" />
                 <div className="relative">
                     <p className="text-sm text-blue-500 font-semibold flex items-center gap-1.5 mb-1">
                         🚀 স্বাগতম, অ্যাডমিন!
                     </p>
-                    <h2 className="text-xl font-extrabold text-gray-900">আপনার লার্নিং প্ল্যাটফর্ম ওভারভিউ</h2>
-                    <p className="text-sm text-gray-400 mt-1 max-w-lg">
+                    <h2 className="text-lg md:text-xl font-extrabold text-gray-900">আপনার লার্নিং প্ল্যাটফর্ম ওভারভিউ</h2>
+                    <p className="text-xs md:text-sm text-gray-400 mt-1 max-w-lg">
                         আপনার প্ল্যাটফর্মের কার্যকারিতা ট্র্যাক করুন, এনরোলমেন্ট মনিটর করুন এবং আপনার কোর্সগুলি পরিচালনা করুন।
                     </p>
                 </div>
                 <button
                     onClick={() => onTabChange('courses')}
-                    className="shrink-0 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
+                    className="shrink-0 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                     <Plus className="h-3.5 w-3.5" /> নতুন কোর্স
                 </button>
@@ -415,20 +415,28 @@ export default function AdminOverview({ onTabChange }) {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Visitor Chart (Spans 2 columns on xl screens) */}
                 <div className="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div>
                             <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                                 <Activity className="h-4 w-4 text-emerald-500" /> ভিজিটর ও লাইভ ট্রাফিক স্ট্যাটিসটিক্স
                             </h3>
                             <p className="text-xs text-gray-400 mt-0.5">দৈনিক ভিজিটর ও পেজভিউ ট্রেন্ড (গত ১৫ দিন)</p>
                         </div>
-                        <div className="flex gap-4 text-xs font-semibold">
-                            <span className="flex items-center gap-1.5 text-emerald-600">
-                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> পেজভিউ (Pageviews)
-                            </span>
-                            <span className="flex items-center gap-1.5 text-amber-500">
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> ইউনিক (Uniques)
-                            </span>
+                        <div className="flex items-center gap-3">
+                            <div className="flex gap-3 text-xs font-semibold">
+                                <span className="flex items-center gap-1.5 text-emerald-600">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> পেজভিউ
+                                </span>
+                                <span className="flex items-center gap-1.5 text-amber-500">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> ইউনিক
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => onTabChange('visitor_stats')}
+                                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
+                            >
+                                বিস্তারিত →
+                            </button>
                         </div>
                     </div>
                     <VisitorStatsChart dailyData={visitorStats.daily} />

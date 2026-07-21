@@ -248,3 +248,32 @@ body {
 .animate-marquee:hover {
     animation-play-state: paused;
 }
+
+/* Fade-in animation for dropdowns and modals */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.18s ease forwards;
+}
+
+/* Admin panel light scrollbar */
+.admin-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 4px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+}

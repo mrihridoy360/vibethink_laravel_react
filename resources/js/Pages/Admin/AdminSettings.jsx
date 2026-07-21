@@ -307,14 +307,14 @@ export default function AdminSettings() {
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                 <div>
-                    <h2 className="text-xl font-extrabold text-slate-800">সাইট সেটিংস</h2>
-                    <p className="text-sm text-slate-500 mt-0.5">সাইটের সকল গ্লোবাল কনফিগারেশন এখান থেকে পরিচালনা করুন।</p>
+                    <h2 className="text-lg md:text-xl font-extrabold text-slate-800">সাইট সেটিংস</h2>
+                    <p className="text-xs md:text-sm text-slate-500 mt-0.5">সাইটের সকল গ্লোবাল কনফিগারেশন এখান থেকে পরিচালনা করুন।</p>
                 </div>
                 <button
                     onClick={fetchAll}
-                    className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors self-start sm:self-auto"
                 >
                     <RefreshCw className="w-3.5 h-3.5" />
                     রিফ্রেশ

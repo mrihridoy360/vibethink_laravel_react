@@ -239,6 +239,9 @@ Route::prefix('api')->group(function () {
             Route::post('/pages/{id}/toggle',                       [AdminPageController::class, 'toggleStatus']);
 
 
+            // ── Visitor Analytics ─────────────────────────────────────
+            Route::get('/visitor-analytics',               [AdminController::class, 'visitorAnalytics']);
+
             // ── Curriculum: Chapters ──────────────────────────────
             Route::get('/courses/{courseId}/chapters',     [AdminController::class, 'getChapters']);
             Route::post('/courses/{courseId}/chapters',    [AdminController::class, 'storeChapter']);

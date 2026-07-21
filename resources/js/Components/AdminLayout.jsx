@@ -8,7 +8,7 @@ import {
     ShoppingBag, GitBranch, BookMarked, MessageSquare, Ticket,
     Mail, AlertTriangle, Globe, Puzzle, HelpCircle, Settings,
     HeadphonesIcon, MessageCircleQuestion, LogOut, Bell, Home,
-    Moon, Search, ChevronDown, ChevronRight, Shield
+    Moon, Search, ChevronDown, ChevronRight, ChevronLeft, Shield, Menu, X, Activity
 } from 'lucide-react';
 
 const MAIN_MENU = [
@@ -33,6 +33,7 @@ const MAIN_MENU = [
     { key: 'tickets', label: 'সাপোর্ট টিকেট', icon: Ticket, active: true, path: '/admin/tickets' },
     { key: 'email_tpl', label: 'ইমেইল টেমপ্লেট', icon: Mail, active: true, path: '/admin/email_tpl' },
     { key: 'error_logs', label: 'এরর লগ', icon: AlertTriangle, active: true, path: '/admin/error_logs' },
+    { key: 'visitor_stats', label: 'ভিজিটর স্ট্যাট', icon: Activity, active: true, path: '/admin/visitor_stats' },
 ];
 
 const BOTTOM_MENU = [
@@ -57,7 +58,7 @@ const PAGE_TITLES = {
     social_review: 'সোশ্যাল রিভিউ',
     tools: 'টুলস ম্যানেজমেন্ট',
     products: 'পণ্য ও অর্ডার ম্যানেজমেন্ট',
-    referral: 'রেফারেল ও এফিলিয়েট',
+    referral: 'রেফারেল ও এফিলিয়েট',
     blog: 'ব্লগ ও কন্টেন্ট ম্যানেজমেন্ট',
     reviews: 'কোর্স রিভিউ ম্যানেজমেন্ট',
     settings: 'সাইট সেটিংস',
@@ -67,15 +68,30 @@ const PAGE_TITLES = {
     help: 'সাহায্য ও গাইড সেন্টার',
     support: 'সাপোর্ট টিকেট',
     faq: 'প্রশ্নাবলী (FAQ) সেটিংস',
+    visitor_stats: 'ভিজিটর স্ট্যাটিস্টিক্স',
 };
 
 export default function AdminLayout({ children, activeTab, headerContent }) {
     const { user, loading, logout } = useAuth();
     const navigate = useNavigate();
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+    // On mobile: sidebarOpen controls visibility (default closed)
+    // On desktop: sidebarCollapsed controls collapsed/expanded
+    const [sidebarOpen, setSidebarOpen] = useState(false);       // mobile drawer
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // desktop collapse
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const { settings } = useSiteSettings();
+
+    // Lock body scroll when mobile sidebar is open
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [sidebarOpen]);
 
     // Close dropdown on click outside
     useEffect(() => {
@@ -103,12 +119,18 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
         navigate('/login');
     };
 
+    // Close mobile sidebar on nav link click
+    const handleNavClick = () => {
+        setSidebarOpen(false);
+    };
+
     const NavItem = ({ item }) => {
         const Icon = item.icon;
         const isActive = activeTab === item.key;
         return (
             <Link
                 to={item.path}
+                onClick={handleNavClick}
                 title={sidebarCollapsed ? item.label : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all group relative ${
                     isActive
@@ -138,132 +160,219 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
 
     if (!user || user.role !== 'admin') return null;
 
-    return (
-        <div className="flex h-screen overflow-hidden bg-[#f4f6fc] font-sans text-gray-800">
-            {/* Sidebar */}
-            <aside className={`bg-white border-r border-gray-200 flex flex-col shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
-                {/* Brand Logo */}
-                <div className="h-16 flex items-center justify-between px-4 shrink-0 border-b border-gray-100">
-                    <Link to="/" className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}>
-                        {sidebarCollapsed ? (
-                            siteFavicon ? (
-                                <img
-                                    src={siteFavicon}
-                                    alt="Favicon"
-                                    className="h-8 w-8 object-contain"
-                                />
-                            ) : (
+    // ── Sidebar inner content (shared between mobile overlay & desktop aside) ──
+    const SidebarContent = ({ collapsed }) => (
+        <>
+            {/* Brand Logo */}
+            <div className="h-16 flex items-center justify-between px-4 shrink-0 border-b border-gray-100">
+                <Link
+                    to="/"
+                    onClick={handleNavClick}
+                    className={`flex items-center ${collapsed ? 'justify-center w-full' : 'gap-2.5 pl-2'}`}
+                >
+                    {collapsed ? (
+                        siteFavicon ? (
+                            <img src={siteFavicon} alt="Favicon" className="h-8 w-8 object-contain" />
+                        ) : (
+                            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+                                {siteName.charAt(0).toUpperCase()}
+                            </div>
+                        )
+                    ) : (
+                        siteLogo ? (
+                            <img src={siteLogo} alt={siteName} className="h-8 max-w-[150px] object-contain" />
+                        ) : (
+                            <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
                                     {siteName.charAt(0).toUpperCase()}
                                 </div>
-                            )
-                        ) : (
-                            siteLogo ? (
-                                <img
-                                    src={siteLogo}
-                                    alt={siteName}
-                                    className="h-8 max-w-[150px] object-contain"
-                                />
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-base shadow-sm">
-                                        {siteName.charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="text-xl font-extrabold text-slate-900 tracking-tight">
-                                        {siteName}
-                                    </span>
-                                </div>
-                            )
-                        )}
-                    </Link>
-                    <button
-                        onClick={() => setSidebarCollapsed(p => !p)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0 cursor-pointer"
-                    >
-                        {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                </div>
-
-                {/* Navigation Links */}
-                <div className="flex-grow overflow-y-auto no-scrollbar px-3 py-4 space-y-5">
-                    <div>
-                        {!sidebarCollapsed && (
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">মেনু</span>
-                        )}
-                        <div className="space-y-0.5">
-                            {MAIN_MENU.map(item => <NavItem key={item.key} item={item} />)}
-                        </div>
-                    </div>
-                    <div>
-                        {!sidebarCollapsed && (
-                            <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">সিস্টেম</span>
-                        )}
-                        <div className="space-y-0.5">
-                            {BOTTOM_MENU.map(item => <NavItem key={item.key} item={item} />)}
-                        </div>
-                    </div>
-                </div>
-
-                {/* User footer */}
-                <div className={`p-3 border-t border-gray-100 ${sidebarCollapsed ? 'flex justify-center' : 'flex items-center justify-between gap-2'}`}>
-                    {!sidebarCollapsed && (
-                        <div className="flex items-center gap-2 min-w-0">
-                            <div className="h-8 w-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                                {user?.name?.charAt(0)?.toUpperCase()}
+                                <span className="text-xl font-extrabold text-slate-900 tracking-tight">{siteName}</span>
                             </div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
-                                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-                            </div>
-                        </div>
+                        )
                     )}
+                </Link>
+
+                {/* Mobile close button */}
+                <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="md:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                    <X className="h-4 w-4" />
+                </button>
+
+                {/* Desktop collapse toggle */}
+                {!collapsed && (
                     <button
-                        onClick={handleLogout}
-                        className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0 cursor-pointer"
-                        title="Logout"
+                        onClick={() => setSidebarCollapsed(true)}
+                        className="hidden md:flex p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0 cursor-pointer"
                     >
-                        <LogOut className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4" />
                     </button>
+                )}
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex-grow overflow-y-auto no-scrollbar px-3 py-4 space-y-5">
+                <div>
+                    {!collapsed && (
+                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">মেনু</span>
+                    )}
+                    <div className="space-y-0.5">
+                        {MAIN_MENU.map(item => <NavItem key={item.key} item={item} />)}
+                    </div>
                 </div>
+                <div>
+                    {!collapsed && (
+                        <span className="px-3 text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">সিস্টেম</span>
+                    )}
+                    <div className="space-y-0.5">
+                        {BOTTOM_MENU.map(item => <NavItem key={item.key} item={item} />)}
+                    </div>
+                </div>
+            </div>
+
+            {/* User footer */}
+            <div className={`p-3 border-t border-gray-100 ${collapsed ? 'flex flex-col items-center gap-2' : 'flex items-center justify-between gap-2'}`}>
+                {/* Desktop expand toggle (when collapsed) */}
+                {collapsed && (
+                    <button
+                        onClick={() => setSidebarCollapsed(false)}
+                        className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+                        title="Expand Sidebar"
+                    >
+                        <ChevronRight className="h-4 w-4" />
+                    </button>
+                )}
+
+                {!collapsed && (
+                    <div className="flex items-center gap-2 min-w-0">
+                        <div className="h-8 w-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            {user?.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                        </div>
+                    </div>
+                )}
+
+                {collapsed && (
+                    <div className="h-8 w-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                )}
+
+                <button
+                    onClick={handleLogout}
+                    className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0 cursor-pointer"
+                    title="Logout"
+                >
+                    <LogOut className="h-4 w-4" />
+                </button>
+            </div>
+        </>
+    );
+
+    return (
+        <div className="flex h-screen overflow-hidden bg-[#f4f6fc] font-sans text-gray-800">
+
+            {/* ── Mobile Backdrop ── */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            {/* ── Mobile Sidebar Drawer ── */}
+            <aside className={`
+                fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 flex flex-col shrink-0
+                transition-transform duration-300 ease-in-out
+                md:hidden
+                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}>
+                <SidebarContent collapsed={false} />
             </aside>
 
-            {/* Main Area */}
-            <div className="flex-grow flex flex-col min-w-0">
-                {/* Topbar */}
-                <header className="h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0">
-                    <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Shield className="h-5 w-5 text-blue-600" />
-                        {headerContent || PAGE_TITLES[activeTab] || 'অ্যাডমিন ড্যাশবোর্ড'}
-                    </h1>
+            {/* ── Desktop Sidebar ── */}
+            <aside className={`
+                hidden md:flex flex-col shrink-0
+                bg-white border-r border-gray-200
+                transition-all duration-300
+                ${sidebarCollapsed ? 'w-16' : 'w-64'}
+            `}>
+                <SidebarContent collapsed={sidebarCollapsed} />
+            </aside>
 
-                    <div className="flex items-center gap-5">
-                        <div className="flex items-center gap-2 text-gray-400">
+            {/* ── Main Area ── */}
+            <div className="flex-grow flex flex-col min-w-0 overflow-hidden">
+
+                {/* Topbar */}
+                <header className="h-14 md:h-16 bg-white border-b border-gray-200 px-3 md:px-6 flex items-center justify-between shrink-0 gap-2">
+
+                    {/* Left: Hamburger (mobile) + Title */}
+                    <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                        {/* Mobile hamburger */}
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors shrink-0 cursor-pointer"
+                            aria-label="Open sidebar"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </button>
+
+                        {/* Desktop sidebar toggle when collapsed */}
+                        {sidebarCollapsed && (
+                            <button
+                                onClick={() => setSidebarCollapsed(false)}
+                                className="hidden md:flex p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0 cursor-pointer"
+                            >
+                                <Menu className="h-5 w-5" />
+                            </button>
+                        )}
+
+                        <h1 className="text-sm md:text-lg font-bold text-gray-900 flex items-center gap-1.5 md:gap-2 truncate">
+                            <Shield className="h-4 w-4 md:h-5 md:w-5 text-blue-600 shrink-0" />
+                            <span className="truncate">
+                                {headerContent || PAGE_TITLES[activeTab] || 'অ্যাডমিন ড্যাশবোর্ড'}
+                            </span>
+                        </h1>
+                    </div>
+
+                    {/* Right: Actions + User */}
+                    <div className="flex items-center gap-2 md:gap-5 shrink-0">
+                        <div className="flex items-center gap-1 md:gap-2 text-gray-400">
                             <button className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors relative">
-                                <Bell className="h-5 w-5" />
+                                <Bell className="h-4 w-4 md:h-5 md:w-5" />
                                 <span className="absolute top-1 right-1 h-1.5 w-1.5 bg-red-500 rounded-full" />
                             </button>
-                            <Link to="/dashboard" className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors" title="Student Dashboard">
-                                <Users className="h-5 w-5" />
+                            <Link
+                                to="/dashboard"
+                                className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                                title="Student Dashboard"
+                            >
+                                <Users className="h-4 w-4 md:h-5 md:w-5" />
                             </Link>
                         </div>
 
+                        {/* User dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="flex items-center gap-2 pl-4 border-l border-gray-100 hover:opacity-90 active:scale-[0.98] transition-all focus:outline-none cursor-pointer text-left bg-transparent border-none"
+                                className="flex items-center gap-1.5 md:gap-2 pl-3 md:pl-4 border-l border-gray-100 hover:opacity-90 active:scale-[0.98] transition-all focus:outline-none cursor-pointer text-left bg-transparent border-none"
                             >
-                                <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-gray-900">{user?.name}</p>
-                                    <p className="text-xs text-gray-400">{user?.email}</p>
+                                <div className="hidden sm:block text-right">
+                                    <p className="text-xs md:text-sm font-bold text-gray-900 max-w-[100px] md:max-w-none truncate">{user?.name}</p>
+                                    <p className="text-[10px] md:text-xs text-gray-400 max-w-[100px] md:max-w-none truncate">{user?.email}</p>
                                 </div>
-                                <div className="h-10 w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-orange-500/20">
+                                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs md:text-sm shadow-md shadow-orange-500/20 shrink-0">
                                     {user?.name?.slice(0, 2)?.toUpperCase()}
                                 </div>
-                                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`h-3 w-3 md:h-4 md:w-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
                             {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-gray-700">
+                                <div className="absolute right-0 mt-2 w-52 md:w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-gray-700">
                                     <div className="px-4 py-2 border-b border-gray-50 mb-1">
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
                                         <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{user?.name}</p>
@@ -285,7 +394,7 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                                     <Link
                                         to="/dashboard"
                                         onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-750 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         <LayoutDashboard className="h-4 w-4 text-gray-400" />
                                         শিক্ষার্থী ড্যাশবোর্ড
@@ -294,7 +403,7 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                                     <Link
                                         to="/dashboard/settings"
                                         onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-750 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         <Settings className="h-4 w-4 text-gray-400" />
                                         প্রোফাইল সেটিংস
@@ -316,16 +425,18 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                 </header>
 
                 {/* Content */}
-                <main className="flex-grow overflow-y-auto p-6">
+                <main className="flex-grow overflow-y-auto p-3 sm:p-4 md:p-6">
                     <div className="max-w-7xl w-full mx-auto">
                         {children}
                     </div>
                 </main>
 
                 {/* Footer */}
-                <footer className="h-12 bg-white border-t border-gray-200 px-6 flex items-center justify-between text-[10px] text-gray-400 shrink-0">
+                <footer className="h-10 md:h-12 bg-white border-t border-gray-200 px-4 md:px-6 flex items-center justify-between text-[10px] text-gray-400 shrink-0">
                     <p>&copy; {new Date().getFullYear()} VibeThink Academy. সর্বস্বত্ব সংরক্ষিত.</p>
-                    <p className="flex items-center gap-1"><Shield className="h-3 w-3 text-blue-400" /> Admin Panel v1.0</p>
+                    <p className="hidden sm:flex items-center gap-1">
+                        <Shield className="h-3 w-3 text-blue-400" /> Admin Panel v1.0
+                    </p>
                 </footer>
             </div>
         </div>

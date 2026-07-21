@@ -192,7 +192,7 @@ export default function AdminTickets() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {Object.entries(statusCfg).map(([k, cfg]) => {
                     const Icon = cfg.icon;
                     return (

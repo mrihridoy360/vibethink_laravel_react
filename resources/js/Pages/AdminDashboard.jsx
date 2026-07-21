@@ -29,6 +29,7 @@ import AdminEmailTemplates from './Admin/AdminEmailTemplates';
 import AdminPages from './Admin/AdminPages';
 import AdminHelp from './Admin/AdminHelp';
 import AdminFaqs from './Admin/AdminFaqs';
+import AdminVisitorStats from './Admin/AdminVisitorStats';
 import AdminLayout from '../Components/AdminLayout';
 
 // ── Coming Soon Placeholder ───────────────────────────────────
@@ -61,7 +62,7 @@ export default function AdminDashboard() {
         navigate(key === 'dashboard' ? '/admin' : `/admin/${key}`);
     };
 
-    const activeTabs = ['dashboard', 'courses', 'leads', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq'];
+    const activeTabs = ['dashboard', 'courses', 'leads', 'users', 'enrollments', 'payments', 'tickets', 'categories', 'assignments', 'gateway', 'coupons', 'error_logs', 'announcements', 'giftmgmt', 'social_review', 'tools', 'products', 'referral', 'blog', 'reviews', 'settings', 'modules', 'email_tpl', 'pages', 'help', 'support', 'faq', 'visitor_stats'];
 
     return (
         <AdminLayout activeTab={activeTab}>
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
             {activeTab === 'help' && <AdminHelp />}
             {activeTab === 'support' && <AdminTickets />}
             {activeTab === 'faq' && <AdminFaqs />}
+            {activeTab === 'visitor_stats' && <AdminVisitorStats />}
 
             {/* Coming Soon tabs */}
             {!activeTabs.includes(activeTab) && (

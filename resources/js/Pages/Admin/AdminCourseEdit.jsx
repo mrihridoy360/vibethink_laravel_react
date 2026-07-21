@@ -1379,19 +1379,19 @@ export default function AdminCourseEdit() {
 
             <div className="space-y-5">
                 {/* Page title */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-xl font-extrabold text-gray-900">Course Setup</h1>
-                        <p className="text-sm text-gray-400 mt-0.5">সব ট্যাব পূরণ করে কোর্স পাবলিশ করুন।</p>
+                        <h1 className="text-lg md:text-xl font-extrabold text-gray-900">Course Setup</h1>
+                        <p className="text-xs md:text-sm text-gray-400 mt-0.5">সব ট্যাব পূরণ করে কোর্স পাবলিশ করুন।</p>
                     </div>
-                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${course?.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold self-start sm:self-auto ${course?.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                         {course?.is_published ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                         {course?.is_published ? 'প্রকাশিত' : 'ড্রাফট'}
                     </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex items-center gap-1 bg-white border border-gray-100 p-1.5 rounded-2xl w-fit">
+                <div className="flex items-center gap-1 bg-white border border-gray-100 p-1.5 rounded-2xl overflow-x-auto no-scrollbar">
                     {TABS.map(tab => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.key;
@@ -1399,9 +1399,9 @@ export default function AdminCourseEdit() {
                             <button
                                 key={tab.key}
                                 onClick={() => setTab(tab.key)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${isActive ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
+                                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${isActive ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
                             >
-                                <Icon className="h-4 w-4" />
+                                <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                                 {tab.label}
                             </button>
                         );

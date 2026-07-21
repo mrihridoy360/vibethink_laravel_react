@@ -1096,7 +1096,7 @@ export default function CourseDetail() {
             {!isEnrolled && (
                 <div
                     ref={ribbonRef}
-                    className="w-full py-4 text-white border-y border-black/10 flex items-center justify-center select-none"
+                    className="w-full py-2.5 text-white border-y border-black/10 flex items-center justify-center select-none"
                     style={{ backgroundColor: 'var(--primary-color)' }}
                 >
                     <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
@@ -1467,7 +1467,7 @@ export default function CourseDetail() {
             {/* Sticky Bottom Ribbon */}
             {!isEnrolled && showStickyRibbon && (
                 <div
-                    className="fixed bottom-0 left-0 right-0 z-50 py-4 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
+                    className="fixed bottom-0 left-0 right-0 z-50 py-2.5 text-white border-t border-black/10 shadow-2xl flex items-center justify-center animate-slide-up"
                     style={{ backgroundColor: 'var(--primary-color)' }}
                 >
                     <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center gap-4 sm:gap-6 w-full">
