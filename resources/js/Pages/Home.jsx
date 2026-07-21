@@ -5,6 +5,7 @@ import CourseCard from '../Components/CourseCard';
 import BlogCard from '../Components/BlogCard';
 import ComingSoonModal from '../Components/ComingSoonModal';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
+import { useSEO } from '../Utils/seo';
 import {
     Search, BookOpen, Clock, Tag, ArrowRight, HelpCircle, ChevronDown,
     ChevronUp, FileText, Brain, TrendingUp, Briefcase, Globe, Sparkles,
@@ -90,6 +91,7 @@ const whyChooseUsItems = [
 ];
 
 export default function Home() {
+    useSEO();
     const [courses, setCourses] = useState([]);
     const [comingSoonCourse, setComingSoonCourse] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();

@@ -260,8 +260,11 @@ Route::get('/payment/zinipay/callback', [App\Http\Controllers\ZiniPayController:
 // Dynamic XML Sitemap Route
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);
 
+// Dynamic Robots.txt Route
+Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robots']);
+
 // Fallback Route for React SPA
-Route::get('/{any}', function () {
+Route::get('/{any}', function ($any = '') {
     $meta = [
         'site_name'                    => 'VibeThink LMS',
         'site_description'             => '',
@@ -270,9 +273,13 @@ Route::get('/{any}', function () {
         'facebook_domain_verification' => null,
         'google_site_verification'     => null,
         'custom_meta_tags'             => null,
+        'robots'                       => 'index, follow',
+        'canonical'                    => url($any),
+        'json_ld'                      => null,
     ];
 
     $initialSettings = [];
+    $defaultSiteName = 'VibeThink LMS';
 
     try {
         $rows = \App\Models\Setting::whereIn('group', ['general', 'appearance', 'footer', 'marketing', 'features', 'verification'])->get();
@@ -282,6 +289,7 @@ Route::get('/{any}', function () {
             }
             if ($row->group === 'general' && $row->key === 'site_name') {
                 $meta['site_name'] = $row->value;
+                $defaultSiteName = $row->value;
             }
             if ($row->group === 'general' && $row->key === 'site_description') {
                 $meta['site_description'] = $row->value;
@@ -307,6 +315,98 @@ Route::get('/{any}', function () {
         }
     } catch (\Exception $e) {
         // Use defaults
+    }
+
+    // Dynamic Course/Blog Meta Pre-rendering
+    try {
+        if (preg_match('/^courses\/([^\/]+)$/', $any, $matches)) {
+            $slug = $matches[1];
+            $course = \App\Models\Course::where('slug', $slug)->where('is_published', true)->first();
+            if ($course) {
+                $title = $course->seo_title ?: $course->title;
+                $meta['site_name'] = $title . ' | ' . $defaultSiteName;
+                $meta['site_description'] = $course->seo_description ?: $course->short_description ?: \Illuminate\Support\Str::limit(strip_tags($course->description), 160);
+                
+                $image = $course->seo_image ?: $course->thumbnail;
+                if ($image) {
+                    $meta['site_logo'] = filter_var($image, FILTER_VALIDATE_URL) ? $image : asset($image);
+                }
+
+                // Add Course Schema JSON-LD
+                $coursePrice = floatval($course->discount_price > 0 ? $course->discount_price : $course->price);
+                $schema = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Course',
+                    'name' => $course->title,
+                    'description' => $course->short_description ?: \Illuminate\Support\Str::limit(strip_tags($course->description), 160),
+                    'provider' => [
+                        '@type' => 'Organization',
+                        'name' => $defaultSiteName,
+                        'url' => url('/')
+                    ]
+                ];
+                if ($coursePrice > 0) {
+                    $schema['offers'] = [
+                        '@type' => 'Offer',
+                        'category' => 'Paid',
+                        'price' => number_format($coursePrice, 2, '.', ''),
+                        'priceCurrency' => 'BDT',
+                        'url' => url('/courses/' . $course->slug)
+                    ];
+                } else {
+                    $schema['offers'] = [
+                        '@type' => 'Offer',
+                        'category' => 'Free',
+                        'price' => '0.00',
+                        'priceCurrency' => 'BDT',
+                        'url' => url('/courses/' . $course->slug)
+                    ];
+                }
+                $meta['json_ld'] = json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+        } elseif (preg_match('/^blog\/([^\/]+)$/', $any, $matches)) {
+            $slug = $matches[1];
+            $blog = \App\Models\BlogPost::where('slug', $slug)->published()->first();
+            if ($blog) {
+                $title = $blog->meta_title ?: $blog->title;
+                $meta['site_name'] = $title . ' | ' . $defaultSiteName;
+                $meta['site_description'] = $blog->meta_description ?: $blog->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($blog->content), 160);
+                
+                $image = $blog->og_image ?: $blog->featured_image;
+                if ($image) {
+                    $meta['site_logo'] = filter_var($image, FILTER_VALIDATE_URL) ? $image : asset($image);
+                }
+                $meta['robots'] = ($blog->is_indexable ? 'index' : 'noindex') . ', ' . ($blog->is_followable ? 'follow' : 'nofollow');
+
+                // Add BlogPosting Schema JSON-LD
+                $schema = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'BlogPosting',
+                    'headline' => $blog->title,
+                    'description' => $blog->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($blog->content), 160),
+                    'datePublished' => $blog->published_at ? $blog->published_at->toIso8601String() : ($blog->created_at ? $blog->created_at->toIso8601String() : null),
+                    'dateModified' => $blog->updated_at ? $blog->updated_at->toIso8601String() : null,
+                    'author' => [
+                        '@type' => 'Person',
+                        'name' => $blog->author ? $blog->author->name : 'Admin'
+                    ],
+                    'publisher' => [
+                        '@type' => 'Organization',
+                        'name' => $defaultSiteName,
+                        'logo' => [
+                            '@type' => 'ImageObject',
+                            'url' => $meta['site_logo'] ?: url('/favicon.ico')
+                        ]
+                    ]
+                ];
+                if ($image) {
+                    $schema['image'] = filter_var($image, FILTER_VALIDATE_URL) ? $image : asset($image);
+                }
+                $meta['json_ld'] = json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+        }
+    } catch (\Exception $e) {
+        // Log or fallback
     }
 
     return view('app', ['meta' => $meta, 'initialSettings' => $initialSettings]);

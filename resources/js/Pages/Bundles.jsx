@@ -4,8 +4,13 @@ import axios from 'axios';
 import { Layers, CheckCircle2, ChevronRight, ArrowRight, ShieldCheck, Sparkles, BookOpen, Star, AlertCircle } from 'lucide-react';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
+import { useSEO } from '../Utils/seo';
 
 export default function Bundles() {
+    useSEO({
+        title: 'কোর্স বান্ডেল সমূহ',
+        description: 'সাশ্রয়ী মূল্যে একাধিক কোর্সের বান্ডেল প্যাক নিয়ে একবারে সম্পূর্ণ ক্যারিয়ার পাথ শিখুন।'
+    });
     const { user } = useAuth();
     const { settings } = useSiteSettings();
     const isEnabled = settings?.features?.feature_bundles === '1' || settings?.features?.feature_bundles === 1 || settings?.features?.feature_bundles === true;

@@ -4,8 +4,13 @@ import { Book, Download, ShoppingCart, Star, Search, Filter, Loader2, AlertCircl
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import { Link } from 'react-router-dom';
+import { useSEO } from '../Utils/seo';
 
 export default function Ebooks() {
+    useSEO({
+        title: 'ই-বুক লাইব্রেরি',
+        description: 'বিভিন্ন বিষয়ের ওপর আমাদের তৈরি করা এক্সক্লুসিভ ই-বুকগুলো ডাউনলোড বা সংগ্রহ করুন।'
+    });
     const { user } = useAuth();
     const { settings } = useSiteSettings();
     const isEnabled = settings?.features?.feature_ebooks === '1' || settings?.features?.feature_ebooks === 1 || settings?.features?.feature_ebooks === true;

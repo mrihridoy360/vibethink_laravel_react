@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Video, Users, ArrowRight, Check, AlertCircle, Heart, Star, Sparkles, Send, ShieldAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { useSEO } from '../Utils/seo';
 
 export default function Workshops() {
+    useSEO({
+        title: 'লাইভ ওয়ার্কশপ সমূহ',
+        description: 'ইন্ডাস্ট্রি এক্সপার্টদের সাথে সরাসরি লাইভ সেশনে অংশ নিয়ে হাতে-কলমে প্র্যাক্টিক্যাল কাজ শিখুন।'
+    });
     const { user } = useAuth();
     const { settings } = useSiteSettings();
     const isEnabled = settings?.features?.feature_workshops === '1' || settings?.features?.feature_workshops === 1 || settings?.features?.feature_workshops === true;

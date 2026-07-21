@@ -117,4 +117,30 @@ class SitemapController extends Controller
             'Content-Type' => 'application/xml',
         ]);
     }
+
+    public function robots(): Response
+    {
+        $baseUrl = config('app.url', 'https://vibethinks.com');
+        $baseUrl = rtrim($baseUrl, '/');
+
+        $txt = [];
+        $txt[] = "User-agent: *";
+        $txt[] = "Disallow: /admin/";
+        $txt[] = "Disallow: /admin/*";
+        $txt[] = "Disallow: /dashboard/";
+        $txt[] = "Disallow: /dashboard/*";
+        $txt[] = "Disallow: /login";
+        $txt[] = "Disallow: /register";
+        $txt[] = "Disallow: /forgot-password";
+        $txt[] = "Disallow: /reset-password";
+        $txt[] = "Disallow: /payment/";
+        $txt[] = "Disallow: /payment/*";
+        $txt[] = "Disallow: /courses/*/learn";
+        $txt[] = "";
+        $txt[] = "Sitemap: {$baseUrl}/sitemap.xml";
+
+        return response(implode("\n", $txt), 200, [
+            'Content-Type' => 'text/plain',
+        ]);
+    }
 }

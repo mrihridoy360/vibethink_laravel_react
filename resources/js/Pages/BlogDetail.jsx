@@ -6,12 +6,22 @@ import {
     Linkedin, Copy, Tag, ArrowRight, BookOpen, List, Calendar, Eye,
     Loader2, AlertCircle
 } from 'lucide-react';
+import { useSEO } from '../Utils/seo';
 
 export default function BlogDetail() {
     const { slug } = useParams();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [data, setData] = useState(null);
+
+    // Dynamic SEO Management
+    useSEO({
+        title: data?.post ? (data.post.meta_title || data.post.title) : 'আর্টিকেল লোড হচ্ছে...',
+        description: data?.post ? (data.post.meta_description || data.post.excerpt || data.post.content) : '',
+        image: data?.post ? (data.post.og_image || data.post.featured_image) : null,
+        robots: data?.post ? ((data.post.is_indexable ? 'index' : 'noindex') + ', ' + (data.post.is_followable ? 'follow' : 'nofollow')) : null
+    });
+
     const [copied, setCopied] = useState(false);
     const [showTOC, setShowTOC] = useState(true);
 

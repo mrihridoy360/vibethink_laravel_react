@@ -3,8 +3,13 @@ import { Search, ShoppingBag, Package, CheckCircle, AlertCircle, Truck, Check, M
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import axios from 'axios';
+import { useSEO } from '../Utils/seo';
 
 export default function Products() {
+    useSEO({
+        title: 'প্রোডাক্টস ও রিসোর্স স্টোর',
+        description: 'আপনার কাজের গতি বাড়াতে ও প্রয়োজনীয় প্রজেক্ট ফাইল, সফটওয়্যার বা ফিজিক্যাল প্রোডাক্টস সংগ্রহ করুন।'
+    });
     const { user } = useAuth();
     const { settings } = useSiteSettings();
     const isEnabled = settings?.features?.feature_products === '1' || settings?.features?.feature_products === 1 || settings?.features?.feature_products === true;

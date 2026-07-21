@@ -5,8 +5,13 @@ import { Search, BookOpen, ArrowRight, Eye, ShoppingCart, Clock } from 'lucide-r
 import ComingSoonModal from '../Components/ComingSoonModal';
 import { useAuth } from '../Contexts/AuthContext';
 import { trackPixelEvent } from '../Utils/metaPixel';
+import { useSEO } from '../Utils/seo';
 
 export default function Courses() {
+    useSEO({
+        title: 'সকল কোর্সসমূহ',
+        description: 'আমাদের প্রিমিয়াম ও ফ্রি কোর্সসমূহ দেখে আপনার প্রয়োজনীয় স্কিল ডেভেলপ করুন।'
+    });
     const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();

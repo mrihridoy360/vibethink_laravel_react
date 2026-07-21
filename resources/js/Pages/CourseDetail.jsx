@@ -7,6 +7,7 @@ import { Play, BookOpen, CheckCircle, ChevronRight, ChevronLeft, Star, Award, He
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
+import { useSEO } from '../Utils/seo';
 
 export default function CourseDetail() {
     const { slug } = useParams();
@@ -14,6 +15,13 @@ export default function CourseDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const [course, setCourse] = useState(null);
+
+    // Dynamic SEO Management
+    useSEO({
+        title: course ? (course.seo_title || course.title) : 'কোর্স লোড হচ্ছে...',
+        description: course ? (course.seo_description || course.short_description || course.description) : '',
+        image: course ? (course.seo_image || course.thumbnail) : null
+    });
     const [isEnrolled, setIsEnrolled] = useState(false);
     const [completedLessons, setCompletedLessons] = useState([]);
     const [loading, setLoading] = useState(true);

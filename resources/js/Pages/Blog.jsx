@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FileText, ChevronDown, Home as HomeIcon, Search, Tag, X } from 'lucide-react';
 import BlogCard from '../Components/BlogCard';
+import { useSEO } from '../Utils/seo';
 
 export default function Blog() {
+    useSEO({
+        title: 'ব্লগ ও আর্টিক্যাল',
+        description: 'আইটি ক্যারিয়ার, এআই, ওয়েব ডেভেলপমেন্ট ও প্রোগ্রামিং রিলেটেড ট্রেন্ডিং টপিক নিয়ে গুরুত্বপূর্ণ আর্টিকেলসমূহ।'
+    });
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');

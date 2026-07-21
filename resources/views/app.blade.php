@@ -8,6 +8,17 @@
 
     <title>{{ $meta['site_name'] ?? 'VibeThink LMS' }}</title>
     <meta name="description" content="{{ $meta['site_description'] ?? '' }}">
+    <meta name="robots" content="{{ $meta['robots'] ?? 'index, follow' }}">
+    
+    @if(!empty($meta['canonical']))
+        <link rel="canonical" href="{{ $meta['canonical'] }}">
+    @endif
+
+    @if(!empty($meta['json_ld']))
+        <script type="application/ld+json">
+            {!! $meta['json_ld'] !!}
+        </script>
+    @endif
 
     @if(!empty($meta['facebook_domain_verification']))
         <meta name="facebook-domain-verification" content="{{ $meta['facebook_domain_verification'] }}">
