@@ -334,4 +334,138 @@ class UserController extends Controller
             'review' => $review,
         ]);
     }
+
+    // ───────────────────────────────────────────
+    // Products & Product Orders
+    // ───────────────────────────────────────────
+
+    public function productOrders()
+    {
+        $user = Auth::user();
+
+        $orders = \App\Models\ProductOrder::with('product')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        $wallet = \App\Models\UserWallet::where('user_id', $user->id)->first();
+
+        return response()->json([
+            'success'        => true,
+            'orders'         => $orders,
+            'wallet_balance' => $wallet ? (float)$wallet->balance : 0,
+        ]);
+    }
+
+    public function orderProduct(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'quantity'       => 'nullable|integer|min:1',
+            'payment_method' => 'required|string',
+            'transaction_id' => 'nullable|string|max:255',
+            'sender_number'  => 'nullable|string|max:255',
+            'notes'          => 'nullable|string|max:1000',
+        ]);
+
+        $product = \App\Models\Product::where('is_active', true)->findOrFail($id);
+
+        $quantity = max(1, (int) $request->input('quantity', 1));
+
+        if ($product->stock !== null && $product->stock < $quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'দুঃখিত, পণ্যটি পর্যাপ্ত স্টকে নেই।'
+            ], 400);
+        }
+
+        $unitPrice   = (float) ($product->sale_price ?? $product->price);
+        $totalAmount = $unitPrice * $quantity;
+        $paymentMethod = $request->input('payment_method', 'wallet');
+
+        if ($paymentMethod === 'zinipay') {
+            return app(\App\Http\Controllers\ZiniPayController::class)->initProductPayment($request, $id);
+        }
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            $status      = 'pending';
+            $completedAt = null;
+
+            if ($paymentMethod === 'wallet') {
+                $wallet = \App\Models\UserWallet::firstOrCreate(
+                    ['user_id' => $user->id],
+                    ['balance' => 0, 'total_earned' => 0, 'total_withdrawn' => 0, 'total_spent' => 0]
+                );
+
+                if ($wallet->balance < $totalAmount) {
+                    \Illuminate\Support\Facades\DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'আপনার ওয়ালেটে পর্যাপ্ত ব্যালেন্স নেই। বর্তমান ব্যালেন্স: ৳' . number_format($wallet->balance, 2)
+                    ], 400);
+                }
+
+                // Deduct balance
+                $wallet->balance -= $totalAmount;
+                $wallet->total_spent += $totalAmount;
+                $wallet->save();
+
+                // Create Wallet Transaction log
+                \App\Models\WalletTransaction::create([
+                    'user_id'   => $user->id,
+                    'type'      => 'debit',
+                    'amount'    => $totalAmount,
+                    'title'     => 'পণ্য ক্রয়: ' . $product->name,
+                    'status'    => 'completed',
+                    'reference' => 'Product Order #' . $product->id,
+                ]);
+
+                $status      = 'completed';
+                $completedAt = now();
+            }
+
+            // Decrement stock if limited
+            if ($product->stock !== null && $product->stock >= $quantity) {
+                $product->decrement('stock', $quantity);
+            }
+
+            $paymentData = [
+                'transaction_id' => $request->input('transaction_id'),
+                'sender_number'  => $request->input('sender_number'),
+                'notes'          => $request->input('notes'),
+            ];
+
+            $order = \App\Models\ProductOrder::create([
+                'user_id'        => $user->id,
+                'product_id'     => $product->id,
+                'quantity'       => $quantity,
+                'price'          => $unitPrice,
+                'total'          => $totalAmount,
+                'status'         => $status,
+                'payment_method' => $paymentMethod,
+                'payment_data'   => $paymentData,
+                'notes'          => $request->input('notes'),
+                'completed_at'   => $completedAt,
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $status === 'completed' 
+                    ? 'পণ্যটি সফলভাবে ক্রয় করা হয়েছে!' 
+                    : 'আপনার পণ্যের অর্ডারটি জমা নেওয়া হয়েছে। অ্যাডমিন ভেরিফাই করলে স্ট্যাটাস আপডেট হবে।',
+                'order'   => $order->load('product'),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'অর্ডার করতে সমস্যা হয়েছে: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

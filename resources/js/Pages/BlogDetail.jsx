@@ -7,6 +7,7 @@ import {
     Loader2, AlertCircle
 } from 'lucide-react';
 import { useSEO } from '../Utils/seo';
+import { formatBlogContent } from '../Utils/markdown';
 
 export default function BlogDetail() {
     const { slug } = useParams();
@@ -154,7 +155,7 @@ export default function BlogDetail() {
                             prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:bg-purple-50/30 prose-blockquote:py-2.5 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:italic
                             prose-code:bg-slate-100 prose-code:text-pink-600 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
                             prose-pre:bg-slate-900 prose-pre:text-emerald-400 prose-pre:p-4 prose-pre:rounded-2xl prose-pre:overflow-x-auto"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
+                        dangerouslySetInnerHTML={{ __html: formatBlogContent(post.content) }}
                     />
 
                     {/* Navigation */}

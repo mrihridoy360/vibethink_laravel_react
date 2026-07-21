@@ -133,6 +133,91 @@ class ZiniPayController extends Controller
     }
 
     /**
+     * Initialize ZiniPay Payment for a product purchase.
+     */
+    public function initProductPayment(Request $request, $productId)
+    {
+        $user = Auth::user();
+        $product = \App\Models\Product::where('is_active', true)->findOrFail($productId);
+        $quantity = max(1, (int)$request->input('quantity', 1));
+
+        if ($product->stock !== null && $product->stock < $quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'দুঃখিত, পণ্যটি পর্যাপ্ত স্টকে নেই।'
+            ], 400);
+        }
+
+        $gateway = PaymentGateway::where('key', 'zinipay')->first();
+        if (!$gateway || !$gateway->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ZiniPay পেমেন্ট মেথডটি বর্তমানে নিষ্ক্রিয় রয়েছে।'
+            ], 400);
+        }
+
+        $apiKey = $gateway->config['api_key'] ?? '';
+        if (empty($apiKey) || $apiKey === 'YOUR_ZINIPAY_API_KEY') {
+            return response()->json([
+                'success' => false,
+                'message' => 'ZiniPay সঠিকভাবে কনফিগার করা হয়নি।'
+            ], 400);
+        }
+
+        $unitPrice = (float)($product->sale_price ?? $product->price);
+        $totalAmount = $unitPrice * $quantity;
+
+        $valId = 'PRD-ZINI-' . strtoupper(Str::random(12));
+
+        $order = \App\Models\ProductOrder::create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'order_number' => $valId,
+            'quantity' => $quantity,
+            'price' => $unitPrice,
+            'total' => $totalAmount,
+            'status' => 'pending',
+            'payment_method' => 'zinipay',
+            'notes' => $request->input('notes'),
+        ]);
+
+        $metadata = [
+            'type' => 'product',
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'order_id' => $order->id,
+        ];
+
+        $paymentPayload = [
+            'cus_name' => $user->name,
+            'cus_email' => $user->email,
+            'amount' => (float)$totalAmount,
+            'metadata' => $metadata,
+            'redirect_url' => route('payment.zinipay.callback'),
+            'cancel_url' => route('payment.zinipay.callback') . '?cancel=1&val_id=' . $valId,
+            'val_id' => $valId,
+            'webhook_url' => route('payment.zinipay.webhook')
+        ];
+
+        $response = $this->ziniPayService->initPayment($paymentPayload);
+
+        if (isset($response['status']) && $response['status'] && isset($response['payment_url'])) {
+            return response()->json([
+                'success' => true,
+                'payment_url' => $response['payment_url']
+            ]);
+        }
+
+        Log::error('ZiniPay product checkout initialization failed', ['response' => $response]);
+        $order->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'ZiniPay চেকআউট শুরু করতে ব্যর্থ হয়েছে: ' . ($response['message'] ?? 'অজানা সমস্যা')
+        ], 500);
+    }
+
+    /**
      * Handle browser redirect callback from ZiniPay.
      *
      * @param Request $request
@@ -145,6 +230,7 @@ class ZiniPayController extends Controller
             $valId = $request->input('val_id');
             if ($valId) {
                 Payment::where('transaction_id', $valId)->where('status', 'pending')->update(['status' => 'failed']);
+                \App\Models\ProductOrder::where('order_number', $valId)->where('status', 'pending')->update(['status' => 'cancelled']);
             }
             return redirect('/payment/failed?error=Payment canceled by user');
         }
@@ -171,6 +257,9 @@ class ZiniPayController extends Controller
             $processed = $this->processCompletedPayment($response);
 
             if ($processed['success']) {
+                if (!empty($processed['is_product'])) {
+                    return redirect('/dashboard/products?tab=orders&success=1&trx=' . $processed['trx_id']);
+                }
                 return redirect('/payment/success?slug=' . $processed['course_slug'] . '&trx=' . $processed['trx_id'] . '&amount=' . ($processed['amount'] ?? ''));
             } else {
                 return redirect('/payment/failed?error=' . urlencode($processed['message']));
@@ -181,6 +270,7 @@ class ZiniPayController extends Controller
         $targetValId = $response['val_id'] ?? $valId;
         if ($targetValId) {
             Payment::where('transaction_id', $targetValId)->where('status', 'pending')->update(['status' => 'failed']);
+            \App\Models\ProductOrder::where('order_number', $targetValId)->where('status', 'pending')->update(['status' => 'cancelled']);
         }
 
         return redirect('/payment/failed?error=Payment was not successful. Status: ' . ($response['status'] ?? 'Unknown'));
@@ -219,13 +309,14 @@ class ZiniPayController extends Controller
         $targetValId = $response['val_id'] ?? $valId;
         if ($targetValId && isset($response['status']) && $response['status'] === 'FAILED') {
             Payment::where('transaction_id', $targetValId)->where('status', 'pending')->update(['status' => 'failed']);
+            \App\Models\ProductOrder::where('order_number', $targetValId)->where('status', 'pending')->update(['status' => 'cancelled']);
         }
 
         return response()->json(['success' => false, 'message' => 'Status verification is not COMPLETED: ' . ($response['status'] ?? 'unknown')]);
     }
 
     /**
-     * Process logic to mark transaction as completed and enroll user.
+     * Process logic to mark transaction as completed and enroll user or fulfill product order.
      *
      * @param array $response
      * @return array
@@ -236,6 +327,38 @@ class ZiniPayController extends Controller
         if (!$valId) {
             return ['success' => false, 'message' => 'Missing merchant validation val_id'];
         }
+
+        // Check if this is a Product Order
+        $productOrder = \App\Models\ProductOrder::where('order_number', $valId)->first();
+        if ($productOrder) {
+            if ($productOrder->status === 'completed') {
+                return [
+                    'success' => true,
+                    'is_product' => true,
+                    'trx_id' => $productOrder->order_number,
+                    'amount' => $productOrder->total
+                ];
+            }
+
+            $productOrder->status = 'completed';
+            $productOrder->completed_at = now();
+            $productOrder->payment_data = $response;
+            $productOrder->save();
+
+            // Decrement stock if needed
+            $product = \App\Models\Product::find($productOrder->product_id);
+            if ($product && $product->stock !== null && $product->stock >= $productOrder->quantity) {
+                $product->decrement('stock', $productOrder->quantity);
+            }
+
+            return [
+                'success' => true,
+                'is_product' => true,
+                'trx_id' => $productOrder->order_number,
+                'amount' => $productOrder->total
+            ];
+        }
+
 
         $payment = Payment::where('transaction_id', $valId)->first();
         if (!$payment) {

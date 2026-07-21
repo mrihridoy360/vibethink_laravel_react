@@ -28,6 +28,7 @@ Route::prefix('api')->group(function () {
     Route::get('/blogs/{slug}', [CourseController::class, 'publicBlogShow']);
     Route::get('/blog-categories', [CourseController::class, 'publicBlogCategories']);
     Route::get('/products', [CourseController::class, 'publicProducts']);
+    Route::get('/payment-gateways', [CourseController::class, 'publicPaymentGateways']);
 
     // Public Settings (no auth required)
     Route::get('/settings', [AdminController::class, 'publicSettings']);
@@ -45,6 +46,7 @@ Route::prefix('api')->group(function () {
 
         // ZiniPay Payment Initialization
         Route::post('/payment/zinipay/init/{courseId}', [App\Http\Controllers\ZiniPayController::class, 'initPayment']);
+        Route::post('/payment/zinipay/init-product/{productId}', [App\Http\Controllers\ZiniPayController::class, 'initProductPayment']);
         Route::post('/lessons/{lessonId}/toggle-progress', [CourseController::class, 'toggleLessonProgress']);
         Route::get('/dashboard-data', [CourseController::class, 'dashboard']);
 
@@ -69,10 +71,12 @@ Route::prefix('api')->group(function () {
         // Support Groups
         Route::get('/support-groups', [UserController::class, 'supportGroups']);
 
-        // Announcements, Gifts, Tools
+        // Announcements, Gifts, Tools, Products
         Route::get('/announcements', [UserController::class, 'announcements']);
         Route::get('/gifts', [UserController::class, 'gifts']);
         Route::get('/tools', [UserController::class, 'tools']);
+        Route::get('/product-orders', [UserController::class, 'productOrders']);
+        Route::post('/products/{id}/order', [UserController::class, 'orderProduct']);
 
         // Social Review
         Route::get('/social-review', [UserController::class, 'socialReview']);

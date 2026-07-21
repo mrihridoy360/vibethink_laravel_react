@@ -23,6 +23,7 @@ import SupportGroup from './Dashboard/SupportGroup';
 import SupportTickets from './Dashboard/SupportTickets';
 import SettingsPage from './Dashboard/Settings';
 import Review from './Dashboard/Review';
+import Products from './Dashboard/Products';
 import Loader from '../Components/Loader';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 
@@ -591,6 +592,7 @@ export default function Dashboard() {
                             {activeTab === 'giftbox' && <GiftBox />}
                             {activeTab === 'review' && <Review />}
                             {activeTab === 'tools' && <Tools />}
+                            {activeTab === 'products' && <Products />}
                             {activeTab === 'certificates' && <Certificates />}
                             {activeTab === 'billing' && <Billing />}
                             {activeTab === 'referral' && <Referral />}
@@ -598,11 +600,6 @@ export default function Dashboard() {
                             {activeTab === 'support_group' && <SupportGroup />}
                             {activeTab === 'support_tickets' && <SupportTickets />}
                             {activeTab === 'settings' && <SettingsPage />}
-
-                            {/* ── Coming Soon Pages ─────────────────── */}
-                            {['products'].includes(activeTab) && (
-                                <ComingSoon tab={activeTab} />
-                            )}
 
                         </div>
                     )}

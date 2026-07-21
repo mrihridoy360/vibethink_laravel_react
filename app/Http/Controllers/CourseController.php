@@ -79,6 +79,18 @@ class CourseController extends Controller
         ]);
     }
 
+    public function publicPaymentGateways()
+    {
+        $gateways = \App\Models\PaymentGateway::where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'gateways' => $gateways
+        ]);
+    }
+
     public function show($slug)
     {
         $course = Course::with(['user:id,name,avatar', 'category', 'chapters' => function($q) {
@@ -397,19 +409,58 @@ class CourseController extends Controller
         ]);
     }
 
-    private function extractTableOfContents(string $html): array
+    private function extractTableOfContents(string $content): array
     {
         $toc = [];
-        preg_match_all('/<h([23])[^>]*id=["\']([^"\']+)["\'][^>]*>(.+?)<\/h\1>/i', $html, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
+        $idx = 0;
+
+        // If content contains HTML heading tags
+        if (preg_match_all('/<h([23])([^>]*)>(.*?)<\/h\1>/i', $content, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $level = (int) $match[1];
+                $attrs = $match[2];
+                $text = trim(strip_tags($match[3]));
+                if (empty($text)) continue;
+
+                if (preg_match('/id=["\']([^"\']+)["\']/i', $attrs, $idMatch)) {
+                    $id = $idMatch[1];
+                } else {
+                    $id = 'heading-' + (int) ++$idx;
+                    $slugText = preg_replace('/[^\w\x{0980}-\x{09FF}]+/u', '-', mb_strtolower($text));
+                    if (!empty($slugText)) {
+                        $id = 'heading-' . trim($slugText, '-');
+                    }
+                }
+
+                $toc[] = [
+                    'level' => $level,
+                    'id' => $id,
+                    'text' => $text,
+                ];
+            }
+            return $toc;
+        }
+
+        // If content is Markdown
+        preg_match_all('/^(#{2,3})\s+(.+?)$/m', $content, $mdMatches, PREG_SET_ORDER);
+        foreach ($mdMatches as $match) {
+            $level = strlen($match[1]);
+            $text = trim(strip_tags($match[2]));
+            if (empty($text)) continue;
+
+            $slugText = preg_replace('/[^\w\x{0980}-\x{09FF}]+/u', '-', mb_strtolower($text));
+            $id = !empty($slugText) ? 'heading-' . trim($slugText, '-') : 'heading-' . (++$idx);
+
             $toc[] = [
-                'level' => (int) $match[1],
-                'id' => $match[2],
-                'text' => strip_tags($match[3]),
+                'level' => $level,
+                'id' => $id,
+                'text' => $text,
             ];
         }
+
         return $toc;
     }
+
 
     public function expressInterest(Request $request, $id)
     {
