@@ -953,18 +953,20 @@ export default function CourseDetail() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 opacity-20 rounded-full blur-3xl pointer-events-none" />
 
                             {/* Avatar - cover full left side */}
-                            <div className="w-full md:w-80 shrink-0 relative min-h-[300px] md:min-h-full">
-                                {course.user.avatar ? (
-                                    <img
-                                        src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
-                                        alt={course.user.name}
-                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                        <User className="h-20 w-20 text-white/70" />
-                                    </div>
-                                )}
+                            <div className="w-full md:w-80 shrink-0 flex items-center justify-center p-6 sm:p-8">
+                                <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-3xl overflow-hidden shadow-md border-4 border-white bg-white shrink-0 relative group">
+                                    {course.user.avatar ? (
+                                        <img
+                                            src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
+                                            alt={course.user.name}
+                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                            <User className="h-20 w-20 text-white/70" />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Details */}
