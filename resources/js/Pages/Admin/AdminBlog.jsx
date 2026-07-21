@@ -324,9 +324,11 @@ function BlogPostModal({ mode, post, categories, tags, courses, onClose, onSaved
 
         if (featuredFile) {
             formData.append('featured_image_file', featuredFile);
+            formData.append('featured_image', featuredFile);
         }
         if (ogFile) {
             formData.append('og_image_file', ogFile);
+            formData.append('og_image', ogFile);
         }
 
         try {

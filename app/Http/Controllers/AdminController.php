@@ -2674,13 +2674,15 @@ class AdminController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
             'blog_category_id' => 'nullable|exists:blog_categories,id',
-            'featured_image_file' => 'nullable|image|max:2048',
+            'featured_image_file' => 'nullable|file|max:10240',
+            'featured_image' => 'nullable',
             'featured_image_alt' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:70',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
             'canonical_url' => 'nullable|url|max:255',
-            'og_image_file' => 'nullable|image|max:2048',
+            'og_image_file' => 'nullable|file|max:10240',
+            'og_image' => 'nullable',
             'schema_type' => 'nullable|in:Article,BlogPosting,NewsArticle',
             'is_indexable' => 'boolean',
             'is_followable' => 'boolean',
@@ -2702,21 +2704,23 @@ class AdminController extends Controller
             $validated['slug'] = $baseSlug . '-' . $counter++;
         }
 
-        // Upload featured image with Cloudinary
-        if ($request->hasFile('featured_image_file')) {
+        // Upload featured image with Cloudinary (auto-compressed, WebP)
+        $featuredFile = $request->file('featured_image_file') ?? $request->file('featured_image');
+        if ($featuredFile) {
             $cloudinary = new CloudinaryService();
-            $result = $cloudinary->uploadImage($request->file('featured_image_file'), 'blog_posts');
-            if ($result) {
-                $validated['featured_image'] = $result;
+            $result = $cloudinary->uploadBlogImage($featuredFile, 'blog_posts');
+            if ($result && !empty($result['url'])) {
+                $validated['featured_image'] = $result['url'];
             }
         }
 
-        // Upload OG image with Cloudinary
-        if ($request->hasFile('og_image_file')) {
+        // Upload OG image with Cloudinary (auto-compressed, WebP)
+        $ogFile = $request->file('og_image_file') ?? $request->file('og_image');
+        if ($ogFile) {
             $cloudinary = new CloudinaryService();
-            $result = $cloudinary->uploadImage($request->file('og_image_file'), 'blog_posts_og');
-            if ($result) {
-                $validated['og_image'] = $result;
+            $result = $cloudinary->uploadBlogImage($ogFile, 'blog_posts_og');
+            if ($result && !empty($result['url'])) {
+                $validated['og_image'] = $result['url'];
             }
         }
 
@@ -2753,13 +2757,15 @@ class AdminController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
             'blog_category_id' => 'nullable|exists:blog_categories,id',
-            'featured_image_file' => 'nullable|image|max:2048',
+            'featured_image_file' => 'nullable|file|max:10240',
+            'featured_image' => 'nullable',
             'featured_image_alt' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:70',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
             'canonical_url' => 'nullable|url|max:255',
-            'og_image_file' => 'nullable|image|max:2048',
+            'og_image_file' => 'nullable|file|max:10240',
+            'og_image' => 'nullable',
             'schema_type' => 'nullable|in:Article,BlogPosting,NewsArticle',
             'is_indexable' => 'boolean',
             'is_followable' => 'boolean',
@@ -2780,38 +2786,40 @@ class AdminController extends Controller
             }
         }
 
-        // Upload featured image with Cloudinary
-        if ($request->hasFile('featured_image_file')) {
+        // Upload featured image with Cloudinary (auto-compressed, WebP)
+        $featuredFile = $request->file('featured_image_file') ?? $request->file('featured_image');
+        if ($featuredFile) {
             $cloudinary = new CloudinaryService();
-            $result = $cloudinary->uploadImage($request->file('featured_image_file'), 'blog_posts');
-            if ($result) {
-                // Delete old image if exists
-                if ($post->featured_image && str_contains($post->featured_image, 'cloudinary.com')) {
-                    $parts = explode('/v2_uploads/', $post->featured_image);
-                    if (count($parts) > 1) {
-                        $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
-                        $cloudinary->deleteImage($pId);
-                    }
+            if ($post->featured_image && $cloudinary->isCloudinaryUrl($post->featured_image)) {
+                $publicId = $cloudinary->extractPublicId($post->featured_image);
+                if ($publicId) {
+                    $cloudinary->deleteImage($publicId);
                 }
-                $validated['featured_image'] = $result;
+            }
+            $result = $cloudinary->uploadBlogImage($featuredFile, 'blog_posts');
+            if ($result && !empty($result['url'])) {
+                $validated['featured_image'] = $result['url'];
             }
         }
 
-        // Upload OG image with Cloudinary
-        if ($request->hasFile('og_image_file')) {
+        // Upload OG image with Cloudinary (auto-compressed, WebP)
+        $ogFile = $request->file('og_image_file') ?? $request->file('og_image');
+        if ($ogFile) {
             $cloudinary = new CloudinaryService();
-            $result = $cloudinary->uploadImage($request->file('og_image_file'), 'blog_posts_og');
-            if ($result) {
-                if ($post->og_image && str_contains($post->og_image, 'cloudinary.com')) {
-                    $parts = explode('/v2_uploads/', $post->og_image);
-                    if (count($parts) > 1) {
-                        $pId = 'v2_uploads/' . explode('.', $parts[1])[0];
-                        $cloudinary->deleteImage($pId);
-                    }
+            if ($post->og_image && $cloudinary->isCloudinaryUrl($post->og_image)) {
+                $publicId = $cloudinary->extractPublicId($post->og_image);
+                if ($publicId) {
+                    $cloudinary->deleteImage($publicId);
                 }
-                $validated['og_image'] = $result;
+            }
+            $result = $cloudinary->uploadBlogImage($ogFile, 'blog_posts_og');
+            if ($result && !empty($result['url'])) {
+                $validated['og_image'] = $result['url'];
             }
         }
+
+
+
 
         if ($validated['status'] === 'published' && $post->status !== 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();

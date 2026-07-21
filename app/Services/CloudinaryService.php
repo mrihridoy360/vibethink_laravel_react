@@ -88,14 +88,27 @@ class CloudinaryService
     }
 
     /**
-     * Upload a course thumbnail to Cloudinary (800px wide, WebP).
+     * Upload a course thumbnail to Cloudinary (800px wide, WebP, auto quality compression).
      */
     public function uploadThumbnail(UploadedFile $file): ?array
     {
         return $this->uploadImage($file, 'thumbnails', [
             'transformation' => 'w_800,c_limit,q_auto',
+            'format'         => 'webp',
         ]);
     }
+
+    /**
+     * Upload a blog image to Cloudinary (1200px max width, WebP, auto quality compression).
+     */
+    public function uploadBlogImage(UploadedFile $file, string $folder = 'blog_posts'): ?array
+    {
+        return $this->uploadImage($file, $folder, [
+            'transformation' => 'w_1200,c_limit,q_auto',
+            'format'         => 'webp',
+        ]);
+    }
+
 
     /**
      * Delete an image from Cloudinary by public_id.

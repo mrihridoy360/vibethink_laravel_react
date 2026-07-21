@@ -1,6 +1,8 @@
 /**
  * Converts Markdown or raw text content with line breaks into beautifully formatted,
  * styled HTML tags with auto-generated heading IDs for Table of Contents navigation.
+ * Compact margin spacing is enforced via explicit inline styles to guarantee no
+ * excessive vertical gaps.
  * 
  * @param {string} content - The raw content or markdown text
  * @returns {string} The formatted HTML string
@@ -14,30 +16,32 @@ export function formatBlogContent(content) {
 
     let text = content.trim();
 
+    // 1. Remove empty paragraphs, empty breaks, &nbsp; paragraphs that cause huge empty gaps
+    text = text.replace(/<p[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '');
+    text = text.replace(/(<br\s*\/?>\s*){2,}/gi, '<br />');
+
+    // 2. Remove inline margin styles from existing HTML if any
+    text = text.replace(/style="[^"]*margin[^"]*"/gi, '');
+
     // Check if it's mostly HTML (contains <p>, <h2>, <h3>, <ul>, <ol>, <div>)
     const hasHtmlBlocks = /<(p|h[1-6]|ul|ol|li|blockquote|div|section|article)\b[^>]*>/i.test(text);
 
     if (hasHtmlBlocks) {
-        // If it's HTML, inject id attributes into h2/h3 tags if missing and format linebreaks
         let headingIndex = 0;
-        text = text.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/gi, (match, level, attrs, innerText) => {
-            if (/id=["\']/i.test(attrs)) {
-                return match;
-            }
+        // Inject IDs and compact margin styles into h1, h2, h3
+        text = text.replace(/<h([1-6])([^>]*)>(.*?)<\/h\1>/gi, (match, level, attrs, innerText) => {
             const cleanText = innerText.replace(/<[^>]+>/g, '').trim();
-            const slug = 'heading-' + (cleanText.toLowerCase().replace(/[^\w\u0980-\u09FF]+/g, '-') || ++headingIndex);
-            return `<h${level}${attrs} id="${slug}">${innerText}</h${level}>`;
+            let idAttr = '';
+            if (!/id=["\']/i.test(attrs)) {
+                const slug = 'heading-' + (cleanText.toLowerCase().replace(/[^\w\u0980-\u09FF]+/g, '-') || ++headingIndex);
+                idAttr = ` id="${slug}"`;
+            }
+            return `<h${level}${attrs}${idAttr} style="margin-top: 1.25rem; margin-bottom: 0.4rem; font-weight: 800; line-height: 1.3;">${innerText}</h${level}>`;
         });
 
-        // Ensure paragraph tags have proper line-height and spacing
-        text = text.replace(/<p(\s+class="([^"]*)")?>/gi, (match, classAttr, existingClasses) => {
-            if (existingClasses && existingClasses.includes('leading-relaxed')) {
-                return match;
-            }
-            const newClasses = existingClasses 
-                ? `${existingClasses} mb-5 leading-relaxed` 
-                : 'mb-5 leading-relaxed text-slate-700 font-normal';
-            return `<p class="${newClasses}">`;
+        // Ensure paragraph tags have tight margin-bottom and no top margin
+        text = text.replace(/<p(\s+[^>]*)?>/gi, (match, attrs) => {
+            return `<p style="margin-top: 0; margin-bottom: 0.65rem; line-height: 1.7;">`;
         });
 
         return text;
@@ -48,33 +52,33 @@ export function formatBlogContent(content) {
 
     // Fenced Code Blocks (```code```)
     text = text.replace(/```([a-z]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre class="bg-slate-900 text-emerald-400 p-4 rounded-2xl overflow-x-auto text-sm font-mono my-6"><code>${escapeHtml(code.trim())}</code></pre>`;
+        return `<pre style="margin-top: 1rem; margin-bottom: 1rem;" class="bg-slate-900 text-emerald-400 p-4 rounded-2xl overflow-x-auto text-sm font-mono"><code>${escapeHtml(code.trim())}</code></pre>`;
     });
 
     // Inline code (`code`)
-    text = text.replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-purple-700 px-2 py-0.5 rounded text-sm font-mono border border-slate-200">$1</code>');
+    text = text.replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-purple-700 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200">$1</code>');
 
     // Headings: ###, ##, #
     text = text.replace(/^### (.*?)$/gm, (match, title) => {
         const slug = 'heading-' + (title.toLowerCase().replace(/[^\w\u0980-\u09FF]+/g, '-') || ++headingIdx);
-        return `<h3 id="${slug}" class="text-xl font-bold text-slate-900 mt-8 mb-4 flex items-center gap-2">${title}</h3>`;
+        return `<h3 id="${slug}" style="margin-top: 1.25rem; margin-bottom: 0.4rem; line-height: 1.3;" class="text-xl font-bold text-slate-900 flex items-center gap-2">${title}</h3>`;
     });
 
     text = text.replace(/^## (.*?)$/gm, (match, title) => {
         const slug = 'heading-' + (title.toLowerCase().replace(/[^\w\u0980-\u09FF]+/g, '-') || ++headingIdx);
-        return `<h2 id="${slug}" class="text-2xl font-extrabold text-slate-900 mt-10 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">${title}</h2>`;
+        return `<h2 id="${slug}" style="margin-top: 1.4rem; margin-bottom: 0.4rem; line-height: 1.3;" class="text-2xl font-extrabold text-slate-900 pb-1 border-b border-slate-100 flex items-center gap-2">${title}</h2>`;
     });
 
     text = text.replace(/^# (.*?)$/gm, (match, title) => {
         const slug = 'heading-' + (title.toLowerCase().replace(/[^\w\u0980-\u09FF]+/g, '-') || ++headingIdx);
-        return `<h1 id="${slug}" class="text-3xl font-extrabold text-slate-900 mt-12 mb-5">${title}</h1>`;
+        return `<h1 id="${slug}" style="margin-top: 1.5rem; margin-bottom: 0.5rem; line-height: 1.3;" class="text-3xl font-extrabold text-slate-900">${title}</h1>`;
     });
 
     // Blockquotes (> Quote)
-    text = text.replace(/^>\s+(.*?)$/gm, '<blockquote class="border-l-4 border-purple-500 bg-purple-50/40 p-4 rounded-r-2xl my-6 text-slate-700 italic font-medium">$1</blockquote>');
+    text = text.replace(/^>\s+(.*?)$/gm, '<blockquote style="margin-top: 1rem; margin-bottom: 1rem;" class="border-l-4 border-purple-500 bg-purple-50/40 p-3.5 rounded-r-xl text-slate-700 italic font-medium">$1</blockquote>');
 
     // Horizontal Rule (--- or ***)
-    text = text.replace(/^(---|\*\*\*)$/gm, '<hr class="my-8 border-slate-200" />');
+    text = text.replace(/^(---|\*\*\*)$/gm, '<hr style="margin-top: 1.25rem; margin-bottom: 1.25rem;" class="border-slate-200" />');
 
     // Bold (**text** or __text__)
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
@@ -94,7 +98,7 @@ export function formatBlogContent(content) {
 
     // Group list items into <ul> or <ol>
     text = text.replace(/(<li class="ml-4 pl-1 text-slate-700 font-normal">.*?<\/li>\n?)+/g, (match) => {
-        return `<ul class="space-y-2 my-5 list-disc pl-6 text-slate-700 font-normal">${match}</ul>`;
+        return `<ul style="margin-top: 0.5rem; margin-bottom: 0.5rem;" class="space-y-1 list-disc pl-6 text-slate-700 font-normal">${match}</ul>`;
     });
 
     // Split by double newlines into paragraphs
@@ -108,7 +112,7 @@ export function formatBlogContent(content) {
         }
         // Convert single newlines inside paragraph to <br />
         const withBreaks = trimmed.replace(/\n/g, '<br />');
-        return `<p class="text-slate-700 text-base md:text-lg font-normal leading-relaxed mb-6">${withBreaks}</p>`;
+        return `<p style="margin-top: 0; margin-bottom: 0.65rem; line-height: 1.7;" class="text-slate-700 text-base md:text-lg font-normal">${withBreaks}</p>`;
     });
 
     return formatted.filter(Boolean).join('\n');

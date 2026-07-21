@@ -144,19 +144,11 @@ export default function BlogDetail() {
 
                     {/* Article Content */}
                     <div
-                        className="prose prose-slate max-w-none text-slate-700 font-semibold text-base sm:text-lg leading-relaxed space-y-4
-                            prose-headings:font-bold prose-headings:text-slate-900 prose-headings:mt-8 prose-headings:mb-3
-                            prose-h2:text-2xl prose-h2:border-b prose-h2:pb-2 prose-h2:border-slate-100
-                            prose-h3:text-lg
-                            prose-p:mb-4
-                            prose-a:text-purple-650 prose-a:font-bold hover:prose-a:underline
-                            prose-ul:list-disc prose-ul:pl-6 prose-ul:my-4
-                            prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-4
-                            prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:bg-purple-50/30 prose-blockquote:py-2.5 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:italic
-                            prose-code:bg-slate-100 prose-code:text-pink-600 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
-                            prose-pre:bg-slate-900 prose-pre:text-emerald-400 prose-pre:p-4 prose-pre:rounded-2xl prose-pre:overflow-x-auto"
+                        className="blog-content-body max-w-none text-slate-700 font-normal text-base md:text-lg"
                         dangerouslySetInnerHTML={{ __html: formatBlogContent(post.content) }}
                     />
+
+
 
                     {/* Navigation */}
                     <nav className="pt-8 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
