@@ -63,7 +63,7 @@ function ImageUploadBox({ label, hint, preview, onChange, inputId }) {
 }
 
 // ── DetailsTab ─────────────────────────────────────────────────────────────────
-function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThumbnailChange, updateSectionTitle }) {
+function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThumbnailChange, instructorImagePreview, onInstructorImageChange, updateSectionTitle }) {
     return (
         <div className="space-y-6">
             {/* Top Grid: Info & Media */}
@@ -160,19 +160,160 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                     </div>
                 </div>
 
-                {/* Right: Thumbnail */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
-                    <div>
-                        <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্স মিডিয়া</h3>
-                        <p className="text-xs text-gray-400">থাম্বনেইল আপলোড করুন।</p>
+                {/* Right Column: Thumbnail & Instructor Info */}
+                <div className="space-y-6">
+                    {/* Thumbnail */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+                        <div>
+                            <h3 className="text-base font-bold text-gray-900 mb-0.5">কোর্স মিডিয়া</h3>
+                            <p className="text-xs text-gray-400">থাম্বনেইল আপলোড করুন।</p>
+                        </div>
+                        <ImageUploadBox
+                            label="থাম্বনেইল ছবি"
+                            hint="16:9 অনুপাত প্রস্তাবিত। সর্বোচ্চ 4MB"
+                            preview={thumbnailPreview}
+                            onChange={onThumbnailChange}
+                            inputId="thumbnail_input"
+                        />
                     </div>
-                    <ImageUploadBox
-                        label="থাম্বনেইল ছবি"
-                        hint="16:9 অনুপাত প্রস্তাবিত। সর্বোচ্চ 4MB"
-                        preview={thumbnailPreview}
-                        onChange={onThumbnailChange}
-                        inputId="thumbnail_input"
-                    />
+
+                    {/* Instructor Info */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+                        <div>
+                            <h3 className="text-base font-bold text-gray-900 mb-0.5">ইনস্ট্রাক্টর তথ্য</h3>
+                            <p className="text-xs text-gray-400">সিঙ্গেল курс পেজের জন্য ইনস্ট্রাক্টর ডিটেইলস।</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">নাম</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_name || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_name: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="ইনস্ট্রাক্টরের নাম..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">পদবী / ডেসিগনেশন</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_designation || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_designation: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="যেমন: কোর্স ইনস্ট্রাক্টর..."
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">বায়ো / বিবরণ</label>
+                            <textarea
+                                rows={3}
+                                value={form.section_titles?.instructor_bio || ''}
+                                onChange={e => setForm(p => ({
+                                    ...p,
+                                    section_titles: {
+                                        ...(p.section_titles || {}),
+                                        instructor_bio: e.target.value
+                                    }
+                                }))}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                                placeholder="ইনস্ট্রাক্টরের সংক্ষিপ্ত বায়ো..."
+                            />
+                        </div>
+
+                        <ImageUploadBox
+                            label="ইনস্ট্রাক্টরের ছবি"
+                            hint="1:1 অনুপাত প্রস্তাবিত। সর্বোচ্চ 4MB"
+                            preview={instructorImagePreview}
+                            onChange={onInstructorImageChange}
+                            inputId="instructor_image_input"
+                        />
+
+                        <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+                            <div>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Stat 1 Label</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_stat1_label || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_stat1_label: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="যেমন: অভিজ্ঞতা"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Stat 1 Value</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_stat1_value || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_stat1_value: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="যেমন: ৬+ বছর"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Stat 2 Label</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_stat2_label || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_stat2_label: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="যেমন: সম্পন্ন প্রজেক্ট"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Stat 2 Value</label>
+                                <input
+                                    type="text"
+                                    value={form.section_titles?.instructor_stat2_value || ''}
+                                    onChange={e => setForm(p => ({
+                                        ...p,
+                                        section_titles: {
+                                            ...(p.section_titles || {}),
+                                            instructor_stat2_value: e.target.value
+                                        }
+                                    }))}
+                                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    placeholder="যেমন: ৪৫০০+ প্রজেক্ট"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1036,13 +1177,23 @@ export default function AdminCourseEdit() {
         problems: [],
         solutions: [],
         faq: [],
-        section_titles: {},
+        section_titles: {
+            instructor_name: '',
+            instructor_designation: 'কোর্স ইনস্ট্রাক্টর',
+            instructor_bio: 'I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results.',
+            instructor_stat1_label: 'অভিজ্ঞতা',
+            instructor_stat1_value: '৬+ বছর',
+            instructor_stat2_label: 'সম্পন্ন প্রজেক্ট',
+            instructor_stat2_value: '৪৫০০+ প্রজেক্ট',
+        },
     });
 
     const [thumbnail, setThumbnail] = useState(null);
     const [thumbnailPreview, setThumbnailPreview] = useState(null);
     const [seoImage, setSeoImage] = useState(null);
     const [seoPreview, setSeoPreview] = useState(null);
+    const [instructorImage, setInstructorImage] = useState(null);
+    const [instructorImagePreview, setInstructorImagePreview] = useState(null);
 
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
@@ -1086,10 +1237,23 @@ export default function AdminCourseEdit() {
                         problems: Array.isArray(found.problems) ? found.problems : [],
                         solutions: Array.isArray(found.solutions) ? found.solutions : [],
                         faq: Array.isArray(found.faq) ? found.faq : [],
-                        section_titles: (found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {},
+                        section_titles: {
+                            instructor_name: found.user?.name || '',
+                            instructor_designation: 'কোর্স ইনস্ট্রাক্টর',
+                            instructor_bio: 'I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results.',
+                            instructor_stat1_label: 'অভিজ্ঞতা',
+                            instructor_stat1_value: '৬+ বছর',
+                            instructor_stat2_label: 'সম্পন্ন প্রজেক্ট',
+                            instructor_stat2_value: '৪৫০০+ প্রজেক্ট',
+                            ...((found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {})
+                        },
                     });
                     if (found.thumbnail) setThumbnailPreview(found.thumbnail.startsWith('http') ? found.thumbnail : `/storage/${found.thumbnail}`);
                     if (found.seo_image) setSeoPreview(found.seo_image.startsWith('http') ? found.seo_image : `/storage/${found.seo_image}`);
+                    const secTitles = (found.section_titles && typeof found.section_titles === 'object') ? found.section_titles : {};
+                    if (secTitles.instructor_image) {
+                        setInstructorImagePreview(secTitles.instructor_image.startsWith('http') ? secTitles.instructor_image : `/storage/${secTitles.instructor_image}`);
+                    }
                 }
 
                 if (catRes.data.success) setCategories(catRes.data.categories);
@@ -1111,6 +1275,13 @@ export default function AdminCourseEdit() {
         if (!file) return;
         setSeoImage(file);
         setSeoPreview(URL.createObjectURL(file));
+    };
+
+    const handleInstructorImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setInstructorImage(file);
+        setInstructorImagePreview(URL.createObjectURL(file));
     };
 
     const updateSectionTitle = (key, text) => {
@@ -1139,6 +1310,7 @@ export default function AdminCourseEdit() {
             });
             if (thumbnail) fd.append('thumbnail', thumbnail);
             if (seoImage) fd.append('seo_image', seoImage);
+            if (instructorImage) fd.append('instructor_image', instructorImage);
             fd.append('_method', 'PUT');
 
             const res = await axios.post(`/api/admin/courses/${id}/update`, fd, {
@@ -1245,6 +1417,8 @@ export default function AdminCourseEdit() {
                         errors={errors}
                         thumbnailPreview={thumbnailPreview}
                         onThumbnailChange={handleThumbnailChange}
+                        instructorImagePreview={instructorImagePreview}
+                        onInstructorImageChange={handleInstructorImageChange}
                         updateSectionTitle={updateSectionTitle}
                     />
                 )}

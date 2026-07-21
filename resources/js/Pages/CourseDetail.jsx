@@ -1028,17 +1028,23 @@ export default function CourseDetail() {
                             {/* Avatar - cover full left side */}
                             <div className="w-full md:w-80 shrink-0 flex items-center justify-center p-6 sm:p-8">
                                 <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-3xl overflow-hidden shadow-md border-4 border-white bg-white shrink-0 relative group">
-                                    {course.user.avatar ? (
-                                        <img
-                                            src={course.user.avatar.startsWith('http') ? course.user.avatar : `/storage/${course.user.avatar}`}
-                                            alt={course.user.name}
-                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                            <User className="h-20 w-20 text-white/70" />
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        const imgUrl = course.section_titles?.instructor_image || course.user?.avatar;
+                                        if (imgUrl) {
+                                            return (
+                                                <img
+                                                    src={imgUrl.startsWith('http') ? imgUrl : `/storage/${imgUrl}`}
+                                                    alt={course.section_titles?.instructor_name || course.user?.name || 'Instructor'}
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                />
+                                            );
+                                        }
+                                        return (
+                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                                <User className="h-20 w-20 text-white/70" />
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
 
@@ -1049,25 +1055,35 @@ export default function CourseDetail() {
                                         Meet Your Mentor
                                     </span>
                                     <h3 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-1.5" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-                                        {course.user.name || 'বিশেষজ্ঞ'}
-                                        <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-50" />
+                                        {course.section_titles?.instructor_name || course.user?.name || 'বিশেষজ্ঞ'}
+                                        <BadgeCheck className="h-6 w-6 text-blue-500 shrink-0 fill-blue-55" />
                                     </h3>
-                                    <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>কোর্স ইনস্ট্রাক্টর</p>
+                                    <p className="text-sm theme-primary-text font-extrabold uppercase tracking-wider" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                                        {course.section_titles?.instructor_designation || 'কোর্স ইনস্ট্রাক্টর'}
+                                    </p>
                                 </div>
 
                                 <p className="text-sm sm:text-base text-slate-650 font-medium leading-relaxed italic border-l-2 border-slate-200 pl-0 md:pl-4">
-                                    "I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."
+                                    {course.section_titles?.instructor_bio || `"I build premium websites, SaaS products, and AI-powered systems for entrepreneurs and growing businesses. With 6+ years of experience and 4500+ completed projects, my focus is simple: clean design, smart execution, and real business results."`}
                                 </p>
 
                                 {/* Stats grid */}
                                 <div className="grid grid-cols-2 gap-3 pt-2" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
                                     <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">অভিজ্ঞতা</div>
-                                        <div className="text-lg font-black text-slate-800">৬+ বছর</div>
+                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                                            {course.section_titles?.instructor_stat1_label || 'অভিজ্ঞতা'}
+                                        </div>
+                                        <div className="text-lg font-black text-slate-800">
+                                            {course.section_titles?.instructor_stat1_value || '৬+ বছর'}
+                                        </div>
                                     </div>
                                     <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-xl p-3 text-center md:text-left shadow-sm">
-                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">সম্পন্ন প্রজেক্ট</div>
-                                        <div className="text-lg font-black text-slate-800">৪৫০০+ প্রজেক্ট</div>
+                                        <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                                            {course.section_titles?.instructor_stat2_label || 'সম্পন্ন প্রজেক্ট'}
+                                        </div>
+                                        <div className="text-lg font-black text-slate-800">
+                                            {course.section_titles?.instructor_stat2_value || '৪৫০০+ প্রজেক্ট'}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

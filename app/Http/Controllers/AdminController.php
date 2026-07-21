@@ -378,6 +378,7 @@ class AdminController extends Controller
             'seo_title'            => 'nullable|string|max:255',
             'seo_description'      => 'nullable|string',
             'seo_image'            => 'nullable|image|max:4096',
+            'instructor_image'     => 'nullable|image|max:4096',
             'what_youll_learn'     => 'nullable|string',
             'requirements'         => 'nullable|string',
             'audience'             => 'nullable|string',
@@ -440,6 +441,25 @@ class AdminController extends Controller
             $result = $cloudinary->uploadThumbnail($request->file('seo_image'));
             if ($result) {
                 $data['seo_image'] = $result['url'];
+            }
+        }
+
+        // Process Instructor Image
+        if ($request->hasFile('instructor_image')) {
+            // Get current section titles from $data or fallback to database
+            $sectionTitles = isset($data['section_titles']) ? $data['section_titles'] : ($course->section_titles ?? []);
+
+            // Delete old Cloudinary instructor image if exists
+            $oldInstructorImage = $sectionTitles['instructor_image'] ?? null;
+            if ($oldInstructorImage && $cloudinary->isCloudinaryUrl($oldInstructorImage)) {
+                $publicId = $cloudinary->extractPublicId($oldInstructorImage);
+                if ($publicId) $cloudinary->deleteImage($publicId);
+            }
+
+            $result = $cloudinary->uploadThumbnail($request->file('instructor_image'));
+            if ($result) {
+                $sectionTitles['instructor_image'] = $result['url'];
+                $data['section_titles'] = $sectionTitles;
             }
         }
 
