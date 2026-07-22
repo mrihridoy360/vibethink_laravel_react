@@ -1957,7 +1957,8 @@ class AdminController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $tools = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->paginate(15);
+        $perPage = min((int) $request->get('per_page', 15), 500);
+        $tools = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json([
             'success' => true,

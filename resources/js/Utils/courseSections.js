@@ -4,6 +4,7 @@
 
 export const DEFAULT_SECTION_TITLES = {
     what_youll_learn: 'আপনি যা শিখবেন',
+    tools: 'কি কি টুল শিখবেন',
     description: 'কোর্স বিবরণ',
     audience: 'কাদের জন্য এই কোর্স?',
     curriculum: 'সম্পূর্ণ কারিকুলাম',
@@ -18,6 +19,7 @@ export const DEFAULT_SECTION_TITLES = {
 // The order in which editable section titles appear in the admin builder.
 export const SECTION_KEYS = [
     'what_youll_learn',
+    'tools',
     'description',
     'audience',
     'curriculum',
@@ -30,8 +32,13 @@ export const SECTION_KEYS = [
 ];
 
 export const getSectionTitle = (sectionTitles, key) => {
-    if (sectionTitles && typeof sectionTitles === 'object' && sectionTitles[key]) {
-        return sectionTitles[key];
+    if (sectionTitles && typeof sectionTitles === 'object') {
+        if (key === 'tools' && typeof sectionTitles.tools_title === 'string' && sectionTitles.tools_title.trim() !== '') {
+            return sectionTitles.tools_title;
+        }
+        if (typeof sectionTitles[key] === 'string' && sectionTitles[key].trim() !== '') {
+            return sectionTitles[key];
+        }
     }
     return DEFAULT_SECTION_TITLES[key] || key;
 };

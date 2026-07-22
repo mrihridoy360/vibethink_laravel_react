@@ -4,7 +4,8 @@ import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import {
     GraduationCap, LogOut, User, BookOpen, LogIn, LayoutDashboard,
-    ChevronDown, Settings, Shield, BookOpenCheck, Search, Sun, Moon, Menu, X, ArrowRight
+    ChevronDown, Settings, Shield, BookOpenCheck, Search, Sun, Moon, Menu, X, ArrowRight,
+    Home, Layers, Video, Book, Newspaper
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -110,12 +111,12 @@ export default function Navbar() {
     };
 
     const navLinks = [
-        { name: 'হোম', path: '/' },
-        { name: 'কোর্স', path: '/courses' },
-        ...(isFeatureEnabled('feature_bundles', '0') ? [{ name: 'বান্ডেল', path: '/bundles' }] : []),
-        ...(isFeatureEnabled('feature_workshops', '0') ? [{ name: 'ওয়ার্কশপ', path: '/workshops' }] : []),
-        ...(isFeatureEnabled('feature_ebooks', '0') ? [{ name: 'ই-বুক', path: '/ebooks' }] : []),
-        ...(isFeatureEnabled('feature_blog', '1') ? [{ name: 'ব্লগ', path: '/blog' }] : []),
+        { name: 'হোম', path: '/', icon: Home },
+        { name: 'কোর্স', path: '/courses', icon: BookOpen },
+        ...(isFeatureEnabled('feature_bundles', '0') ? [{ name: 'বান্ডেল', path: '/bundles', icon: Layers }] : []),
+        ...(isFeatureEnabled('feature_workshops', '0') ? [{ name: 'ওয়ার্কশপ', path: '/workshops', icon: Video }] : []),
+        ...(isFeatureEnabled('feature_ebooks', '0') ? [{ name: 'ই-বুক', path: '/ebooks', icon: Book }] : []),
+        ...(isFeatureEnabled('feature_blog', '1') ? [{ name: 'ব্লগ', path: '/blog', icon: Newspaper }] : []),
     ];
 
     return (
@@ -167,16 +168,18 @@ export default function Navbar() {
                         <div className="bg-[#F8F9FA] border border-[#E9ECEF] rounded-full p-1.5 flex items-center gap-1 shadow-sm">
                             {navLinks.map((link) => {
                                 const isActive = activeTab === link.name;
+                                const Icon = link.icon;
                                 return (
                                     <Link
                                         key={link.name}
                                         to={link.path}
-                                        className={`relative px-4 py-1.5 rounded-full text-sm font-bold transition-all duration-300 ${isActive
+                                        className={`relative px-3.5 py-1.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1.5 ${isActive
                                             ? 'theme-primary-bg text-white shadow-md scale-[1.03]'
                                             : 'text-[#495057] theme-primary-text-hover'
                                             }`}
                                     >
-                                        {link.name}
+                                        {Icon && <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />}
+                                        <span>{link.name}</span>
                                     </Link>
                                 );
                             })}
@@ -419,17 +422,19 @@ export default function Navbar() {
                         <div className="flex flex-col gap-1">
                             {navLinks.map((link) => {
                                 const isActive = activeTab === link.name;
+                                const Icon = link.icon;
                                 return (
                                     <Link
                                         key={link.name}
                                         to={link.path}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${isActive
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 ${isActive
                                             ? 'theme-primary-bg-light theme-primary-text'
                                             : 'text-slate-600 hover:bg-slate-50'
                                             }`}
                                     >
-                                        {link.name}
+                                        {Icon && <Icon className={`w-4.5 h-4.5 ${isActive ? 'theme-primary-text' : 'text-slate-400'}`} />}
+                                        <span>{link.name}</span>
                                     </Link>
                                 );
                             })}

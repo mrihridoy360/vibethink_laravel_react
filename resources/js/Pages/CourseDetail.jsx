@@ -657,6 +657,71 @@ export default function CourseDetail() {
                     </div>
                 )}
 
+                {/* Tools Learned Section ("কি কি টুল শিখবেন") */}
+                {course.section_titles?.tools && Array.isArray(course.section_titles.tools) && course.section_titles.tools.length > 0 && (
+                    <div className="my-8 lg:my-12">
+                        <div className="bg-[#0c1327] border border-slate-800/80 rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 shadow-xl relative overflow-hidden">
+                            {/* Ambient Background Glows */}
+                            <div className="absolute top-0 left-1/4 w-60 h-60 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute bottom-0 right-1/4 w-60 h-60 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+
+                            {/* Section Header */}
+                            <div className="relative z-10 space-y-0.5 mb-5 sm:mb-6 text-left">
+                                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                    {getSectionTitle(course.section_titles, 'tools')}
+                                </h2>
+                                <p className="text-slate-400 text-xs sm:text-sm font-medium">
+                                    {course.section_titles?.tools_subtitle || 'এই কোর্সে যে সব টুল ব্যবহার করতে শিখবেন'}
+                                </p>
+                            </div>
+
+                            {/* Tools Grid - Compact & Responsive */}
+                            <div className="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
+                                {course.section_titles.tools.map((tool, idx) => {
+                                    const cardBgStyles = [
+                                        'bg-indigo-950/30 border-indigo-500/20 hover:border-indigo-400/40 hover:bg-indigo-900/30 shadow-indigo-950/10',
+                                        'bg-purple-950/30 border-purple-500/20 hover:border-purple-400/40 hover:bg-purple-900/30 shadow-purple-950/10',
+                                        'bg-teal-950/30 border-teal-500/20 hover:border-teal-400/40 hover:bg-teal-900/30 shadow-teal-950/10',
+                                        'bg-rose-950/30 border-rose-500/20 hover:border-rose-400/40 hover:bg-rose-900/30 shadow-rose-950/10',
+                                        'bg-blue-950/30 border-blue-500/20 hover:border-blue-400/40 hover:bg-blue-900/30 shadow-blue-950/10',
+                                        'bg-amber-950/30 border-amber-500/20 hover:border-amber-400/40 hover:bg-amber-900/30 shadow-amber-950/10',
+                                        'bg-cyan-950/30 border-cyan-500/20 hover:border-cyan-400/40 hover:bg-cyan-900/30 shadow-cyan-950/10',
+                                        'bg-emerald-950/30 border-emerald-500/20 hover:border-emerald-400/40 hover:bg-emerald-900/30 shadow-emerald-950/10',
+                                    ];
+                                    const styleClass = cardBgStyles[idx % cardBgStyles.length];
+
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className={`rounded-xl sm:rounded-2xl p-3 sm:p-3.5 flex flex-col items-center justify-center text-center gap-2 sm:gap-2.5 transition-all duration-300 hover:-translate-y-1 backdrop-blur-md shadow-sm border ${styleClass}`}
+                                        >
+                                            {/* White Rounded Container for Tool Logo */}
+                                            <div className="w-11 h-11 sm:w-13 sm:h-13 bg-white rounded-xl sm:rounded-2xl p-2 flex items-center justify-center shadow-sm border border-white/40 shrink-0">
+                                                {tool.logo ? (
+                                                    <img
+                                                        src={tool.logo}
+                                                        alt={tool.name}
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                ) : (
+                                                    <span className="text-base font-bold text-slate-800">
+                                                        {tool.name ? tool.name.charAt(0) : '?'}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Tool Name */}
+                                            <span className="text-white font-bold text-xs sm:text-sm tracking-tight text-center leading-snug truncate w-full">
+                                                {tool.name}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
             </div> {/* Closes max-w-7xl main container */}
 
             {/* Audience (কাদের জন্য এই কোর্স) - Edge to Edge */}

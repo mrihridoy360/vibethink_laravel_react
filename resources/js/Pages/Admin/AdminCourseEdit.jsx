@@ -6,7 +6,8 @@ import {
     ArrowLeft, BookOpen, LayoutDashboard, Settings, Globe, Save,
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
-    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users, MessageSquare, Pencil
+    Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users, MessageSquare, Pencil,
+    Cpu, Download, Search, Check
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -1151,6 +1152,514 @@ function FaqEditor({ items, onChange, titleValue, onTitleChange }) {
     );
 }
 
+// ── ToolsTab ──────────────────────────────────────────────────────────────────
+function ToolsTab({ form, setForm }) {
+    const [name, setName] = useState('');
+    const [logo, setLogo] = useState('');
+    const [logoPreview, setLogoPreview] = useState('');
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [platformTools, setPlatformTools] = useState([]);
+    const [loadingTools, setLoadingTools] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const fileInputRef = useRef();
+
+    const tools = form.section_titles?.tools || [];
+
+    const handleLogoChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 256;
+                const MAX_HEIGHT = 256;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/png');
+                setLogo(dataUrl);
+                setLogoPreview(dataUrl);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const startEdit = (index) => {
+        const item = tools[index];
+        setName(item.name || '');
+        setLogo(item.logo || '');
+        setLogoPreview(item.logo || '');
+        setEditingIndex(index);
+    };
+
+    const cancelEdit = () => {
+        setName('');
+        setLogo('');
+        setLogoPreview('');
+        setEditingIndex(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const addOrUpdateTool = () => {
+        if (!name.trim()) {
+            alert('অনুগ্রহ করে টুলের নাম প্রদান করুন।');
+            return;
+        }
+
+        const newTool = {
+            id: Date.now(),
+            name: name.trim(),
+            logo: logo || logoPreview || ''
+        };
+
+        let updatedList;
+        if (editingIndex !== null) {
+            updatedList = [...tools];
+            updatedList[editingIndex] = {
+                ...updatedList[editingIndex],
+                name: name.trim(),
+                logo: logo || logoPreview || updatedList[editingIndex].logo
+            };
+        } else {
+            updatedList = [...tools, newTool];
+        }
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                tools: updatedList
+            }
+        }));
+
+        cancelEdit();
+    };
+
+    const removeTool = (index) => {
+        if (editingIndex === index) cancelEdit();
+        const updatedList = tools.filter((_, i) => i !== index);
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                tools: updatedList
+            }
+        }));
+    };
+
+    const moveTool = (index, direction) => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === tools.length - 1) return;
+
+        const updatedList = [...tools];
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+
+        const temp = updatedList[index];
+        updatedList[index] = updatedList[swapIndex];
+        updatedList[swapIndex] = temp;
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                tools: updatedList
+            }
+        }));
+    };
+
+    const openImportModal = async () => {
+        setIsImportModalOpen(true);
+        if (platformTools.length === 0) {
+            setLoadingTools(true);
+            try {
+                const res = await axios.get('/api/admin/tools?per_page=100');
+                if (res.data.success) {
+                    const fetched = res.data.tools?.data || res.data.tools || [];
+                    setPlatformTools(fetched);
+                }
+            } catch (err) {
+                console.error('Error fetching tools:', err);
+            } finally {
+                setLoadingTools(false);
+            }
+        }
+    };
+
+    const importTool = (platformTool) => {
+        const logoUrl = platformTool.icon || platformTool.thumbnail || '';
+        const exists = tools.some(t => t.name.toLowerCase() === platformTool.name.toLowerCase());
+        if (exists) {
+            alert(`"${platformTool.name}" টুলটি ইতিমধ্যে যুক্ত আছে!`);
+            return;
+        }
+
+        const newTool = {
+            id: platformTool.id || Date.now(),
+            name: platformTool.name,
+            logo: logoUrl
+        };
+
+        const updatedList = [...tools, newTool];
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                tools: updatedList
+            }
+        }));
+    };
+
+    const filteredPlatformTools = platformTools.filter(t => 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    return (
+        <div className="space-y-6">
+            {/* Section Header Controls */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 mb-0.5">"কি কি টুল শিখবেন" সেকশন সেটিংস</h3>
+                        <p className="text-xs text-gray-400">সিঙ্গেল কোর্স পেজের টুলের টাইটেল এবং সাবটাইটেল কাস্টমাইজ করুন।</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={openImportModal}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition-all border border-indigo-200 shadow-sm cursor-pointer shrink-0"
+                    >
+                        <Download className="h-4 w-4" /> /admin/tools থেকে ইম্পোর্ট করুন
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">সেকশন শিরোনাম (Title)</label>
+                        <input
+                            type="text"
+                            value={form.section_titles?.tools_title || ''}
+                            onChange={e => setForm(p => ({
+                                ...p,
+                                section_titles: {
+                                    ...(p.section_titles || {}),
+                                    tools_title: e.target.value
+                                }
+                            }))}
+                            placeholder="যেমন: কি কি টুল শিখবেন"
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">সাবটাইটেল (Subtitle)</label>
+                        <input
+                            type="text"
+                            value={form.section_titles?.tools_subtitle || ''}
+                            onChange={e => setForm(p => ({
+                                ...p,
+                                section_titles: {
+                                    ...(p.section_titles || {}),
+                                    tools_subtitle: e.target.value
+                                }
+                            }))}
+                            placeholder="যেমন: এই কোর্সে যে সব টুল ব্যবহার করতে শিখবেন"
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Form & Tools List */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Form: Add / Edit Tool */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5 lg:col-span-1 self-start">
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 mb-0.5">
+                            {editingIndex !== null ? 'টুল সংশোধন করুন' : 'নতুন টুল যোগ করুন'}
+                        </h3>
+                        <p className="text-xs text-gray-400">টুলের নাম ও লোগো যুক্ত করুন।</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">টুলের নাম <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="যেমন: React, Flutter, MySQL..."
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">টুলের লোগো (Logo Image / Icon URL)</label>
+                            <div className="space-y-3">
+                                <input
+                                    type="text"
+                                    value={logo}
+                                    onChange={e => {
+                                        setLogo(e.target.value);
+                                        setLogoPreview(e.target.value);
+                                    }}
+                                    className="w-full px-4 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono"
+                                    placeholder="https://example.com/logo.png বা ফাইল আপলোড করুন"
+                                />
+                                <div className="flex items-center gap-3">
+                                    {logoPreview ? (
+                                        <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 shadow-sm p-2 flex items-center justify-center">
+                                            <img src={logoPreview} alt="Preview" className="w-full h-full object-contain" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-200">
+                                            <ImageIcon className="h-6 w-6" />
+                                        </div>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current.click()}
+                                        className="px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <Upload className="h-3.5 w-3.5" /> লোগো আপলোড
+                                    </button>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleLogoChange}
+                                        className="hidden"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {editingIndex !== null ? (
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={addOrUpdateTool}
+                                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                                >
+                                    <CheckCircle className="h-4 w-4" /> আপডেট করুন
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={cancelEdit}
+                                    className="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all cursor-pointer"
+                                >
+                                    বাতিল
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={addOrUpdateTool}
+                                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                                <Plus className="h-4 w-4" /> টুল যুক্ত করুন
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right: List of added tools */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5 lg:col-span-2">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-base font-bold text-gray-900 mb-0.5">যুক্ত করা টুলসমূহ ({tools.length})</h3>
+                            <p className="text-xs text-gray-400">কোর্সের শিক্ষার্থীরা এই টুলগুলো শিখবে।</p>
+                        </div>
+                    </div>
+
+                    {tools.length === 0 ? (
+                        <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2">
+                            <Cpu className="h-10 w-10 text-gray-300" />
+                            <span className="text-sm font-semibold">কোনো টুল যুক্ত করা হয়নি</span>
+                            <button
+                                type="button"
+                                onClick={openImportModal}
+                                className="text-xs text-blue-600 font-bold hover:underline mt-1 cursor-pointer"
+                            >
+                                /admin/tools থেকে ইম্পোর্ট করুন →
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {tools.map((tool, index) => (
+                                <div key={index} className="flex items-center gap-3.5 p-3.5 border border-gray-100 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-all">
+                                    <div className="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-sm p-2 flex items-center justify-center shrink-0">
+                                        {tool.logo ? (
+                                            <img src={tool.logo} alt={tool.name} className="w-full h-full object-contain" />
+                                        ) : (
+                                            <Cpu className="w-6 h-6 text-gray-400" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-bold text-gray-900 truncate">{tool.name}</h4>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={() => moveTool(index, 'up')}
+                                            disabled={index === 0}
+                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
+                                            title="উপরে"
+                                        >
+                                            <ChevronUp className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => moveTool(index, 'down')}
+                                            disabled={index === tools.length - 1}
+                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
+                                            title="নিচে"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => startEdit(index)}
+                                            className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 cursor-pointer"
+                                            title="এডিট"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTool(index)}
+                                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer"
+                                            title="মুছুন"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Import from /admin/tools Modal */}
+            {isImportModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-gray-100 max-h-[85vh] flex flex-col">
+                        {/* Modal Header */}
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">প্লাটফর্মের টুলস থেকে ইম্পোর্ট করুন</h3>
+                                <p className="text-xs text-gray-400 mt-0.5">/admin/tools পেইজে থাকা টুলগুলো থেকে সিলেক্ট করুন</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsImportModalOpen(false)}
+                                className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50">
+                            <div className="relative">
+                                <Search className="h-4 w-4 absolute left-3.5 top-3 text-gray-400" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    placeholder="টুলের নাম অনুসন্ধান করুন..."
+                                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Tools Grid inside modal */}
+                        <div className="p-6 overflow-y-auto flex-1 no-scrollbar">
+                            {loadingTools ? (
+                                <div className="py-12 flex flex-col items-center justify-center gap-2">
+                                    <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                                    <span className="text-xs text-gray-400">টুলস লোড হচ্ছে...</span>
+                                </div>
+                            ) : filteredPlatformTools.length === 0 ? (
+                                <div className="py-12 text-center text-gray-400">
+                                    <Cpu className="h-10 w-10 mx-auto text-gray-300 mb-2" />
+                                    <p className="text-sm font-semibold">কোনো টুল পাওয়া যায়নি</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {filteredPlatformTools.map(pt => {
+                                        const isAlreadyAdded = tools.some(t => t.name.toLowerCase() === pt.name.toLowerCase());
+                                        const logoUrl = pt.icon || pt.thumbnail || '';
+                                        return (
+                                            <div
+                                                key={pt.id}
+                                                className={`p-3.5 rounded-2xl border transition-all flex flex-col items-center text-center gap-2 relative ${isAlreadyAdded ? 'bg-green-50/50 border-green-200 opacity-80' : 'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}`}
+                                            >
+                                                <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 p-2 shadow-sm flex items-center justify-center">
+                                                    {logoUrl ? (
+                                                        <img src={logoUrl} alt={pt.name} className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <Cpu className="w-6 h-6 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-900 truncate w-full">{pt.name}</span>
+                                                <button
+                                                    type="button"
+                                                    disabled={isAlreadyAdded}
+                                                    onClick={() => importTool(pt)}
+                                                    className={`mt-1 w-full py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${isAlreadyAdded ? 'bg-green-100 text-green-700 cursor-default' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                                                >
+                                                    {isAlreadyAdded ? (
+                                                        <><Check className="h-3 w-3" /> যুক্ত আছে</>
+                                                    ) : (
+                                                        <><Plus className="h-3 w-3" /> ইম্পোর্ট</>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setIsImportModalOpen(false)}
+                                className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                            >
+                                সম্পন্ন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ── Main AdminCourseEdit ───────────────────────────────────────────────────────
 export default function AdminCourseEdit() {
     const { user, loading, logout } = useAuth();
@@ -1349,6 +1858,7 @@ export default function AdminCourseEdit() {
     const TABS = [
         { key: 'details', label: 'ল্যান্ডিং পেজ', icon: LayoutDashboard },
         { key: 'curriculum', label: 'কারিকুলাম', icon: ListVideo },
+        { key: 'tools', label: 'কি কি টুল শিখবেন', icon: Cpu },
         { key: 'settings', label: 'সেটিংস ও মূল্য', icon: Settings },
         { key: 'testimonials', label: 'টেস্টিমোনিয়াল', icon: MessageSquare },
         { key: 'seo', label: 'SEO', icon: Globe },
@@ -1430,6 +1940,9 @@ export default function AdminCourseEdit() {
                         </div>
                         <CurriculumBuilder courseId={id} />
                     </div>
+                )}
+                {activeTab === 'tools' && (
+                    <ToolsTab form={form} setForm={setForm} />
                 )}
                 {activeTab === 'settings' && (
                     <SettingsTab form={form} setForm={setForm} errors={errors} />
