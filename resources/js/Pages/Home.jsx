@@ -4,12 +4,14 @@ import axios from 'axios';
 import CourseCard from '../Components/CourseCard';
 import BlogCard from '../Components/BlogCard';
 import ComingSoonModal from '../Components/ComingSoonModal';
+import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
 import { useSEO } from '../Utils/seo';
 import {
     Search, BookOpen, Clock, Tag, ArrowRight, HelpCircle, ChevronDown,
     ChevronUp, FileText, Brain, TrendingUp, Briefcase, Globe, Sparkles,
-    Award, UserCheck, ShieldCheck, Headphones, Rocket, Trophy
+    Award, UserCheck, ShieldCheck, Headphones, Rocket, Trophy,
+    Share2, Wallet, Coins, Gift, CheckCircle2
 } from 'lucide-react';
 
 const whyLearnAiItems = [
@@ -90,8 +92,15 @@ const whyChooseUsItems = [
     }
 ];
 
+const toBengaliNum = (num) => {
+    if (num === null || num === undefined || num === '') return '';
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return String(num).replace(/[0-9]/g, (digit) => bengaliDigits[digit]);
+};
+
 export default function Home() {
     useSEO();
+    const { user } = useAuth();
     const [courses, setCourses] = useState([]);
     const [comingSoonCourse, setComingSoonCourse] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -99,6 +108,11 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
 
     const { settings } = useSiteSettings();
+
+    const commissionVal = settings?.affiliate?.commission_percentage
+        ? parseFloat(settings.affiliate.commission_percentage)
+        : 10;
+    const commissionText = `${toBengaliNum(commissionVal)}%`;
 
     // FAQs are already available from the preloaded site settings,
     // so no separate /api/settings request is needed here.
@@ -312,6 +326,81 @@ export default function Home() {
                                 </div>
                             );
                         })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Affiliate / Earnings Section */}
+            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-10 md:p-14 shadow-2xl border border-indigo-500/20">
+                {/* Ambient Background Glows */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    {/* Left Column: Heading & CTAs */}
+                    <div className="lg:col-span-7 space-y-5 text-left">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-extrabold tracking-wide">
+                            <Gift className="w-4 h-4 text-indigo-400" />
+                            <span>এফিলিয়েট অ্যান্ড রেফারেল প্রোগ্রাম</span>
+                        </div>
+
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                            কোর্স শেয়ার করে আর্ন করুন <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">{commissionText} পর্যন্ত কমিশন!</span>
+                        </h2>
+
+                        <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-medium">
+                            আপনার ইউনিক রেফারেল লিঙ্ক শেয়ার করে বন্ধুদের সাথে VibeThink কোর্স প্রোমোট করুন এবং প্রতিটি সফল ইনরোলমেন্টে পাচ্ছেন নগদ কমিশন। কোন বাধা ছাড়া বাড়িতে বসেই প্যাসিভ ইনকাম শুরু করুন।
+                        </p>
+
+                        <div className="pt-2 flex flex-wrap items-center gap-4">
+                            <Link
+                                to={user ? '/dashboard/affiliate' : '/login'}
+                                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-black text-sm flex items-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all"
+                            >
+                                <Coins className="w-4.5 h-4.5 text-amber-300" />
+                                <span>আজই এফিলিয়েট শুরু করুন</span>
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                            <Link
+                                to={user ? '/dashboard/affiliate' : '/login'}
+                                className="px-5 py-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-sm transition-all"
+                            >
+                                কমিশন রেট দেখুন
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Right Column: 3 Easy Steps Cards */}
+                    <div className="lg:col-span-5 grid grid-cols-1 gap-3.5">
+                        <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-start gap-4 hover:border-indigo-400/30 transition-all">
+                            <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center shrink-0 text-indigo-400">
+                                <Share2 className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-extrabold text-base mb-1">১. লিঙ্ক শেয়ার করুন</h3>
+                                <p className="text-slate-300 text-xs leading-relaxed font-medium">ড্যাশবোর্ড থেকে আপনার নিজস্ব ইউনিক রেফারেল লিঙ্ক কপি করে সোশ্যাল মিডিয়া বা বন্ধুদের সাথে শেয়ার করুন।</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-start gap-4 hover:border-purple-400/30 transition-all">
+                            <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center shrink-0 text-purple-400">
+                                <CheckCircle2 className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-extrabold text-base mb-1">২. বন্ধু এনরোল করবে</h3>
+                                <p className="text-slate-300 text-xs leading-relaxed font-medium">আপনার লিঙ্ক ব্যবহার করে যেকোনো শিক্ষার্থী কোর্সে এনরোলমেন্ট সম্পন্ন করবে।</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-start gap-4 hover:border-emerald-400/30 transition-all">
+                            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-emerald-400">
+                                <Wallet className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-extrabold text-base mb-1">৩. ইনস্ট্যান্ট কমিশন পান</h3>
+                                <p className="text-slate-300 text-xs leading-relaxed font-medium">প্রতিটি বিক্রয়ে পাবেন {commissionText} পর্যন্ত নিশ্চিত কমিশন ও ইনস্ট্যান্ট উইথড্র সুবিধা।</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

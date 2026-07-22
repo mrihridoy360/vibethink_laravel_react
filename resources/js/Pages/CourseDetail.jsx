@@ -455,21 +455,38 @@ export default function CourseDetail() {
                                     </span>
                                 </div>
 
-                                {/* Guarantee & Access (shown only when not enrolled) */}
-                                {!isEnrolled && (
-                                    <div className="space-y-2.5">
-                                        {course.lifetime_access && (
-                                            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                                                <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                                                <span className="text-sm font-bold text-emerald-700">ফুল লাইফটাইম অ্যাক্সেস</span>
+                                {/* Countdown Timer (above button) */}
+                                {course.section_titles?.countdown_enabled && (
+                                    <div
+                                        className="rounded-2xl p-4 border border-rose-200/80 bg-rose-50/60 relative overflow-hidden text-center space-y-2.5 shadow-xs"
+                                        style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                                    >
+                                        <div className="text-sm sm:text-base font-black text-rose-600 flex items-center justify-center gap-1.5">
+                                            <Clock className="w-4 h-4 text-rose-500 animate-pulse shrink-0" />
+                                            <span>অফার শেষ হতে আর মাত্র বাকি আছে</span>
+                                        </div>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="bg-white rounded-xl px-3 py-2 min-w-[58px] text-center shadow-xs border border-rose-100">
+                                                <span className="text-xl sm:text-2xl font-black leading-none text-rose-600 block">
+                                                    {toBengaliNum(String(timeLeft.hours).padStart(2, '0'))}
+                                                </span>
+                                                <span className="block text-[11px] font-extrabold text-slate-500 mt-1">ঘণ্টা</span>
                                             </div>
-                                        )}
-                                        {parseInt(course.money_back_days, 10) > 0 && (
-                                            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-blue-50 border border-blue-100">
-                                                <Shield className="h-4 w-4 text-blue-600 shrink-0" />
-                                                <span className="text-sm font-bold text-blue-700">{toBengaliNum(course.money_back_days)} দিনের মানি-ব্যাক গ্যারান্টি</span>
+                                            <span className="text-rose-400 font-black text-base pb-3.5">:</span>
+                                            <div className="bg-white rounded-xl px-3 py-2 min-w-[58px] text-center shadow-xs border border-rose-100">
+                                                <span className="text-xl sm:text-2xl font-black leading-none text-rose-600 block">
+                                                    {toBengaliNum(String(timeLeft.minutes).padStart(2, '0'))}
+                                                </span>
+                                                <span className="block text-[11px] font-extrabold text-slate-500 mt-1">মিনিট</span>
                                             </div>
-                                        )}
+                                            <span className="text-rose-400 font-black text-base pb-3.5">:</span>
+                                            <div className="bg-white rounded-xl px-3 py-2 min-w-[58px] text-center shadow-xs border border-rose-100">
+                                                <span className="text-xl sm:text-2xl font-black leading-none text-rose-600 block">
+                                                    {toBengaliNum(String(timeLeft.seconds).padStart(2, '0'))}
+                                                </span>
+                                                <span className="block text-[11px] font-extrabold text-slate-500 mt-1">সেকেন্ড</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
@@ -492,6 +509,16 @@ export default function CourseDetail() {
                                         </button>
                                     )}
                                 </div>
+
+                                {/* Guarantee Badge (below button) */}
+                                {!isEnrolled && (
+                                    <div className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-blue-50/80 border border-blue-100/80 text-center">
+                                        <Shield className="h-4 w-4 text-blue-600 shrink-0" />
+                                        <span className="text-xs sm:text-sm font-bold text-blue-700">
+                                            {toBengaliNum(course.money_back_days || 7)} দিনের মানি-ব্যাক গ্যারান্টি
+                                        </span>
+                                    </div>
+                                )}
 
 
 

@@ -3141,6 +3141,13 @@ class AdminController extends Controller
             }
             $grouped[$row->group][$row->key] = $row->value;
         }
+
+        $referralSetting = ReferralSetting::first();
+        if ($referralSetting) {
+            $grouped['affiliate']['commission_percentage'] = $referralSetting->commission_percentage;
+            $grouped['affiliate']['is_active'] = $referralSetting->is_active;
+        }
+
         return response()->json(['success' => true, 'settings' => $grouped]);
     }
 

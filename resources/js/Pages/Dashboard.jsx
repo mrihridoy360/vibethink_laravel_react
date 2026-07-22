@@ -38,7 +38,7 @@ const MENU_ITEMS = [
     { key: 'products', label: 'পণ্য', icon: ShoppingBag },
     { key: 'certificates', label: 'সার্টিফিকেট', icon: Award },
     { key: 'billing', label: 'বিলিং', icon: CreditCard },
-    { key: 'referral', label: 'রেফারেল', icon: Users },
+    { key: 'affiliate', label: 'এফিলিয়েট', icon: Users },
     { key: 'wallet', label: 'ওয়ালেট', icon: Wallet },
 ];
 
@@ -59,7 +59,8 @@ const PAGE_TITLES = {
     products: 'পণ্য',
     certificates: 'সার্টিফিকেট',
     billing: 'বিলিং',
-    referral: 'রেফারেল',
+    affiliate: 'এফিলিয়েট',
+    referral: 'এফিলিয়েট',
     wallet: 'ওয়ালেট',
     support_group: 'সাপোর্ট গ্রুপ',
     support_tickets: 'সাপোর্ট টিকেট',
@@ -87,7 +88,7 @@ export default function Dashboard() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
     const { tab } = useParams();
-    const activeTab = (tab && PAGE_TITLES[tab]) ? tab : 'dashboard';
+    const activeTab = (tab && PAGE_TITLES[tab]) ? (tab === 'referral' ? 'affiliate' : tab) : 'dashboard';
 
     const { settings } = useSiteSettings();
     const siteLogo = settings?.appearance?.site_logo || null;
@@ -595,7 +596,7 @@ export default function Dashboard() {
                             {activeTab === 'products' && <Products />}
                             {activeTab === 'certificates' && <Certificates />}
                             {activeTab === 'billing' && <Billing />}
-                            {activeTab === 'referral' && <Referral />}
+                            {(activeTab === 'affiliate' || activeTab === 'referral') && <Referral />}
                             {activeTab === 'wallet' && <WalletPage />}
                             {activeTab === 'support_group' && <SupportGroup />}
                             {activeTab === 'support_tickets' && <SupportTickets />}
