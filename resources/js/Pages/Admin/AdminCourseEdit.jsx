@@ -1428,8 +1428,8 @@ function ToolsTab({ form, setForm }) {
                                 />
                                 <div className="flex items-center gap-3">
                                     {logoPreview ? (
-                                        <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 shadow-sm p-2 flex items-center justify-center">
-                                            <img src={logoPreview} alt="Preview" className="w-full h-full object-contain" />
+                                        <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 shadow-sm p-0 overflow-hidden flex items-center justify-center">
+                                            <img src={logoPreview} alt="Preview" className="w-full h-full object-cover rounded-2xl" />
                                         </div>
                                     ) : (
                                         <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-200">
@@ -1508,9 +1508,9 @@ function ToolsTab({ form, setForm }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {tools.map((tool, index) => (
                                 <div key={index} className="flex items-center gap-3.5 p-3.5 border border-gray-100 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-all">
-                                    <div className="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-sm p-2 flex items-center justify-center shrink-0">
+                                    <div className="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-sm p-0 overflow-hidden flex items-center justify-center shrink-0">
                                         {tool.logo ? (
-                                            <img src={tool.logo} alt={tool.name} className="w-full h-full object-contain" />
+                                            <img src={tool.logo} alt={tool.name} className="w-full h-full object-cover rounded-xl" />
                                         ) : (
                                             <Cpu className="w-6 h-6 text-gray-400" />
                                         )}

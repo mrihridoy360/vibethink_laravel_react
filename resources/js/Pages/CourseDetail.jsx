@@ -657,9 +657,58 @@ export default function CourseDetail() {
                     </div>
                 )}
 
-                {/* Tools Learned Section ("কি কি টুল শিখবেন") */}
+            </div> {/* Closes max-w-7xl main container */}
+
+            {/* Audience (কাদের জন্য এই কোর্স) - Edge to Edge */}
+            {course.audience && Array.isArray(course.audience) && course.audience.length > 0 && (
+                <div className="border-y border-slate-200/40 py-16 w-full" style={{ backgroundColor: '#F4F5F7' }}>
+                    <div className="max-w-7xl mx-auto px-4 md:px-6">
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-10 text-center leading-tight">
+                            {getSectionTitle(course.section_titles, 'audience')}
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+                            {course.audience.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group h-full"
+                                >
+                                    {/* Icon Badge */}
+                                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200/60 flex items-center justify-center shrink-0 mb-5 transition-transform duration-300 group-hover:scale-110 shadow-sm">
+                                        {idx === 0 ? (
+                                            <Brain className="h-6 w-6 text-purple-600" />
+                                        ) : idx === 1 ? (
+                                            <Code className="h-6 w-6 text-cyan-600" />
+                                        ) : idx === 2 ? (
+                                            <Briefcase className="h-6 w-6 text-indigo-600" />
+                                        ) : (
+                                            <Award className="h-6 w-6 text-emerald-600" />
+                                        )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="space-y-3 flex-1">
+                                        <h3 className="text-lg sm:text-xl font-black text-slate-900 leading-snug">
+                                            {renderText(item)}
+                                        </h3>
+                                        {typeof item === 'object' && item !== null && item.sub_text && (
+                                            <p className="text-sm sm:text-base text-slate-500 font-medium leading-relaxed">
+                                                {item.sub_text}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reopen max-w-7xl container for subsequent elements */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 relative z-20">
+
+                {/* Tools Learned Section ("কি কি টুল শিখবেন") - Placed right below Audience, matching max-w-5xl width */}
                 {course.section_titles?.tools && Array.isArray(course.section_titles.tools) && course.section_titles.tools.length > 0 && (
-                    <div className="my-8 lg:my-12">
+                    <div className="mb-16 lg:mb-24 max-w-5xl mx-auto">
                         <div className="bg-[#0c1327] border border-slate-800/80 rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 shadow-xl relative overflow-hidden">
                             {/* Ambient Background Glows */}
                             <div className="absolute top-0 left-1/4 w-60 h-60 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -696,12 +745,12 @@ export default function CourseDetail() {
                                             className={`rounded-xl sm:rounded-2xl p-3 sm:p-3.5 flex flex-col items-center justify-center text-center gap-2 sm:gap-2.5 transition-all duration-300 hover:-translate-y-1 backdrop-blur-md shadow-sm border ${styleClass}`}
                                         >
                                             {/* White Rounded Container for Tool Logo */}
-                                            <div className="w-11 h-11 sm:w-13 sm:h-13 bg-white rounded-xl sm:rounded-2xl p-2 flex items-center justify-center shadow-sm border border-white/40 shrink-0">
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm border border-white/40 shrink-0 overflow-hidden p-0">
                                                 {tool.logo ? (
                                                     <img
                                                         src={tool.logo}
                                                         alt={tool.name}
-                                                        className="w-full h-full object-contain"
+                                                        className="w-full h-full object-cover rounded-xl sm:rounded-2xl"
                                                     />
                                                 ) : (
                                                     <span className="text-base font-bold text-slate-800">
