@@ -106,6 +106,8 @@ export default function Dashboard() {
 
     const stats = data?.stats || { enrolled_count: 0, active_count: 0, completed_count: 0, pending_count: 0 };
     const enrollments = data?.enrollments || [];
+    const ongoingEnrollment = enrollments.find(e => e.progress > 0 && e.progress < 100);
+
     return (
         <div className="flex h-screen overflow-hidden bg-[#f4f6fc] text-gray-800 font-sans">
             {/* ── Reusable Sidebar ───────────────────────────── */}
