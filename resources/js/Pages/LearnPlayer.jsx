@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import VideoPlayer from '../Components/VideoPlayer';
 import Loader from '../Components/Loader';
+import Sidebar from '../Components/Sidebar';
 import Lottie from 'lottie-react';
 import comingSoonAnimation from '../Assets/Animations/coming-soon.json';
 import {
