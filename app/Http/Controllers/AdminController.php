@@ -496,6 +496,7 @@ class AdminController extends Controller
             $chapter->lessons()->delete();
         }
         $course->chapters()->delete();
+        Payment::where('course_id', $course->id)->where('status', 'completed')->update(['status' => 'refunded']);
         $course->enrollments()->delete();
         $course->delete();
 
@@ -666,6 +667,7 @@ class AdminController extends Controller
             ], 400);
         }
 
+        Payment::where('user_id', $user->id)->where('status', 'completed')->update(['status' => 'refunded']);
         $user->enrollments()->delete();
         $user->delete();
 
@@ -758,6 +760,12 @@ class AdminController extends Controller
                 'message' => 'ইনরোলমেন্টটি পাওয়া যায়নি।',
             ], 404);
         }
+
+        // Update associated completed payments to refunded status so total revenue decreases
+        Payment::where('user_id', $enrollment->user_id)
+            ->where('course_id', $enrollment->course_id)
+            ->where('status', 'completed')
+            ->update(['status' => 'refunded']);
 
         $enrollment->delete();
 
