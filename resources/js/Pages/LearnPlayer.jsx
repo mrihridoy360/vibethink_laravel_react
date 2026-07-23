@@ -136,7 +136,7 @@ export default function LearnPlayer() {
             <Sidebar activeTab="enrolled" sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
 
             {/* ── Main Area ───────────────────────────────── */}
-            <div className={`flex-grow flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+            <div className="flex-grow flex flex-col min-w-0 transition-all duration-300">
 
                 {/* Topbar */}
                 <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 sticky top-0 z-40">
