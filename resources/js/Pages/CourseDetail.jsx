@@ -796,7 +796,7 @@ export default function CourseDetail() {
                                             }}
                                             className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                                         >
-                                            আজই এনরোল করুন
+                                            এখুনি এনরোল করুন
                                             <ArrowRight className="h-4 w-4" />
                                         </button>
                                     </div>
