@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
-import { Play, BookOpen, CheckCircle, ChevronRight, ChevronLeft, Star, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight, Facebook, Phone, MapPin, MessageSquare, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Play, BookOpen, CheckCircle, CheckCircle2, ChevronRight, ChevronLeft, Star, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight, Facebook, Phone, MapPin, MessageSquare, Twitter, Instagram, Linkedin, TrendingUp, Gift } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
 import { getSectionTitle } from '../Utils/courseSections';
@@ -683,6 +683,128 @@ export default function CourseDetail() {
                         </div>
                     </div>
                 )}
+
+                {/* ── Course Value Breakdown Section (ইউজার কত টাকার ভ্যালু পাচ্ছে) ── */}
+                {(() => {
+                    const valueItems = course.section_titles?.value_items || [];
+                    if (!Array.isArray(valueItems) || valueItems.length === 0) return null;
+
+                    const totalCalculatedValue = valueItems.reduce((acc, item) => acc + (parseFloat(item.value) || 0), 0);
+                    const coursePrice = currentPrice || 0;
+                    const savingsAmount = Math.max(0, totalCalculatedValue - coursePrice);
+                    const savingsPercentage = totalCalculatedValue > 0 ? Math.round((savingsAmount / totalCalculatedValue) * 100) : 0;
+
+                    return (
+                        <div className="my-16 lg:my-24 max-w-6xl mx-auto">
+                            {/* Section Header */}
+                            <div className="text-center mb-10 sm:mb-12">
+                                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
+                                    <TrendingUp className="h-4 w-4 text-emerald-600" />
+                                    কোর্স ভ্যালু ও রিটার্ন অন ইনভেস্টমেন্ট
+                                </span>
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
+                                    {course.section_titles?.value_breakdown_title || 'কোর্সের সাথে কত টাকার ভ্যালু পাচ্ছেন?'}
+                                </h2>
+                                <p className="text-slate-500 text-sm sm:text-base font-medium mt-2 max-w-2xl mx-auto">
+                                    {course.section_titles?.value_breakdown_subtitle || 'একটি সিঙ্গেল কোর্সেই পাচ্ছেন আপনার ক্যারিয়ার বিল্ড করতে প্রয়োজনীয় সকল রিসোর্স ও লাইফটাইম সাপোর্ট'}
+                                </p>
+                            </div>
+
+                            {/* Cards & ROI Breakdown Grid */}
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                                {/* Left Column: Value Items Grid */}
+                                <div className="lg:col-span-7 xl:col-span-8 space-y-3.5">
+                                    {valueItems.map((item, idx) => (
+                                        <div
+                                            key={item.id || idx}
+                                            className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex items-center justify-between gap-4 group"
+                                        >
+                                            <div className="flex items-center gap-3.5 min-w-0">
+                                                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100/80 flex items-center justify-center shrink-0 text-emerald-600 font-bold group-hover:scale-105 transition-transform">
+                                                    <CheckCircle2 className="h-5 w-5" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="text-base sm:text-lg font-black text-slate-800 leading-snug truncate">
+                                                        {item.title}
+                                                    </h4>
+                                                    {item.sub_text && (
+                                                        <p className="text-xs sm:text-sm text-slate-500 font-medium truncate mt-0.5">
+                                                            {item.sub_text}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                                <span className="inline-block px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-black text-sm sm:text-base">
+                                                    ৳{toBengaliNum(parseFloat(item.value || 0).toLocaleString())}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Right Column: Total Value & Price Savings Box */}
+                                <div className="lg:col-span-5 xl:col-span-4">
+                                    <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indigo-900/50 relative overflow-hidden sticky top-24">
+                                        {/* Ambient Glow */}
+                                        <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                                        <h3 className="text-lg sm:text-xl font-extrabold mb-5 pb-4 border-b border-white/10 flex items-center gap-2">
+                                            <Gift className="h-5 w-5 text-emerald-400" />
+                                            মোট মূল্য সমীকরণ
+                                        </h3>
+
+                                        <div className="space-y-4 mb-6">
+                                            <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-300">
+                                                <span>ইনক্লুডেড মোট ভ্যালু:</span>
+                                                <span className="text-base font-black text-white line-through opacity-75">
+                                                    ৳{toBengaliNum(totalCalculatedValue.toLocaleString())}
+                                                </span>
+                                            </div>
+
+                                            {originalPrice > 0 && (
+                                                <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-300">
+                                                    <span>কোর্সের রেগুলার প্রাইস:</span>
+                                                    <span className="text-base font-black text-slate-300 line-through opacity-80">
+                                                        ৳{toBengaliNum(originalPrice.toLocaleString())}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-300">
+                                                <span>বিশেষ অফার মূল্য:</span>
+                                                <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+                                                    ৳{toBengaliNum(coursePrice.toLocaleString())}
+                                                </span>
+                                            </div>
+
+                                            {savingsAmount > 0 && (
+                                                <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                                                    <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">আপনি সেভ করছেন:</span>
+                                                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black">
+                                                        ৳{toBengaliNum(savingsAmount.toLocaleString())} ({toBengaliNum(String(savingsPercentage))}% ছাড়!)
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            onClick={() => {
+                                                const checkoutBtn = document.getElementById('enroll-button') || document.querySelector('[data-enroll-trigger]');
+                                                if (checkoutBtn) checkoutBtn.click();
+                                                else window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
+                                        >
+                                            আজই এনরোল করুন
+                                            <ArrowRight className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
 
             </div> {/* Closes max-w-7xl main container */}
 

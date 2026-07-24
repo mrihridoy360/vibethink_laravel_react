@@ -14,11 +14,13 @@ export const DEFAULT_SECTION_TITLES = {
     faq: 'সচরাচর প্রশ্ন ও উত্তর',
     requirements: 'প্রয়োজনীয় রিকোয়ারমেন্টস',
     this_course_includes: 'কোর্সের সাথে যা যা থাকছে',
+    value_breakdown: 'কোর্সের সাথে কত টাকার ভ্যালু পাচ্ছেন?',
 };
 
 // The order in which editable section titles appear in the admin builder.
 export const SECTION_KEYS = [
     'what_youll_learn',
+    'value_breakdown',
     'tools',
     'description',
     'audience',

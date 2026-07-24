@@ -10,8 +10,9 @@ import {
     Cpu, Download, Search, Check, GripVertical
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
-import AdminLayout from '../../Components/AdminLayout';
 import FeatureListEditor from './Partials/FeatureListEditor';
+import ValueBreakdownEditor from './Partials/ValueBreakdownEditor';
+import AdminLayout from '../../Components/AdminLayout';
 import { DEFAULT_SECTION_TITLES } from '../../Utils/courseSections';
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -378,6 +379,12 @@ function DetailsTab({ form, setForm, categories, errors, thumbnailPreview, onThu
                 onChange={val => setForm(p => ({ ...p, faq: val }))}
                 titleValue={form.section_titles?.faq}
                 onTitleChange={val => updateSectionTitle('faq', val)}
+            />
+
+            {/* Course Value Breakdown Editor */}
+            <ValueBreakdownEditor
+                form={form}
+                setForm={setForm}
             />
         </div>
     );
