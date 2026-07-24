@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Contexts/AuthContext';
 import { useSiteSettings } from '../Contexts/SiteSettingsContext';
+import VideoPlayer from '../Components/VideoPlayer';
 import { Play, BookOpen, CheckCircle, CheckCircle2, ChevronRight, ChevronLeft, Star, Award, HelpCircle, Clock, ChevronDown, User, Globe, Shield, ShieldCheck, BadgeCheck, Zap, Lock, Sparkles, Smartphone, Brain, Code, Briefcase, Headphones, ArrowRight, Facebook, Phone, MapPin, MessageSquare, Twitter, Instagram, Linkedin, TrendingUp, Gift } from 'lucide-react';
 import { trackPixelEvent } from '../Utils/metaPixel';
 import { parseMarkdownToHtml } from '../Utils/markdown';
@@ -31,6 +32,7 @@ export default function CourseDetail() {
     const [expandedFaq, setExpandedFaq] = useState(null);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showStickyRibbon, setShowStickyRibbon] = useState(true);
+    const [isPlayingPromo, setIsPlayingPromo] = useState(false);
     const ribbonRef = useRef(null);
 
     const { settings } = useSiteSettings();
@@ -181,6 +183,23 @@ export default function CourseDetail() {
             });
         }
     }, [course]);
+
+    const thumbnailUrl = course?.thumbnail
+        ? (course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`)
+        : (course?.seo_image ? (course.seo_image.startsWith('http') ? course.seo_image : `/storage/${course.seo_image}`) : null);
+
+    const promoVideoSource = useMemo(() => {
+        if (!course?.video_url) return null;
+        return {
+            type: 'video',
+            sources: [
+                {
+                    src: course.video_url,
+                },
+            ],
+            poster: thumbnailUrl,
+        };
+    }, [course?.video_url, thumbnailUrl]);
 
     const handleEnroll = async () => {
         if (!user) {
@@ -350,21 +369,27 @@ export default function CourseDetail() {
                     {/* Right Column - Sticky Info Card (Screenshot Layout) */}
                     <div className="lg:col-span-1 lg:sticky lg:top-24 self-start space-y-4 lg:-mt-68 relative z-30">
                         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-                            {/* Thumbnail */}
-                            <div className="relative aspect-video bg-slate-100">
-                                {course.thumbnail ? (
-                                    <img
-                                        src={course.thumbnail.startsWith('http') ? course.thumbnail : `/storage/${course.thumbnail}`}
-                                        alt={course.title}
-                                        className="w-full h-full object-cover"
-                                    />
+                            {/* Thumbnail / Promotional Video */}
+                            <div className="relative aspect-video bg-black overflow-hidden">
+                                {course.video_url ? (
+                                    <VideoPlayer source={promoVideoSource} autoPlay={true} />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                        <BookOpen className="h-12 w-12 text-white/60" />
-                                    </div>
-                                )}
-                                {course.thumbnail && (
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                    <>
+                                        {thumbnailUrl ? (
+                                            <img
+                                                src={thumbnailUrl}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                                <BookOpen className="h-12 w-12 text-white/60" />
+                                            </div>
+                                        )}
+                                        {thumbnailUrl && (
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                        )}
+                                    </>
                                 )}
                             </div>
 
