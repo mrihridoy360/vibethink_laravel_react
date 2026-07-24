@@ -119,6 +119,12 @@ export default function Navbar() {
         ...(isFeatureEnabled('feature_blog', '1') ? [{ name: 'ব্লগ', path: '/blog', icon: Newspaper }] : []),
     ];
 
+    const avatarUrl = user?.avatar
+        ? (user.avatar.startsWith('http') || user.avatar.startsWith('data:')
+            ? user.avatar
+            : `/storage/${user.avatar.replace(/^\/?storage\//, '')}`)
+        : null;
+
     return (
         <>
             <nav className="fixed top-0 left-0 w-full z-50 bg-white border-t-[0px] border-[#4E6178] border-b border-slate-100 shadow-sm transition-all duration-300 py-3 px-4 md:py-3.5 md:px-6">
@@ -198,8 +204,8 @@ export default function Navbar() {
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     className="flex items-center gap-2 p-1 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer"
                                 >
-                                    {user.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
                                     ) : (
                                         <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
                                             {user.name.charAt(0)}
@@ -212,15 +218,24 @@ export default function Navbar() {
                                 {/* Dropdown Menu Box */}
                                 {dropdownOpen && (
                                     <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl z-[100] py-2 animate-fadeIn text-slate-800">
-                                        <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
-                                            <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
-                                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                                            {user.role === 'admin' && (
-                                                <span className="inline-block mt-1.5 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
-                                                    অ্যাডমিন
-                                                </span>
+                                        <div className="px-4 py-2.5 border-b border-slate-100 mb-1 flex items-center gap-3">
+                                            {avatarUrl ? (
+                                                <img src={avatarUrl} alt={user.name} className="h-10 w-10 rounded-full object-cover border theme-primary-border-light shrink-0" />
+                                            ) : (
+                                                <div className="h-10 w-10 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-sm uppercase border theme-primary-border-light shrink-0">
+                                                    {user.name.charAt(0)}
+                                                </div>
                                             )}
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                                <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
+                                                <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                                {user.role === 'admin' && (
+                                                    <span className="inline-block mt-1 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
+                                                        অ্যাডমিন
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {user.role === 'admin' && (
@@ -308,8 +323,8 @@ export default function Navbar() {
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     className="flex items-center p-0.5 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer shrink-0"
                                 >
-                                    {user.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
                                     ) : (
                                         <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
                                             {user.name.charAt(0)}
@@ -320,15 +335,24 @@ export default function Navbar() {
                                 {/* Mobile Dropdown Menu Box */}
                                 {dropdownOpen && (
                                     <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl z-[100] py-2 animate-fadeIn text-slate-800">
-                                        <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
-                                            <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
-                                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                                            {user.role === 'admin' && (
-                                                <span className="inline-block mt-1.5 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
-                                                    অ্যাডমিন
-                                                </span>
+                                        <div className="px-4 py-2.5 border-b border-slate-100 mb-1 flex items-center gap-3">
+                                            {avatarUrl ? (
+                                                <img src={avatarUrl} alt={user.name} className="h-10 w-10 rounded-full object-cover border theme-primary-border-light shrink-0" />
+                                            ) : (
+                                                <div className="h-10 w-10 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-sm uppercase border theme-primary-border-light shrink-0">
+                                                    {user.name.charAt(0)}
+                                                </div>
                                             )}
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                                <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
+                                                <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                                {user.role === 'admin' && (
+                                                    <span className="inline-block mt-1 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
+                                                        অ্যাডমিন
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {user.role === 'admin' && (
@@ -446,9 +470,18 @@ export default function Navbar() {
                                 <div className="h-9 w-32 rounded-full bg-slate-100 animate-pulse" />
                             ) : user ? (
                                 <div className="flex flex-col gap-2">
-                                    <div className="px-4 py-2 bg-slate-50 rounded-xl mb-1">
-                                        <p className="text-xs font-bold text-slate-800">{user.name}</p>
-                                        <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                                    <div className="px-4 py-2.5 bg-slate-50 rounded-xl mb-1 flex items-center gap-3">
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt={user.name} className="h-9 w-9 rounded-full object-cover border border-slate-200 shrink-0" />
+                                        ) : (
+                                            <div className="h-9 w-9 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light shrink-0">
+                                                {user.name.charAt(0)}
+                                            </div>
+                                        )}
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-bold text-slate-800 truncate">{user.name}</p>
+                                            <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                                        </div>
                                     </div>
                                     {user.role === 'admin' && (
                                         <Link

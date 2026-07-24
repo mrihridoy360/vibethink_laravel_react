@@ -231,10 +231,9 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                 </div>
             </div>
 
-            {/* User footer */}
-            <div className={`p-3 border-t border-gray-100 ${collapsed ? 'flex flex-col items-center gap-2' : 'flex items-center justify-between gap-2'}`}>
-                {/* Desktop expand toggle (when collapsed) */}
-                {collapsed && (
+            {/* Sidebar Footer Toggle (when collapsed) */}
+            {collapsed && (
+                <div className="p-3 border-t border-gray-100 flex items-center justify-center shrink-0">
                     <button
                         onClick={() => setSidebarCollapsed(false)}
                         className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
@@ -242,34 +241,8 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                     >
                         <ChevronRight className="h-4 w-4" />
                     </button>
-                )}
-
-                {!collapsed && (
-                    <div className="flex items-center gap-2 min-w-0">
-                        <div className="h-8 w-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                            {user?.name?.charAt(0)?.toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-                        </div>
-                    </div>
-                )}
-
-                {collapsed && (
-                    <div className="h-8 w-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                        {user?.name?.charAt(0)?.toUpperCase()}
-                    </div>
-                )}
-
-                <button
-                    onClick={handleLogout}
-                    className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-50 shrink-0 cursor-pointer"
-                    title="Logout"
-                >
-                    <LogOut className="h-4 w-4" />
-                </button>
-            </div>
+                </div>
+            )}
         </>
     );
 
@@ -355,72 +328,94 @@ export default function AdminLayout({ children, activeTab, headerContent }) {
                             </Link>
                         </div>
 
-                        {/* User dropdown */}
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="flex items-center gap-1.5 md:gap-2 pl-3 md:pl-4 border-l border-gray-100 hover:opacity-90 active:scale-[0.98] transition-all focus:outline-none cursor-pointer text-left bg-transparent border-none"
-                            >
-                                <div className="hidden sm:block text-right">
-                                    <p className="text-xs md:text-sm font-bold text-gray-900 max-w-[100px] md:max-w-none truncate">{user?.name}</p>
-                                    <p className="text-[10px] md:text-xs text-gray-400 max-w-[100px] md:max-w-none truncate">{user?.email}</p>
-                                </div>
-                                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs md:text-sm shadow-md shadow-orange-500/20 shrink-0">
-                                    {user?.name?.slice(0, 2)?.toUpperCase()}
-                                </div>
-                                <ChevronDown className={`h-3 w-3 md:h-4 md:w-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                        {/* User profile dropdown (Public Navbar / Dashboard style) */}
+                        {(() => {
+                            const avatarUrl = user?.avatar
+                                ? (user.avatar.startsWith('http') || user.avatar.startsWith('data:')
+                                    ? user.avatar
+                                    : `/storage/${user.avatar.replace(/^\/?storage\//, '')}`)
+                                : null;
 
-                            {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-52 md:w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-gray-700">
-                                    <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
-                                        <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{user?.name}</p>
-                                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                                        <span className="inline-block mt-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[10px] font-bold">
-                                            অ্যাডমিন
-                                        </span>
-                                    </div>
-
-                                    <Link
-                                        to="/"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <Home className="h-4 w-4 text-gray-400" />
-                                        হোম পেজ
-                                    </Link>
-
-                                    <Link
-                                        to="/dashboard"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <LayoutDashboard className="h-4 w-4 text-gray-400" />
-                                        শিক্ষার্থী ড্যাশবোর্ড
-                                    </Link>
-
-                                    <Link
-                                        to="/dashboard/settings"
-                                        onClick={() => setDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <Settings className="h-4 w-4 text-gray-400" />
-                                        প্রোফাইল সেটিংস
-                                    </Link>
-
-                                    <div className="border-t border-gray-100 my-1.5" />
-
+                            return (
+                                <div className="relative" ref={dropdownRef}>
+                                    {/* Profile Dropdown Trigger */}
                                     <button
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                                        className="flex items-center gap-2 p-1 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer border-none"
                                     >
-                                        <LogOut className="h-4 w-4" />
-                                        লগআউট
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
+                                        ) : (
+                                            <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
+                                                {user?.name?.charAt(0) || 'A'}
+                                            </div>
+                                        )}
+                                        <span className="text-xs text-slate-700 font-bold pr-1 pl-0.5 hidden lg:inline">{user?.name}</span>
+                                        <ChevronDown className={`h-3.5 w-3.5 text-slate-450 mr-1 transition-transform duration-250 ${dropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
+
+                                    {/* Dropdown Menu Box */}
+                                    {dropdownOpen && (
+                                        <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-slate-800">
+                                            <div className="px-4 py-2.5 border-b border-slate-100 mb-1 flex items-center gap-3">
+                                                {avatarUrl ? (
+                                                    <img src={avatarUrl} alt={user.name} className="h-10 w-10 rounded-full object-cover border theme-primary-border-light shrink-0" />
+                                                ) : (
+                                                    <div className="h-10 w-10 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-sm uppercase border theme-primary-border-light shrink-0">
+                                                        {user?.name?.charAt(0) || 'A'}
+                                                    </div>
+                                                )}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                                    <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user?.name}</p>
+                                                    <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                                                    <span className="inline-block mt-1 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
+                                                        অ্যাডমিন
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <Link
+                                                to="/"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <Home className="h-4 w-4 text-slate-400" />
+                                                হোম পেজ
+                                            </Link>
+
+                                            <Link
+                                                to="/dashboard"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                                                শিক্ষার্থী ড্যাশবোর্ড
+                                            </Link>
+
+                                            <Link
+                                                to="/dashboard/settings"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <Settings className="h-4 w-4 text-slate-400" />
+                                                প্রোফাইল সেটিংস
+                                            </Link>
+
+                                            <div className="border-t border-slate-100 my-1.5" />
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                            >
+                                                <LogOut className="h-4 w-4" />
+                                                লগআউট
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            );
+                        })()}
                     </div>
                 </header>
 

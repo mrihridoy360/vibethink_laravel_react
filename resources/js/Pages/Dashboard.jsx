@@ -140,84 +140,124 @@ export default function Dashboard() {
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-gray-400" />
                         </div>
 
-                        {/* Icons */}
+                        {/* Notifications Bell */}
                         <div className="flex items-center gap-3 text-gray-400">
-                            <button className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors relative">
+                            <button className="p-1.5 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors relative cursor-pointer border-none bg-transparent">
                                 <Bell className="h-5 w-5" />
                                 <span className="absolute top-1 right-1 h-1.5 w-1.5 bg-red-500 rounded-full" />
                             </button>
                         </div>
 
-                        {/* User */}
-                        <div className="relative" ref={profileDropdownRef}>
-                            <button
-                                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                                className="flex items-center gap-2 pl-4 border-l border-gray-100 hover:opacity-90 active:scale-[0.98] transition-all focus:outline-none cursor-pointer text-left bg-transparent border-none"
-                            >
-                                <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-gray-900">{user.name}</p>
-                                    <p className="text-xs text-gray-400">{user.email}</p>
-                                </div>
-                                <div className="h-10 w-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm uppercase shadow-md shadow-orange-500/20">
-                                    {user.name.slice(0, 2)}
-                                </div>
-                                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                        {/* User Profile (Public Navbar style) */}
+                        {(() => {
+                            const avatarUrl = user?.avatar
+                                ? (user.avatar.startsWith('http') || user.avatar.startsWith('data:')
+                                    ? user.avatar
+                                    : `/storage/${user.avatar.replace(/^\/?storage\//, '')}`)
+                                : null;
 
-                            {profileDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-gray-700">
-                                    <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
-                                        <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{user.name}</p>
-                                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                                        {user.role === 'admin' && (
-                                            <span className="inline-block mt-1.5 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
-                                                অ্যাডমিন
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <Link
-                                        to="/"
-                                        onClick={() => setProfileDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <HomeIcon className="h-4 w-4 text-gray-400" />
-                                        হোম পেজ
-                                    </Link>
-
-                                    {user.role === 'admin' && (
-                                        <Link
-                                            to="/admin"
-                                            onClick={() => setProfileDropdownOpen(false)}
-                                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                        >
-                                            <Shield className="h-4 w-4 text-gray-400" />
-                                            এডমিন প্যানেল
-                                        </Link>
-                                    )}
-
-                                    <Link
-                                        to="/dashboard/settings"
-                                        onClick={() => setProfileDropdownOpen(false)}
-                                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <Settings className="h-4 w-4 text-gray-400" />
-                                        প্রোফাইল সেটিংস
-                                    </Link>
-
-                                    <div className="border-t border-gray-100 my-1.5" />
-
+                            return (
+                                <div className="relative" ref={profileDropdownRef}>
+                                    {/* Profile Dropdown Trigger */}
                                     <button
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                        onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                                        className="flex items-center gap-2 p-1 rounded-full bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200/50 focus:outline-none cursor-pointer border-none"
                                     >
-                                        <LogOut className="h-4 w-4" />
-                                        লগআউট
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt={user.name} className="h-8.5 w-8.5 rounded-full object-cover border theme-primary-border-light" />
+                                        ) : (
+                                            <div className="h-8.5 w-8.5 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-xs uppercase border theme-primary-border-light">
+                                                {user.name?.charAt(0) || 'U'}
+                                            </div>
+                                        )}
+                                        <span className="text-xs text-slate-700 font-bold pr-1 pl-0.5 hidden lg:inline">{user.name}</span>
+                                        <ChevronDown className={`h-3.5 w-3.5 text-slate-450 mr-1 transition-transform duration-250 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
+
+                                    {/* Dropdown Menu Box */}
+                                    {profileDropdownOpen && (
+                                        <div className="absolute right-0 mt-2.5 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl z-50 py-2 animate-fadeIn text-slate-800">
+                                            <div className="px-4 py-2.5 border-b border-slate-100 mb-1 flex items-center gap-3">
+                                                {avatarUrl ? (
+                                                    <img src={avatarUrl} alt={user.name} className="h-10 w-10 rounded-full object-cover border theme-primary-border-light shrink-0" />
+                                                ) : (
+                                                    <div className="h-10 w-10 rounded-full theme-primary-bg-light theme-primary-text flex items-center justify-center font-bold text-sm uppercase border theme-primary-border-light shrink-0">
+                                                        {user.name?.charAt(0) || 'U'}
+                                                    </div>
+                                                )}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Signed In As</p>
+                                                    <p className="text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</p>
+                                                    <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                                    {user.role === 'admin' && (
+                                                        <span className="inline-block mt-1 px-2 py-0.5 bg-red-50 text-red-650 border border-red-100 rounded-md text-[10px] font-bold">
+                                                            অ্যাডমিন
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <Link
+                                                to="/"
+                                                onClick={() => setProfileDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <HomeIcon className="h-4 w-4 text-slate-400" />
+                                                হোম পেজ
+                                            </Link>
+
+                                            {user.role === 'admin' && (
+                                                <Link
+                                                    to="/admin"
+                                                    onClick={() => setProfileDropdownOpen(false)}
+                                                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                                >
+                                                    <Shield className="h-4 w-4 text-slate-400" />
+                                                    এডমিন প্যানেল
+                                                </Link>
+                                            )}
+
+                                            <Link
+                                                to="/dashboard"
+                                                onClick={() => setProfileDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                                                ড্যাশবোর্ড
+                                            </Link>
+
+                                            <Link
+                                                to="/dashboard/enrolled"
+                                                onClick={() => setProfileDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <BookOpenCheck className="h-4 w-4 text-slate-400" />
+                                                ইনরোলড কোর্সসমূহ
+                                            </Link>
+
+                                            <Link
+                                                to="/dashboard/settings"
+                                                onClick={() => setProfileDropdownOpen(false)}
+                                                className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 theme-primary-text-hover transition-colors"
+                                            >
+                                                <Settings className="h-4 w-4 text-slate-400" />
+                                                প্রোফাইল সেটিংস
+                                            </Link>
+
+                                            <div className="border-t border-slate-100 my-1.5" />
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors text-left cursor-pointer border-none bg-transparent"
+                                            >
+                                                <LogOut className="h-4 w-4" />
+                                                লগআউট
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            );
+                        })()}
                     </div>
                 </header>
 

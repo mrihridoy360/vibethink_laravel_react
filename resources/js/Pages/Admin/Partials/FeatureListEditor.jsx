@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, CheckCircle, Target, BookOpen, Clock, Award, Shield, AlertCircle, HelpCircle, User, Users, CreditCard, Play, Star, MessageSquare } from 'lucide-react';
+import { Plus, Trash2, CheckCircle, Target, BookOpen, Clock, Award, Shield, AlertCircle, HelpCircle, User, Users, CreditCard, Play, Star, MessageSquare, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 
 const ICON_MAP = {
     CheckCircle,
@@ -21,6 +21,10 @@ const ICON_MAP = {
 export default function FeatureListEditor({ items, onChange, label, placeholder, subPlaceholder = 'অতিরিক্ত বিবরণ (ঐচ্ছিক)', titleValue, onTitleChange }) {
     const list = Array.isArray(items) ? items : [];
     const [titleLocal, setTitleLocal] = useState(titleValue || '');
+
+    // Drag and Drop state
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
 
     useEffect(() => {
         setTitleLocal(titleValue || '');
@@ -46,6 +50,51 @@ export default function FeatureListEditor({ items, onChange, label, placeholder,
         onChange(updated);
     };
 
+    const handleMove = (index, direction) => {
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= list.length) return;
+        const updated = [...list];
+        const [movedItem] = updated.splice(index, 1);
+        updated.splice(targetIndex, 0, movedItem);
+        onChange(updated);
+    };
+
+    // Drag and drop handlers
+    const handleDragStart = (e, index) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', index.toString());
+        setDraggedIndex(index);
+    };
+
+    const handleDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedIndex === null || draggedIndex === index) return;
+        setDragOverIndex(index);
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = (e, targetIndex) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        const updated = [...list];
+        const [draggedItem] = updated.splice(draggedIndex, 1);
+        updated.splice(targetIndex, 0, draggedItem);
+
+        onChange(updated);
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
     return (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-50">
@@ -69,8 +118,31 @@ export default function FeatureListEditor({ items, onChange, label, placeholder,
             <div className="space-y-3">
                 {list.map((item, index) => {
                     const IconComponent = ICON_MAP[item.icon] || CheckCircle;
+                    const isDragged = draggedIndex === index;
+                    const isOver = dragOverIndex === index;
+
                     return (
-                        <div key={index} className="flex gap-3 items-start p-4 bg-gray-50 rounded-xl border border-gray-100 group relative">
+                        <div
+                            key={index}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragLeave={handleDragLeave}
+                            onDragEnd={handleDragEnd}
+                            onDrop={(e) => handleDrop(e, index)}
+                            className={`flex gap-3 items-start p-4 rounded-xl border transition-all group relative ${
+                                isDragged
+                                    ? 'opacity-40 border-dashed border-blue-400 bg-blue-50/30 scale-[0.99]'
+                                    : isOver
+                                    ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50'
+                                    : 'bg-gray-50 border-gray-100 hover:border-gray-200'
+                            }`}
+                        >
+                            {/* Drag Handle */}
+                            <div className="flex items-center justify-center pt-2 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors shrink-0" title="ড্রাগ করে পজিশন চেঞ্জ করুন">
+                                <GripVertical className="h-5 w-5" />
+                            </div>
+
                             {/* Icon select */}
                             <div className="flex flex-col gap-1 shrink-0">
                                 <div className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 shadow-sm mb-1.5">
@@ -105,14 +177,35 @@ export default function FeatureListEditor({ items, onChange, label, placeholder,
                                 />
                             </div>
 
-                            {/* Delete button */}
-                            <button
-                                type="button"
-                                onClick={() => handleRemove(index)}
-                                className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-55 transition-colors"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
+                            {/* Actions: Reorder arrows & Delete */}
+                            <div className="flex flex-col sm:flex-row items-center gap-1 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={() => handleMove(index, 'up')}
+                                    disabled={index === 0}
+                                    className="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-200/60 disabled:opacity-20 cursor-pointer transition-colors"
+                                    title="উপরে নিন"
+                                >
+                                    <ChevronUp className="h-4 w-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleMove(index, 'down')}
+                                    disabled={index === list.length - 1}
+                                    className="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-200/60 disabled:opacity-20 cursor-pointer transition-colors"
+                                    title="নিচে নিন"
+                                >
+                                    <ChevronDown className="h-4 w-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemove(index)}
+                                    className="text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                                    title="আইটেম মুছুন"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
                     );
                 })}
@@ -135,3 +228,4 @@ export default function FeatureListEditor({ items, onChange, label, placeholder,
         </div>
     );
 }
+

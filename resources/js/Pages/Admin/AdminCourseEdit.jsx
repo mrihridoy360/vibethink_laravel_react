@@ -7,7 +7,7 @@ import {
     Upload, Image as ImageIcon, Loader2, CheckCircle, AlertCircle,
     DollarSign, Eye, EyeOff, Tag, Languages, Shield, LogOut, Home,
     Bell, Trash2, X, ListVideo, Plus, ChevronUp, ChevronDown, Clock, Users, MessageSquare, Pencil,
-    Cpu, Download, Search, Check
+    Cpu, Download, Search, Check, GripVertical
 } from 'lucide-react';
 import CurriculumBuilder from './Partials/CurriculumBuilder';
 import AdminLayout from '../../Components/AdminLayout';
@@ -393,9 +393,59 @@ function TestimonialsTab({ form, setForm }) {
     const [image, setImage] = useState('');
     const [imagePreview, setImagePreview] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
     const fileInputRef = useRef();
 
     const testimonials = form.section_titles?.testimonials || [];
+
+    const handleTestimonialDragStart = (e, index) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', index.toString());
+        setDraggedIndex(index);
+    };
+
+    const handleTestimonialDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedIndex === null || draggedIndex === index) return;
+        setDragOverIndex(index);
+    };
+
+    const handleTestimonialDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleTestimonialDragEnd = () => {
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleTestimonialDrop = (e, targetIndex) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        const updatedList = [...testimonials];
+        const [movedItem] = updatedList.splice(draggedIndex, 1);
+        updatedList.splice(targetIndex, 0, movedItem);
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                testimonials: updatedList
+            }
+        }));
+
+        if (editingIndex === draggedIndex) {
+            setEditingIndex(targetIndex);
+        } else if (editingIndex === targetIndex) {
+            setEditingIndex(draggedIndex);
+        }
+
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -682,56 +732,78 @@ function TestimonialsTab({ form, setForm }) {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {testimonials.map((item, index) => (
-                            <div key={index} className="flex items-center gap-4 p-4 border border-gray-100 rounded-2xl hover:bg-gray-50/50 transition-all">
-                                <img src={item.image} alt={item.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm" />
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-bold text-gray-900 truncate">{item.name}</h4>
-                                    <p className="text-xs text-gray-550 truncate flex items-center gap-1.5 mt-0.5">
-                                        <span>{item.designation}</span>
-                                        <span className="text-gray-300">•</span>
-                                        <span className="flex items-center text-amber-500 font-bold">{item.rating || 5}★</span>
-                                        <span className="text-gray-300">•</span>
-                                        <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                                            {item.source === 'facebook' ? 'Facebook' : 'Website'}
-                                        </span>
-                                    </p>
+                        {testimonials.map((item, index) => {
+                            const isDragged = draggedIndex === index;
+                            const isOver = dragOverIndex === index;
+                            return (
+                                <div
+                                    key={index}
+                                    draggable
+                                    onDragStart={(e) => handleTestimonialDragStart(e, index)}
+                                    onDragOver={(e) => handleTestimonialDragOver(e, index)}
+                                    onDragLeave={handleTestimonialDragLeave}
+                                    onDragEnd={handleTestimonialDragEnd}
+                                    onDrop={(e) => handleTestimonialDrop(e, index)}
+                                    className={`flex items-center gap-4 p-4 border rounded-2xl transition-all ${
+                                        isDragged
+                                            ? 'opacity-40 border-dashed border-blue-400 bg-blue-50/30 scale-[0.99]'
+                                            : isOver
+                                            ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50'
+                                            : 'border-gray-100 hover:bg-gray-50/50'
+                                    }`}
+                                >
+                                    <div className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors shrink-0" title="ড্রাগ করে পজিশন চেঞ্জ করুন">
+                                        <GripVertical className="h-5 w-5" />
+                                    </div>
+                                    <img src={item.image} alt={item.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-bold text-gray-900 truncate">{item.name}</h4>
+                                        <p className="text-xs text-gray-550 truncate flex items-center gap-1.5 mt-0.5">
+                                            <span>{item.designation}</span>
+                                            <span className="text-gray-300">•</span>
+                                            <span className="flex items-center text-amber-500 font-bold">{item.rating || 5}★</span>
+                                            <span className="text-gray-300">•</span>
+                                            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                                                {item.source === 'facebook' ? 'Facebook' : 'Website'}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            disabled={index === 0}
+                                            onClick={() => moveTestimonial(index, 'up')}
+                                            className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
+                                        >
+                                            <ChevronUp className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={index === testimonials.length - 1}
+                                            onClick={() => moveTestimonial(index, 'down')}
+                                            className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => startEdit(index)}
+                                            className={`p-1.5 rounded-lg transition-all cursor-pointer ${editingIndex === index ? 'bg-blue-50 text-blue-600' : 'hover:bg-blue-50 text-gray-500 hover:text-blue-600'}`}
+                                            title="এডিট করুন"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTestimonial(index)}
+                                            className="p-1.5 hover:bg-red-50 text-red-500 hover:text-red-700 rounded-lg transition-all cursor-pointer"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                    <button
-                                        type="button"
-                                        disabled={index === 0}
-                                        onClick={() => moveTestimonial(index, 'up')}
-                                        className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
-                                    >
-                                        <ChevronUp className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        disabled={index === testimonials.length - 1}
-                                        onClick={() => moveTestimonial(index, 'down')}
-                                        className="p-1.5 hover:bg-gray-100 text-gray-500 hover:text-gray-800 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
-                                    >
-                                        <ChevronDown className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => startEdit(index)}
-                                        className={`p-1.5 rounded-lg transition-all cursor-pointer ${editingIndex === index ? 'bg-blue-50 text-blue-600' : 'hover:bg-blue-50 text-gray-500 hover:text-blue-600'}`}
-                                        title="এডিট করুন"
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeTestimonial(index)}
-                                        className="p-1.5 hover:bg-red-50 text-red-500 hover:text-red-700 rounded-lg transition-all cursor-pointer"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -1032,6 +1104,8 @@ function FaqEditor({ items, onChange, titleValue, onTitleChange }) {
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [titleLocal, setTitleLocal] = useState(titleValue || '');
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
 
     useEffect(() => {
         setTitleLocal(titleValue || '');
@@ -1054,6 +1128,41 @@ function FaqEditor({ items, onChange, titleValue, onTitleChange }) {
         const updated = [...items];
         [updated[idx], updated[target]] = [updated[target], updated[idx]];
         onChange(updated);
+    };
+
+    const handleFaqDragStart = (e, idx) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', idx.toString());
+        setDraggedIndex(idx);
+    };
+
+    const handleFaqDragOver = (e, idx) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedIndex === null || draggedIndex === idx) return;
+        setDragOverIndex(idx);
+    };
+
+    const handleFaqDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleFaqDragEnd = () => {
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleFaqDrop = (e, targetIndex) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        const updated = [...items];
+        const [moved] = updated.splice(draggedIndex, 1);
+        updated.splice(targetIndex, 0, moved);
+        onChange(updated);
+
+        setDraggedIndex(null);
+        setDragOverIndex(null);
     };
 
     return (
@@ -1108,44 +1217,66 @@ function FaqEditor({ items, onChange, titleValue, onTitleChange }) {
                 <p className="text-sm text-gray-400 italic">এখনো কোনো FAQ যোগ করা হয়নি।</p>
             ) : (
                 <div className="space-y-3">
-                    {items.map((faq, idx) => (
-                        <div key={idx} className="border border-gray-100 rounded-xl p-4">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-gray-800">প্রশ্ন: {faq.question}</p>
-                                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{faq.answer}</p>
-                                </div>
-                                <div className="flex items-center gap-1 shrink-0">
-                                    <button
-                                        type="button"
-                                        onClick={() => moveFaq(idx, -1)}
-                                        disabled={idx === 0}
-                                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
-                                        title="উপরে"
-                                    >
-                                        <ChevronUp className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => moveFaq(idx, 1)}
-                                        disabled={idx === items.length - 1}
-                                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
-                                        title="নিচে"
-                                    >
-                                        <ChevronDown className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFaq(idx)}
-                                        className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
-                                        title="মুছুন"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
+                    {items.map((faq, idx) => {
+                        const isDragged = draggedIndex === idx;
+                        const isOver = dragOverIndex === idx;
+                        return (
+                            <div
+                                key={idx}
+                                draggable
+                                onDragStart={(e) => handleFaqDragStart(e, idx)}
+                                onDragOver={(e) => handleFaqDragOver(e, idx)}
+                                onDragLeave={handleFaqDragLeave}
+                                onDragEnd={handleFaqDragEnd}
+                                onDrop={(e) => handleFaqDrop(e, idx)}
+                                className={`border rounded-xl p-4 transition-all ${
+                                    isDragged
+                                        ? 'opacity-40 border-dashed border-blue-400 bg-blue-50/30 scale-[0.99]'
+                                        : isOver
+                                        ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50'
+                                        : 'border-gray-100 hover:border-gray-200'
+                                }`}
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center pt-0.5 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors shrink-0" title="ড্রাগ করে পজিশন চেঞ্জ করুন">
+                                        <GripVertical className="h-5 w-5" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-gray-800">প্রশ্ন: {faq.question}</p>
+                                        <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{faq.answer}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={() => moveFaq(idx, -1)}
+                                            disabled={idx === 0}
+                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                            title="উপরে"
+                                        >
+                                            <ChevronUp className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => moveFaq(idx, 1)}
+                                            disabled={idx === items.length - 1}
+                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                            title="নিচে"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFaq(idx)}
+                                            className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                                            title="মুছুন"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
@@ -1162,9 +1293,53 @@ function ToolsTab({ form, setForm }) {
     const [platformTools, setPlatformTools] = useState([]);
     const [loadingTools, setLoadingTools] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
     const fileInputRef = useRef();
 
     const tools = form.section_titles?.tools || [];
+
+    const handleToolDragStart = (e, index) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', index.toString());
+        setDraggedIndex(index);
+    };
+
+    const handleToolDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedIndex === null || draggedIndex === index) return;
+        setDragOverIndex(index);
+    };
+
+    const handleToolDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleToolDragEnd = () => {
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleToolDrop = (e, targetIndex) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        const updatedList = [...tools];
+        const [movedItem] = updatedList.splice(draggedIndex, 1);
+        updatedList.splice(targetIndex, 0, movedItem);
+
+        setForm(prev => ({
+            ...prev,
+            section_titles: {
+                ...(prev.section_titles || {}),
+                tools: updatedList
+            }
+        }));
+
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
 
     const handleLogoChange = (e) => {
         const file = e.target.files[0];
@@ -1506,56 +1681,78 @@ function ToolsTab({ form, setForm }) {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {tools.map((tool, index) => (
-                                <div key={index} className="flex items-center gap-3.5 p-3.5 border border-gray-100 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-all">
-                                    <div className="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-sm p-0 overflow-hidden flex items-center justify-center shrink-0">
-                                        {tool.logo ? (
-                                            <img src={tool.logo} alt={tool.name} className="w-full h-full object-cover rounded-xl" />
-                                        ) : (
-                                            <Cpu className="w-6 h-6 text-gray-400" />
-                                        )}
+                            {tools.map((tool, index) => {
+                                const isDragged = draggedIndex === index;
+                                const isOver = dragOverIndex === index;
+                                return (
+                                    <div
+                                        key={index}
+                                        draggable
+                                        onDragStart={(e) => handleToolDragStart(e, index)}
+                                        onDragOver={(e) => handleToolDragOver(e, index)}
+                                        onDragLeave={handleToolDragLeave}
+                                        onDragEnd={handleToolDragEnd}
+                                        onDrop={(e) => handleToolDrop(e, index)}
+                                        className={`flex items-center gap-3 p-3.5 border rounded-2xl transition-all ${
+                                            isDragged
+                                                ? 'opacity-40 border-dashed border-blue-400 bg-blue-50/30 scale-[0.99]'
+                                                : isOver
+                                                ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50'
+                                                : 'border-gray-100 bg-gray-50/50 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <div className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors shrink-0" title="ড্রাগ করে পজিশন চেঞ্জ করুন">
+                                            <GripVertical className="h-5 w-5" />
+                                        </div>
+                                        <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 shadow-sm p-0 overflow-hidden flex items-center justify-center shrink-0">
+                                            {tool.logo ? (
+                                                <img src={tool.logo} alt={tool.name} className="w-full h-full object-cover rounded-xl" />
+                                            ) : (
+                                                <Cpu className="w-5 h-5 text-gray-400" />
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-bold text-gray-900 truncate">{tool.name}</h4>
+                                        </div>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                            <button
+                                                type="button"
+                                                onClick={() => moveTool(index, 'up')}
+                                                disabled={index === 0}
+                                                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
+                                                title="উপরে"
+                                            >
+                                                <ChevronUp className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => moveTool(index, 'down')}
+                                                disabled={index === tools.length - 1}
+                                                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
+                                                title="নিচে"
+                                            >
+                                                <ChevronDown className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => startEdit(index)}
+                                                className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 cursor-pointer"
+                                                title="এডিট"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeTool(index)}
+                                                className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer"
+                                                title="মুছুন"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-bold text-gray-900 truncate">{tool.name}</h4>
-                                    </div>
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <button
-                                            type="button"
-                                            onClick={() => moveTool(index, 'up')}
-                                            disabled={index === 0}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
-                                            title="উপরে"
-                                        >
-                                            <ChevronUp className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => moveTool(index, 'down')}
-                                            disabled={index === tools.length - 1}
-                                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 cursor-pointer"
-                                            title="নিচে"
-                                        >
-                                            <ChevronDown className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => startEdit(index)}
-                                            className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 cursor-pointer"
-                                            title="এডিট"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeTool(index)}
-                                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer"
-                                            title="মুছুন"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
